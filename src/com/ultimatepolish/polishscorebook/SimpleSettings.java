@@ -227,7 +227,7 @@ public class SimpleSettings extends MenuContainerActivity {
             // Create DbxFileSystem for synchronized file access.
             DbxFileSystem dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
             
-            String fileName = new SimpleDateFormat("yyyy-MM-dd_hh-mm'.db'", Locale.US).format(new Date());
+            String fileName = new SimpleDateFormat("yyyy-MM-dd_HH-mm'.db'", Locale.US).format(new Date());
 
             DbxPath phDBpath = new DbxPath(DbxPath.ROOT, fileName);
             if (!dbxFs.exists(phDBpath)) {
