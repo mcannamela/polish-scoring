@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.ultimatepolish.polishscorebook"
+	android:versionCode="1"
+	android:versionName="1.0" >
+
+	<uses-sdk
+		android:minSdkVersion="14"
+		android:targetSdkVersion="17" />
+
+	<!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
+
+
+	<!-- required for dropbox -->
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+	<application
+		android:allowBackup="true"
+		android:icon="@drawable/ic_launcher"
+		android:label="@string/app_name"
+		android:theme="@style/AppTheme" >
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.PolishScorebook"
+			android:label="@string/title_activity_polish_scorebook" >
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity android:name="com.dropbox.sync.android.DbxAuthActivity" />
+		<activity
+			android:name="com.dropbox.client2.android.AuthActivity"
+			android:launchMode="singleTask" >
+			<intent-filter>
+				<data android:scheme="db-v08dmrsen6b8pr5" />
+
+				<action android:name="android.intent.action.VIEW" />
+
+				<category android:name="android.intent.category.BROWSABLE" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+
+		<service
+			android:name="com.dropbox.sync.android.DbxSyncService"
+			android:enabled="true"
+			android:exported="false"
+			android:label="Dropbox Sync" />
+
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.GameInProgress"
+			android:label="@string/title_activity_game_in_progress"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Games" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.MenuContainerActivity"
+			android:label="@string/title_activity_menu_container"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.NewGame"
+			android:label="@string/title_activity_new_game"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Games" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.NewPlayer"
+			android:label="@string/title_activity_new_player"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Players" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.NewTeam"
+			android:label="@string/title_activity_new_team"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Teams" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.NewSession"
+			android:label="@string/title_activity_new_session"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Sessions" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.NewVenue"
+			android:label="@string/title_activity_new_venue"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Venues" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.View_Games"
+			android:label="@string/title_activity_games"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.View_Players"
+			android:label="@string/title_activity_players"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.View_Teams"
+			android:label="@string/title_activity_teams"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.View_Sessions"
+			android:label="@string/title_activity_sessions"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.View_Venues"
+			android:label="@string/title_activity_venues"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.SimpleSettings"
+			android:label="@string/title_activity_simple_settings"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.Detail_Game"
+			android:label="@string/title_activity_detail_game"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Games" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.Detail_Player"
+			android:label="@string/title_activity_detail_player"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Players" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.Detail_Team"
+			android:label="@string/title_activity_detail_team"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Teams" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.Detail_Session"
+			android:label="@string/title_activity_detail_session"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Sessions" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.Detail_Venue"
+			android:label="@string/title_activity_detail_venue"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Venues" >
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.AboutPage"
+			android:label="@string/title_activity_about_page"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.ultimatepolish.polishscorebook.PolishScorebook" />
+		</activity>
+		<activity
+			android:name="com.ultimatepolish.polishscorebook.Settings"
+			android:label="@string/title_activity_settings"
+			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.ultimatepolish.polishscorebook.PolishScorebook" />
+		</activity>
+	</application>
+
+</manifest>
