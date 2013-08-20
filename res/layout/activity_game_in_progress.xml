@@ -342,5 +342,38 @@
         android:layout_marginRight="30dp"
         android:text="0"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/gip_button_fired_on"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/gip_toggle_button_on_fire"
+        android:layout_alignBottom="@+id/gip_toggle_button_on_fire"
+        android:layout_alignLeft="@+id/gip_playerError"
+        android:onClick="buttonPressed"
+        android:text="FiredOn" />
+
+    <ToggleButton
+        android:id="@+id/gip_toggle_button_on_fire"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/numPicker_catch"
+        android:layout_below="@+id/gip_ownGoal"
+        android:layout_marginTop="27dp"
+        android:onClick="onFirePressed"
+        android:text="OnFire"
+        android:textOff="OnFire"
+        android:textOn="OnFire" />
+
+    <ToggleButton
+        android:id="@+id/gip_toggle_button_is_tipped"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/viewPager_throwsTables"
+        android:layout_alignLeft="@+id/gip_toggle_button_on_fire"
+        android:text="isTipped"
+        android:textOff="isTipped"
+        android:onClick="isTippedPressed"
+        android:textOn="isTipped" />
 	
 </RelativeLayout>
