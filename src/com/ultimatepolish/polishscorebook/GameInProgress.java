@@ -160,46 +160,68 @@ public class GameInProgress extends MenuContainerActivity
 		log("buttonPressed(): " + view.getContentDescription() + " was pressed");
 		int buttonId = view.getId();
 		
+		boolean isNA = getThrowResult()==ThrowResult.NA;
 			switch (buttonId) {
 				case R.id.gip_button_high:
 					uiThrow.setThrowType(ThrowType.BALL_HIGH);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_low:
 					uiThrow.setThrowType(ThrowType.BALL_LOW);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_left:
 					uiThrow.setThrowType(ThrowType.BALL_LEFT);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_right:
 					uiThrow.setThrowType(ThrowType.BALL_RIGHT);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_trap:
 					uiThrow.setThrowType(ThrowType.TRAP);
-					uiThrow.setThrowResult(ThrowResult.NA);
-					applyThrowResultToNumPicker(uiThrow.getThrowResult());
+					setThrowResult(ThrowResult.NA);
 					((ImageView) view).getDrawable().setLevel(2);
 					break;
 				case R.id.gip_button_short:
 					uiThrow.setThrowType(ThrowType.SHORT);
-					uiThrow.setThrowResult(ThrowResult.NA);
-					applyThrowResultToNumPicker(uiThrow.getThrowResult());
+					setThrowResult(ThrowResult.NA);
 					break;
 				case R.id.gip_button_strike:
 					uiThrow.setThrowType(ThrowType.STRIKE);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_bottle:
 					uiThrow.setThrowType(ThrowType.BOTTLE);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_pole:
 					uiThrow.setThrowType(ThrowType.POLE);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_cup:
 					uiThrow.setThrowType(ThrowType.CUP);
+					if(isNA){
+						setThrowResult(ThrowResult.CATCH);
+					}
 					break;
 				case R.id.gip_button_fired_on:
 					uiThrow.setThrowType(ThrowType.FIRED_ON);
-					uiThrow.setThrowResult(ThrowResult.NA);
-					applyThrowResultToNumPicker(uiThrow.getThrowResult());
+					setThrowResult(ThrowResult.NA);
 					break;
 			}
 			
@@ -213,8 +235,7 @@ public class GameInProgress extends MenuContainerActivity
 	public void onFirePressed(View view){
 		uiThrow.isOnFire = isOnFire();
 		if (uiThrow.isOnFire){
-			uiThrow.setThrowResult(ThrowResult.NA);
-			applyThrowResultToNumPicker(ThrowResult.NA);
+			setThrowResult(ThrowResult.NA);
 		}
 		
 		renderPage(getPageIdx(ag.getActiveIdx()));
@@ -865,7 +886,8 @@ public class GameInProgress extends MenuContainerActivity
 		return uiThrow.getThrowResult();
 	}
 	protected void setThrowResult(int throwResult){
-		uiThrow.setThrowResult(throwResult);
+		setThrowResult(throwResult);
+		applyThrowResultToNumPicker(throwResult);
 	}
 	
 	
