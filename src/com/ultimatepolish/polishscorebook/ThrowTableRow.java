@@ -20,7 +20,7 @@ public class ThrowTableRow extends TableRow {
 	public static int tableTextSize = 20;
 	public static int tableTextColor = Color.BLACK;
 	public static int tableBackgroundColor = Color.WHITE;
-	public static int columnWidth = 30;
+	public static int columnWidth = 25;
 	
 	public ThrowTableRow(Context context) {
 		super(context);

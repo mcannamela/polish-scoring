@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
@@ -71,7 +72,7 @@ public class GameInProgress extends MenuContainerActivity
 //	int currentThrowResult = ThrowResult.CATCH;
 	int currentDeadType = DeadType.ALIVE;
 //	int[] currentFireCounts = {0, 0};
-	boolean currentIsTipped;
+//	boolean currentIsTipped;
 	
 	// ownGoals: 0) linefault, 1) drink drop, 2) knocked pole, 3) knocked bottle, 4) bottle break
 	boolean[] currentOwnGoals = {false, false, false, false, false};
@@ -134,7 +135,7 @@ public class GameInProgress extends MenuContainerActivity
 			}
 			
 			updateActiveThrow();
-			buttonPressed(view);
+			throwTypeButtonPressed(view);
 			return true;
         }
 	};
@@ -155,7 +156,7 @@ public class GameInProgress extends MenuContainerActivity
 		gotoThrowIdx(global_throw_idx);
 	}
 	
-	public void buttonPressed(View view){
+	public void throwTypeButtonPressed(View view){
 		log("buttonPressed(): " + view.getContentDescription() + " was pressed");
 		int buttonId = view.getId();
 		
@@ -203,6 +204,20 @@ public class GameInProgress extends MenuContainerActivity
 			}
 			
 			confirmThrow();
+	}
+	
+	public void isTippedPressed(View view){
+		uiThrow.isTipped = isTipped();
+		renderPage(getPageIdx(ag.getActiveIdx()));
+	}
+	public void onFirePressed(View view){
+		uiThrow.isOnFire = isOnFire();
+		if (uiThrow.isOnFire){
+			uiThrow.setThrowResult(ThrowResult.NA);
+			applyThrowResultToNumPicker(ThrowResult.NA);
+		}
+		
+		renderPage(getPageIdx(ag.getActiveIdx()));
 	}
 	
 	public void errorButtonPressed(View view){
@@ -663,15 +678,11 @@ public class GameInProgress extends MenuContainerActivity
 	//APPLY THROW STATE TO UI STATE ===============================
 	private void setUIState(){
 //		uiThrow = ag.getActiveThrow();
-		setUIState(uiThrow);
+		setUIThrowResult();
+		setUISpecialMarks();
 	}
-	private void setUIState(Throw t){
-		setUIThrowResult(t);
-//		setUIThrowType(t);
-		setUISpecialMarks(t);
-	}
-	private void setUIThrowResult(Throw t) {
-		applyThrowResultToNumPicker(t.getThrowResult());
+	private void setUIThrowResult() {
+		applyThrowResultToNumPicker(uiThrow.getThrowResult());
 //		currentThrowResult = t.getThrowResult();
 	}
 //	private void setUIThrowType(Throw t){
@@ -694,27 +705,27 @@ public class GameInProgress extends MenuContainerActivity
 //		
 //		setBrokenButtonState(t.getThrowType());
 //	}
-	private void setUISpecialMarks(Throw t){
-		setTipped(t.isTipped);
-		setOnFire(t.isOnFire);
-//		currentFireCounts = t.getFireCounts();
-		setDeadViews(t.getDeadType());
+	private void setUISpecialMarks(){
+		setTipped(uiThrow.isTipped);
+		setOnFire(uiThrow.isOnFire);
+//		currentFireCounts = uiThrow.getFireCounts();
+		setDeadViews(uiThrow.getDeadType());
 		
 		// ownGoals: 0) linefault, 1) drink drop, 2) knocked pole, 3) knocked bottle, 4) bottle break
-		currentOwnGoals[0] = t.isLineFault;
-		currentOwnGoals[1] = t.isOffensiveDrinkDropped;
-		currentOwnGoals[2] = t.isOffensivePoleKnocked;
-		currentOwnGoals[3] = t.isOffensiveBottleKnocked;
-		currentOwnGoals[4] = t.isOffensiveBreakError;
+		currentOwnGoals[0] = uiThrow.isLineFault;
+		currentOwnGoals[1] = uiThrow.isOffensiveDrinkDropped;
+		currentOwnGoals[2] = uiThrow.isOffensivePoleKnocked;
+		currentOwnGoals[3] = uiThrow.isOffensiveBottleKnocked;
+		currentOwnGoals[4] = uiThrow.isOffensiveBreakError;
 		
 		// defErrors: 0) goaltend, 1) drink hit, 2) drink drop, 3) knocked pole, 4) knocked bottle, 5) bottle break
-		currentDefErrors[0] = t.isGoaltend;
-		currentDefErrors[1] = t.isGrabbed;
-		currentDefErrors[2] = t.isDrinkHit;
-		currentDefErrors[3] = t.isDefensiveDrinkDropped;
-		currentDefErrors[4] = t.isDefensivePoleKnocked;
-		currentDefErrors[5] = t.isDefensiveBottleKnocked;
-		currentDefErrors[6] = t.isDefensiveBreakError;
+		currentDefErrors[0] = uiThrow.isGoaltend;
+		currentDefErrors[1] = uiThrow.isGrabbed;
+		currentDefErrors[2] = uiThrow.isDrinkHit;
+		currentDefErrors[3] = uiThrow.isDefensiveDrinkDropped;
+		currentDefErrors[4] = uiThrow.isDefensivePoleKnocked;
+		currentDefErrors[5] = uiThrow.isDefensiveBottleKnocked;
+		currentDefErrors[6] = uiThrow.isDefensiveBreakError;
 		
 		setErrorButtonState();
 	}
