@@ -35,7 +35,6 @@ import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.ActiveGame;
 import com.ultimatepolish.scorebookdb.DeadType;
 import com.ultimatepolish.scorebookdb.Game;
-import com.ultimatepolish.scorebookdb.Player;
 import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.ThrowResult;
 import com.ultimatepolish.scorebookdb.ThrowType;
@@ -54,11 +53,9 @@ public class GameInProgress extends MenuContainerActivity implements
 	Game g;
 	ActiveGame ag;
 	Throw uiThrow;
-	Player[] p = new Player[2];
 
 	Dao<Game, Long> gDao;
 	Dao<Throw, Long> tDao;
-	Dao<Player, Long> pDao;
 
 	int currentThrowType = ThrowType.NOT_THROWN;
 	int currentThrowResult = ThrowResult.NA;
@@ -481,16 +478,11 @@ public class GameInProgress extends MenuContainerActivity implements
 			try {
 				gDao = Game.getDao(context);
 				tDao = Throw.getDao(context);
-				pDao = Player.getDao(context);
 
 				g = gDao.queryForId(gId);
-				pDao.refresh(g.getFirstPlayer());
-				pDao.refresh(g.getSecondPlayer());
 
 				ag = new ActiveGame(g, context);
 				uiThrow = ag.getActiveThrow();
-				p[0] = g.getFirstPlayer();
-				p[1] = g.getSecondPlayer();
 
 			} catch (SQLException e) {
 				Toast.makeText(getApplicationContext(), e.getMessage(),
@@ -506,8 +498,8 @@ public class GameInProgress extends MenuContainerActivity implements
 
 		// player names
 		tv = (TextView) findViewById(R.id.textView_players);
-		tv.setText(p[0].getDisplayName() + " "
-				+ getString(R.string.gip_vs_text) + " " + p[1].getDisplayName());
+		tv.setText(ag.getP1Name() + " " + getString(R.string.gip_vs_text) + " "
+				+ ag.getP2Name());
 
 		// session
 		tv = (TextView) findViewById(R.id.textView_session);
@@ -529,12 +521,12 @@ public class GameInProgress extends MenuContainerActivity implements
 
 		// table header
 		tv = (TextView) findViewById(R.id.header_p1);
-		tv.setText(p[0].getNickName());
+		tv.setText(ag.getP1Nick());
 		tv.setTextColor(ThrowTableRow.tableTextColor);
 		tv.setTextSize(ThrowTableRow.tableTextSize);
 
 		tv = (TextView) findViewById(R.id.header_p2);
-		tv.setText(p[1].getNickName());
+		tv.setText(ag.getP2Nick());
 		tv.setTextColor(ThrowTableRow.tableTextColor);
 		tv.setTextSize(ThrowTableRow.tableTextSize);
 

@@ -11,17 +11,19 @@ import android.content.Context;
 import com.j256.ormlite.dao.Dao;
 
 public class ActiveGame {
-
-	private ArrayList<Throw> tArray;
-	private int activeIdx;
-	private Game g;
-	private Session s;
-	private Venue v;
 	private Context context;
+	private int activeIdx;
+
+	private Game g;
+	private Player[] p = new Player[2];
+	private Session s;
+	private ArrayList<Throw> tArray;
+	private Venue v;
 
 	private Dao<Game, Long> gDao;
-	private Dao<Throw, Long> tDao;
+	private Dao<Player, Long> pDao;
 	private Dao<Session, Long> sDao;
+	private Dao<Throw, Long> tDao;
 	private Dao<Venue, Long> vDao;
 
 	public ActiveGame(Game g, Context context) {
@@ -29,13 +31,17 @@ public class ActiveGame {
 		this.g = g;
 
 		gDao = Game.getDao(context);
+		pDao = Player.getDao(context);
+		sDao = Session.getDao(context);
 		tDao = Throw.getDao(context);
 		vDao = Venue.getDao(context);
-		sDao = Session.getDao(context);
 
 		try {
 			sDao.refresh(g.getSession());
 			vDao.refresh(g.getVenue());
+			pDao.refresh(g.getFirstPlayer());
+			pDao.refresh(g.getSecondPlayer());
+
 			tArray = g.getThrowList(context);
 		} catch (SQLException e) {
 			throw new RuntimeException("couldn't get throws for game "
@@ -44,6 +50,8 @@ public class ActiveGame {
 
 		s = g.getSession();
 		v = g.getVenue();
+		p[0] = g.getFirstPlayer();
+		p[1] = g.getSecondPlayer();
 
 		activeIdx = 0;
 		if (tArray.size() > 0) {
@@ -207,6 +215,22 @@ public class ActiveGame {
 
 	public void setGame(Game g) {
 		this.g = g;
+	}
+
+	public String getP1Name() {
+		return p[0].getDisplayName();
+	}
+
+	public String getP2Name() {
+		return p[1].getDisplayName();
+	}
+
+	public String getP1Nick() {
+		return p[0].getNickName();
+	}
+
+	public String getP2Nick() {
+		return p[1].getNickName();
 	}
 
 	public String getSessionName() {
