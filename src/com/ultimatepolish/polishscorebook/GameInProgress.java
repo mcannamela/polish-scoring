@@ -36,11 +36,9 @@ import com.ultimatepolish.scorebookdb.ActiveGame;
 import com.ultimatepolish.scorebookdb.DeadType;
 import com.ultimatepolish.scorebookdb.Game;
 import com.ultimatepolish.scorebookdb.Player;
-import com.ultimatepolish.scorebookdb.Session;
 import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.ThrowResult;
 import com.ultimatepolish.scorebookdb.ThrowType;
-import com.ultimatepolish.scorebookdb.Venue;
 
 public class GameInProgress extends MenuContainerActivity implements
 		ThrowTableFragment.OnTableRowClickedListener {
@@ -57,14 +55,10 @@ public class GameInProgress extends MenuContainerActivity implements
 	ActiveGame ag;
 	Throw uiThrow;
 	Player[] p = new Player[2];
-	Session s;
-	Venue v;
 
 	Dao<Game, Long> gDao;
 	Dao<Throw, Long> tDao;
 	Dao<Player, Long> pDao;
-	Dao<Session, Long> sDao;
-	Dao<Venue, Long> vDao;
 
 	int currentThrowType = ThrowType.NOT_THROWN;
 	int currentThrowResult = ThrowResult.NA;
@@ -488,21 +482,15 @@ public class GameInProgress extends MenuContainerActivity implements
 				gDao = Game.getDao(context);
 				tDao = Throw.getDao(context);
 				pDao = Player.getDao(context);
-				vDao = Venue.getDao(context);
-				sDao = Session.getDao(context);
 
 				g = gDao.queryForId(gId);
 				pDao.refresh(g.getFirstPlayer());
 				pDao.refresh(g.getSecondPlayer());
-				sDao.refresh(g.getSession());
-				vDao.refresh(g.getVenue());
 
 				ag = new ActiveGame(g, context);
 				uiThrow = ag.getActiveThrow();
 				p[0] = g.getFirstPlayer();
 				p[1] = g.getSecondPlayer();
-				s = g.getSession();
-				v = g.getVenue();
 
 			} catch (SQLException e) {
 				Toast.makeText(getApplicationContext(), e.getMessage(),
@@ -524,11 +512,11 @@ public class GameInProgress extends MenuContainerActivity implements
 		// session
 		tv = (TextView) findViewById(R.id.textView_session);
 		tv.setText(getString(R.string.gip_session_text) + " "
-				+ s.getSessionName());
+				+ ag.getSessionName());
 
 		// venue
 		tv = (TextView) findViewById(R.id.textView_venue);
-		tv.setText(getString(R.string.gip_venue_text) + " " + v.getName());
+		tv.setText(getString(R.string.gip_venue_text) + " " + ag.getVenueName());
 
 		// date
 		tv = (TextView) findViewById(R.id.textView_datePlayed);

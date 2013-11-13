@@ -15,10 +15,14 @@ public class ActiveGame {
 	private ArrayList<Throw> tArray;
 	private int activeIdx;
 	private Game g;
+	private Session s;
+	private Venue v;
 	private Context context;
 
 	private Dao<Game, Long> gDao;
 	private Dao<Throw, Long> tDao;
+	private Dao<Session, Long> sDao;
+	private Dao<Venue, Long> vDao;
 
 	public ActiveGame(Game g, Context context) {
 		super();
@@ -26,13 +30,20 @@ public class ActiveGame {
 
 		gDao = Game.getDao(context);
 		tDao = Throw.getDao(context);
+		vDao = Venue.getDao(context);
+		sDao = Session.getDao(context);
 
 		try {
+			sDao.refresh(g.getSession());
+			vDao.refresh(g.getVenue());
 			tArray = g.getThrowList(context);
 		} catch (SQLException e) {
 			throw new RuntimeException("couldn't get throws for game "
 					+ g.getId() + ": ", e);
 		}
+
+		s = g.getSession();
+		v = g.getVenue();
 
 		activeIdx = 0;
 		if (tArray.size() > 0) {
@@ -196,6 +207,14 @@ public class ActiveGame {
 
 	public void setGame(Game g) {
 		this.g = g;
+	}
+
+	public String getSessionName() {
+		return s.getSessionName();
+	}
+
+	public String getVenueName() {
+		return v.getName();
 	}
 
 	public Context getContext() {
