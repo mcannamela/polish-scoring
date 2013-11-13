@@ -1,6 +1,5 @@
 package com.ultimatepolish.polishscorebook;
 
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import android.widget.Toast;
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.ActiveGame;
 import com.ultimatepolish.scorebookdb.DeadType;
-import com.ultimatepolish.scorebookdb.Game;
 import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.ThrowResult;
 import com.ultimatepolish.scorebookdb.ThrowType;
@@ -50,11 +48,9 @@ public class GameInProgress extends MenuContainerActivity implements
 	private View[] deadViews = new View[4];
 	private View naView;
 
-	Game g;
 	ActiveGame ag;
 	Throw uiThrow;
 
-	Dao<Game, Long> gDao;
 	Dao<Throw, Long> tDao;
 
 	int currentThrowType = ThrowType.NOT_THROWN;
@@ -461,7 +457,7 @@ public class GameInProgress extends MenuContainerActivity implements
 	protected void onPause() {
 		super.onPause();
 		ag.saveAllThrows();
-		saveGame(true);
+		ag.saveGame();
 	}
 
 	@Override
@@ -474,21 +470,10 @@ public class GameInProgress extends MenuContainerActivity implements
 	// INITIALIZATION =============================================
 	private void initGame(long gId) {
 		Context context = getApplicationContext();
-		if (gId != -1) {
-			try {
-				gDao = Game.getDao(context);
-				tDao = Throw.getDao(context);
+		tDao = Throw.getDao(context);
 
-				g = gDao.queryForId(gId);
-
-				ag = new ActiveGame(g, context);
-				uiThrow = ag.getActiveThrow();
-
-			} catch (SQLException e) {
-				Toast.makeText(getApplicationContext(), e.getMessage(),
-						Toast.LENGTH_LONG).show();
-			}
-		}
+		ag = new ActiveGame(gId, context);
+		uiThrow = ag.getActiveThrow();
 	}
 
 	private void initMetadata() {
@@ -512,12 +497,12 @@ public class GameInProgress extends MenuContainerActivity implements
 
 		// date
 		tv = (TextView) findViewById(R.id.textView_datePlayed);
-		tv.setText(df.format(g.getDatePlayed()));
+		tv.setText(df.format(ag.getGameDate()));
 
 		// game ID
 		tv = (TextView) findViewById(R.id.textView_gId);
 		tv.setText(getString(R.string.gip_gamenum_text)
-				+ String.valueOf(g.getId()));
+				+ String.valueOf(ag.getGameId()));
 
 		// table header
 		tv = (TextView) findViewById(R.id.header_p1);
@@ -662,32 +647,12 @@ public class GameInProgress extends MenuContainerActivity implements
 			loge("gotoThrow() - Failed to change to page " + getPageIdx(idx)
 					+ ".", e);
 		}
-
 		ag.saveGame();
 	}
 
 	private void respectGentlemens() {
 		GentlemensDialogFragment frag = new GentlemensDialogFragment();
 		frag.show(getFragmentManager(), "gentlemens");
-	}
-
-	private void saveGame() {
-		saveGame(false);
-	}
-
-	private void saveGame(boolean onExit) {
-		if (onExit) {
-			Toast.makeText(getApplicationContext(), "Saving the game...",
-					Toast.LENGTH_SHORT).show();
-		}
-
-		ag.saveGame();
-
-		if (onExit) {
-			Toast.makeText(getApplicationContext(), "Game saved.",
-					Toast.LENGTH_SHORT).show();
-		}
-
 	}
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
