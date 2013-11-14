@@ -797,6 +797,38 @@ public class Throw implements Comparable<Throw> {
 		return initialOffensivePlayerScore;
 	}
 
+	public boolean[] getOwnGoals() {
+		boolean[] ownGoals = { isLineFault, isOffensiveDrinkDropped,
+				isOffensivePoleKnocked, isOffensiveBottleKnocked,
+				isOffensiveBreakError };
+		return ownGoals;
+	}
+
+	public void setOwnGoals(boolean[] ownGoals) {
+		isLineFault = ownGoals[0];
+		isOffensiveDrinkDropped = ownGoals[1];
+		isOffensivePoleKnocked = ownGoals[2];
+		isOffensiveBottleKnocked = ownGoals[3];
+		isOffensiveBreakError = ownGoals[4];
+	}
+
+	public boolean[] getDefErrors() {
+		boolean[] defErrors = { isGoaltend, isGrabbed, isDrinkHit,
+				isDefensiveDrinkDropped, isDefensivePoleKnocked,
+				isDefensiveBottleKnocked, isDefensiveBreakError };
+		return defErrors;
+	}
+
+	public void setDefErrors(boolean[] defErrors) {
+		isGoaltend = defErrors[0];
+		isGrabbed = defErrors[1];
+		isDrinkHit = defErrors[2];
+		isDefensiveDrinkDropped = defErrors[3];
+		isDefensivePoleKnocked = defErrors[4];
+		isDefensiveBottleKnocked = defErrors[5];
+		isDefensiveBreakError = defErrors[6];
+	}
+
 	public void setInitialOffensivePlayerScore(int initialOffensivePlayerScore) {
 		this.initialOffensivePlayerScore = initialOffensivePlayerScore;
 	}

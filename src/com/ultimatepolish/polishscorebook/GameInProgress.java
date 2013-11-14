@@ -37,7 +37,6 @@ import com.ultimatepolish.scorebookdb.ThrowType;
 
 public class GameInProgress extends MenuContainerActivity implements
 		ThrowTableFragment.OnTableRowClickedListener {
-
 	public static String LOGTAG = "GIP";
 	private FragmentArrayAdapter vpAdapter;
 	private List<ThrowTableFragment> fragmentArray = new ArrayList<ThrowTableFragment>(
@@ -45,22 +44,11 @@ public class GameInProgress extends MenuContainerActivity implements
 	private ViewPager vp;
 	private View[] deadViews = new View[4];
 	private View naView;
+	NumberPicker resultNp;
 
 	public ActiveGame ag;
-	Throw uiThrow;
-
 	Dao<Throw, Long> tDao;
-
-	boolean[] currentOwnGoals = { false, false, false, false, false };
-	boolean[] currentDefErrors = { false, false, false, false, false, false,
-			false };
-	// eventually will rewrite error storage using hashtables...
-	// Hashtable<String, Boolean> currentOwnGoal = new Hashtable<String,
-	// Boolean>(5);
-	// Hashtable<String, Boolean> currentDefError = new Hashtable<String,
-	// Boolean>(7);
-
-	NumberPicker resultNp;
+	Throw uiThrow;
 
 	// LISTENERS ==============================================================
 	private OnValueChangeListener numberPickerChangeListener = new OnValueChangeListener() {
@@ -324,9 +312,11 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	public void OwnGoalDialog() {
+		final boolean[] ownGoals = uiThrow.getOwnGoals();
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Own Goal")
-				.setMultiChoiceItems(R.array.owngoals, currentOwnGoals,
+				.setMultiChoiceItems(R.array.owngoals, ownGoals,
 						new DialogInterface.OnMultiChoiceClickListener() {
 
 							@Override
@@ -335,10 +325,11 @@ public class GameInProgress extends MenuContainerActivity implements
 								if (isChecked) {
 									// If the user checked the item, add it to
 									// the selected items
-									currentOwnGoals[which] = true;
+									ownGoals[which] = true;
 								} else {
-									currentOwnGoals[which] = false;
+									ownGoals[which] = false;
 								}
+								uiThrow.setOwnGoals(ownGoals);
 								updateActiveThrow();
 							}
 						})
@@ -353,9 +344,11 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	private void PlayerErrorDialog() {
+		final boolean[] defErrors = uiThrow.getDefErrors();
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Defensive Error")
-				.setMultiChoiceItems(R.array.defErrors, currentDefErrors,
+				.setMultiChoiceItems(R.array.defErrors, defErrors,
 						new DialogInterface.OnMultiChoiceClickListener() {
 
 							@Override
@@ -364,10 +357,11 @@ public class GameInProgress extends MenuContainerActivity implements
 								if (isChecked) {
 									// If the user checked the item, add it to
 									// the selected items
-									currentDefErrors[which] = true;
+									defErrors[which] = true;
 								} else {
-									currentDefErrors[which] = false;
+									defErrors[which] = false;
 								}
+								uiThrow.setDefErrors(defErrors);
 								updateActiveThrow();
 							}
 						})
@@ -966,12 +960,12 @@ public class GameInProgress extends MenuContainerActivity implements
 		TextView deVw = (TextView) findViewById(R.id.gip_playerError);
 		ogVw.setTextColor(Color.BLACK);
 		deVw.setTextColor(Color.BLACK);
-		for (boolean og : currentOwnGoals) {
+		for (boolean og : uiThrow.getOwnGoals()) {
 			if (og) {
 				ogVw.setTextColor(Color.RED);
 			}
 		}
-		for (boolean de : currentDefErrors) {
+		for (boolean de : uiThrow.getDefErrors()) {
 			if (de) {
 				deVw.setTextColor(Color.RED);
 			}
