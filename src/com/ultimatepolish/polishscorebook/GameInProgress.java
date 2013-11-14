@@ -22,8 +22,6 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnLongClickListener;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnValueChangeListener;
@@ -53,7 +51,6 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	Dao<Throw, Long> tDao;
 
-	int currentThrowType = ThrowType.NOT_THROWN;
 	int currentThrowResult = ThrowResult.NA;
 	int currentDeadType = DeadType.ALIVE;
 	int[] currentFireCounts = { 0, 0 };
@@ -70,22 +67,16 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	NumberPicker resultNp;
 
-	// LISTENERS ==================================================
-	private OnCheckedChangeListener checkboxChangedListener = new OnCheckedChangeListener() {
-		public void onCheckedChanged(CompoundButton buttonView,
-				boolean isChecked) {
-			updateActiveThrow();
-		}
-	};
-
+	// LISTENERS ==============================================================
 	private OnValueChangeListener numberPickerChangeListener = new OnValueChangeListener() {
 		public void onValueChange(NumberPicker parent, int oldVal, int newVal) {
 			if (currentThrowResult == ThrowResult.BROKEN
 					|| currentThrowResult == ThrowResult.NA) {
-				// if the numberpicker changed, unset broken and NA status so
-				// that
-				// updateActiveThrow can change the result. Otherwise the
-				// numberpicker is ignored.
+				/*
+				 * if the numberpicker changed, unset broken and NA status so
+				 * that updateActiveThrow can change the result. Otherwise the
+				 * numberpicker is ignored.
+				 */
 				currentThrowResult = ThrowResult.CATCH;
 				naView.setBackgroundColor(Color.LTGRAY);
 			}
@@ -110,31 +101,31 @@ public class GameInProgress extends MenuContainerActivity implements
 				}
 				break;
 			case R.id.gip_button_pole:
-				currentThrowType = ThrowType.POLE;
+				uiThrow.setThrowType(ThrowType.POLE);
 				if (currentThrowResult == ThrowResult.BROKEN) {
 					currentThrowResult = getThrowResultFromNP();
 				} else {
 					currentThrowResult = ThrowResult.BROKEN;
 				}
-				setBrokenButtonState(currentThrowType);
+				setBrokenButtonState(uiThrow.getThrowType());
 				break;
 			case R.id.gip_button_cup:
-				currentThrowType = ThrowType.CUP;
+				uiThrow.setThrowType(ThrowType.CUP);
 				if (currentThrowResult == ThrowResult.BROKEN) {
 					currentThrowResult = getThrowResultFromNP();
 				} else {
 					currentThrowResult = ThrowResult.BROKEN;
 				}
-				setBrokenButtonState(currentThrowType);
+				setBrokenButtonState(uiThrow.getThrowType());
 				break;
 			case R.id.gip_button_bottle:
-				currentThrowType = ThrowType.BOTTLE;
+				uiThrow.setThrowType(ThrowType.BOTTLE);
 				if (currentThrowResult == ThrowResult.BROKEN) {
 					currentThrowResult = getThrowResultFromNP();
 				} else {
 					currentThrowResult = ThrowResult.BROKEN;
 				}
-				setBrokenButtonState(currentThrowType);
+				setBrokenButtonState(uiThrow.getThrowType());
 				break;
 			case R.id.gip_button_high:
 				if (currentDeadType == DeadType.HIGH) {
@@ -200,18 +191,18 @@ public class GameInProgress extends MenuContainerActivity implements
 		log("buttonPressed(): " + view.getContentDescription() + " was pressed");
 		int buttonId = view.getId();
 
-		if (currentThrowType == ThrowType.TRAP
-				|| currentThrowType == ThrowType.TRAP_REDEEMED) {
+		if (uiThrow.getThrowType() == ThrowType.TRAP
+				|| uiThrow.getThrowType() == ThrowType.TRAP_REDEEMED) {
 			switch (buttonId) {
 			case R.id.gip_button_trap:
-				currentThrowType = ThrowType.NOT_THROWN;
+				uiThrow.setThrowType(ThrowType.NOT_THROWN);
 				currentThrowResult = getThrowResultFromNP();
 				((ImageView) view).getDrawable().setLevel(0);
 				break;
 			case R.id.gip_button_bottle:
 			case R.id.gip_button_pole:
 			case R.id.gip_button_cup:
-				currentThrowType = ThrowType.TRAP_REDEEMED;
+				uiThrow.setThrowType(ThrowType.TRAP_REDEEMED);
 				confirmThrow();
 				break;
 			default:
@@ -221,39 +212,39 @@ public class GameInProgress extends MenuContainerActivity implements
 		} else {
 			switch (buttonId) {
 			case R.id.gip_button_high:
-				currentThrowType = ThrowType.BALL_HIGH;
+				uiThrow.setThrowType(ThrowType.BALL_HIGH);
 				break;
 			case R.id.gip_button_low:
-				currentThrowType = ThrowType.BALL_LOW;
+				uiThrow.setThrowType(ThrowType.BALL_LOW);
 				break;
 			case R.id.gip_button_left:
-				currentThrowType = ThrowType.BALL_LEFT;
+				uiThrow.setThrowType(ThrowType.BALL_LEFT);
 				break;
 			case R.id.gip_button_right:
-				currentThrowType = ThrowType.BALL_RIGHT;
+				uiThrow.setThrowType(ThrowType.BALL_RIGHT);
 				break;
 			case R.id.gip_button_trap:
-				currentThrowType = ThrowType.TRAP;
+				uiThrow.setThrowType(ThrowType.TRAP);
 				((ImageView) view).getDrawable().setLevel(2);
 				break;
 			case R.id.gip_button_short:
-				currentThrowType = ThrowType.SHORT;
+				uiThrow.setThrowType(ThrowType.SHORT);
 				break;
 			case R.id.gip_button_strike:
-				currentThrowType = ThrowType.STRIKE;
+				uiThrow.setThrowType(ThrowType.STRIKE);
 				break;
 			case R.id.gip_button_bottle:
-				currentThrowType = ThrowType.BOTTLE;
+				uiThrow.setThrowType(ThrowType.BOTTLE);
 				break;
 			case R.id.gip_button_pole:
-				currentThrowType = ThrowType.POLE;
+				uiThrow.setThrowType(ThrowType.POLE);
 				break;
 			case R.id.gip_button_cup:
-				currentThrowType = ThrowType.CUP;
+				uiThrow.setThrowType(ThrowType.CUP);
 				break;
 			}
 
-			if (currentThrowType != ThrowType.TRAP) {
+			if (uiThrow.getThrowType() != ThrowType.TRAP) {
 				confirmThrow();
 			}
 		}
@@ -271,9 +262,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	}
 
-	// ==================================================
-
-	// ############################## INNER CLASSES ############################
+	// INNER CLASSES ==========================================================
 	private class FragmentArrayAdapter extends FragmentPagerAdapter {
 
 		public FragmentArrayAdapter(FragmentManager fm) {
@@ -366,7 +355,6 @@ public class GameInProgress extends MenuContainerActivity implements
 				});
 		AlertDialog dialog = builder.create();
 		dialog.show();
-
 	}
 
 	private void PlayerErrorDialog() {
@@ -413,9 +401,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	}
 
-	// #################################################################
-
-	// ANDROID CALLBACKS =============================================
+	// ANDROID CALLBACKS ======================================================
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate(): creating GIP");
@@ -465,9 +451,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		super.onStop();
 	}
 
-	// =================================================================
-
-	// INITIALIZATION =============================================
+	// INITIALIZATION =========================================================
 	private void initGame(long gId) {
 		Context context = getApplicationContext();
 		tDao = Throw.getDao(context);
@@ -610,12 +594,10 @@ public class GameInProgress extends MenuContainerActivity implements
 		// vpAdapter.getCount() + " items");
 	}
 
-	// =================================================================
-
-	// STATE LOGIC AND PROGRAM FLOW +++++++++++++++++++++++++++++++++++++
+	// STATE LOGIC AND PROGRAM FLOW ===========================================
 	void updateActiveThrow() {
 		log("updateThrow(): Updating throw at idx " + ag.getActiveIdx());
-		applyUIStateToActiveThrow();
+		uiThrowToActiveThrow();
 		renderPage(getPageIdx(ag.getActiveIdx()));
 	}
 
@@ -634,7 +616,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		log("gotoThrow() - Going from throw idx " + ag.getActiveIdx()
 				+ " to throw idx " + newActiveIdx + ".");
 
-		applyUIStateToActiveThrow();
+		uiThrowToActiveThrow();
 		ag.setActiveIdx(newActiveIdx);
 		applyActiveThrowToUIState();
 
@@ -655,10 +637,8 @@ public class GameInProgress extends MenuContainerActivity implements
 		frag.show(getFragmentManager(), "gentlemens");
 	}
 
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-	// - SET THROW FROM UI STATE ---------------------------------------------
-	private void applyUIStateToActiveThrow() {
+	// UI to AG ===============================================================
+	private void uiThrowToActiveThrow() {
 		applyUIStateToThrow(uiThrow);
 		ag.updateActiveThrow(uiThrow);
 	}
@@ -766,9 +746,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	}
 
-	// -------------------------------------------------------------
-
-	// APPLY THROW STATE TO UI STATE ===============================
+	// AG to UI ===============================================================
 	private void applyActiveThrowToUIState() {
 		uiThrow = ag.getActiveThrow();
 		applyThrowToUIState(uiThrow);
@@ -786,7 +764,7 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	private void setThrowType(Throw t) {
-		currentThrowType = t.getThrowType();
+		uiThrow.setThrowType(t.getThrowType());
 
 		// wait until after click event?
 		setThrowButtonState(ThrowType.BALL_HIGH, R.id.gip_button_high);
@@ -804,7 +782,7 @@ public class GameInProgress extends MenuContainerActivity implements
 					.setLevel(3);
 		}
 
-		setBrokenButtonState(currentThrowType);
+		setBrokenButtonState(uiThrow.getThrowType());
 	}
 
 	private void setSpecialMarks(Throw t) {
@@ -839,10 +817,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		setErrorButtonState();
 	}
 
-	// ===================================================================
-
-	// {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-	// {{{{{{{{{{{{{{{{{{{{{{{{{Draw the scores{{{{{{{{{{{{{{{{{{{{{{{
+	// Draw the scores ========================================================
 
 	private void renderPage(int pidx) {
 		renderPage(pidx, true);
@@ -875,8 +850,6 @@ public class GameInProgress extends MenuContainerActivity implements
 			frag.highlightThrow(idx);
 		}
 	}
-
-	// {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 
 	public int getThrowResultFromNP() {
 		int theResult = 0;
@@ -935,10 +908,10 @@ public class GameInProgress extends MenuContainerActivity implements
 	private void setThrowButtonState(int throwType, int id) {
 		ImageView btn = (ImageView) findViewById(id);
 
-		if (throwType == currentThrowType) {
+		if (throwType == uiThrow.getThrowType()) {
 			btn.getDrawable().setLevel(1);
 		} else if (throwType == ThrowType.TRAP
-				&& currentThrowType == ThrowType.TRAP_REDEEMED) {
+				&& uiThrow.getThrowType() == ThrowType.TRAP_REDEEMED) {
 			btn.getDrawable().setLevel(1);
 		} else {
 			btn.getDrawable().setLevel(0);
