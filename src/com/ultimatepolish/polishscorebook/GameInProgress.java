@@ -48,7 +48,7 @@ public class GameInProgress extends MenuContainerActivity implements
 	private View[] deadViews = new View[4];
 	private View naView;
 
-	ActiveGame ag;
+	public ActiveGame ag;
 	Throw uiThrow;
 
 	Dao<Throw, Long> tDao;
