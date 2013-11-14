@@ -51,11 +51,6 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	Dao<Throw, Long> tDao;
 
-	int currentThrowResult = ThrowResult.NA;
-	int currentDeadType = DeadType.ALIVE;
-	int[] currentFireCounts = { 0, 0 };
-	boolean currentIsTipped;
-
 	boolean[] currentOwnGoals = { false, false, false, false, false };
 	boolean[] currentDefErrors = { false, false, false, false, false, false,
 			false };
@@ -70,14 +65,14 @@ public class GameInProgress extends MenuContainerActivity implements
 	// LISTENERS ==============================================================
 	private OnValueChangeListener numberPickerChangeListener = new OnValueChangeListener() {
 		public void onValueChange(NumberPicker parent, int oldVal, int newVal) {
-			if (currentThrowResult == ThrowResult.BROKEN
-					|| currentThrowResult == ThrowResult.NA) {
+			if (uiThrow.getThrowResult() == ThrowResult.BROKEN
+					|| uiThrow.getThrowResult() == ThrowResult.NA) {
 				/*
 				 * if the numberpicker changed, unset broken and NA status so
 				 * that updateActiveThrow can change the result. Otherwise the
 				 * numberpicker is ignored.
 				 */
-				currentThrowResult = ThrowResult.CATCH;
+				uiThrow.setThrowResult(ThrowResult.CATCH);
 				naView.setBackgroundColor(Color.LTGRAY);
 			}
 			updateActiveThrow();
@@ -93,8 +88,8 @@ public class GameInProgress extends MenuContainerActivity implements
 
 			switch (buttonId) {
 			case R.id.gip_button_strike:
-				currentIsTipped = !currentIsTipped;
-				if (currentIsTipped) {
+				uiThrow.isTipped = !uiThrow.isTipped;
+				if (uiThrow.isTipped) {
 					((ImageView) view).getDrawable().setLevel(2);
 				} else {
 					((ImageView) view).getDrawable().setLevel(0);
@@ -102,57 +97,57 @@ public class GameInProgress extends MenuContainerActivity implements
 				break;
 			case R.id.gip_button_pole:
 				uiThrow.setThrowType(ThrowType.POLE);
-				if (currentThrowResult == ThrowResult.BROKEN) {
-					currentThrowResult = getThrowResultFromNP();
+				if (uiThrow.getThrowResult() == ThrowResult.BROKEN) {
+					uiThrow.setThrowResult(getThrowResultFromNP());
 				} else {
-					currentThrowResult = ThrowResult.BROKEN;
+					uiThrow.setThrowResult(ThrowResult.BROKEN);
 				}
 				setBrokenButtonState(uiThrow.getThrowType());
 				break;
 			case R.id.gip_button_cup:
 				uiThrow.setThrowType(ThrowType.CUP);
-				if (currentThrowResult == ThrowResult.BROKEN) {
-					currentThrowResult = getThrowResultFromNP();
+				if (uiThrow.getThrowResult() == ThrowResult.BROKEN) {
+					uiThrow.setThrowResult(getThrowResultFromNP());
 				} else {
-					currentThrowResult = ThrowResult.BROKEN;
+					uiThrow.setThrowResult(ThrowResult.BROKEN);
 				}
 				setBrokenButtonState(uiThrow.getThrowType());
 				break;
 			case R.id.gip_button_bottle:
 				uiThrow.setThrowType(ThrowType.BOTTLE);
-				if (currentThrowResult == ThrowResult.BROKEN) {
-					currentThrowResult = getThrowResultFromNP();
+				if (uiThrow.getThrowResult() == ThrowResult.BROKEN) {
+					uiThrow.setThrowResult(getThrowResultFromNP());
 				} else {
-					currentThrowResult = ThrowResult.BROKEN;
+					uiThrow.setThrowResult(ThrowResult.BROKEN);
 				}
 				setBrokenButtonState(uiThrow.getThrowType());
 				break;
 			case R.id.gip_button_high:
-				if (currentDeadType == DeadType.HIGH) {
-					currentDeadType = DeadType.ALIVE;
+				if (uiThrow.getDeadType() == DeadType.HIGH) {
+					uiThrow.setDeadType(DeadType.ALIVE);
 				} else {
-					currentDeadType = DeadType.HIGH;
+					uiThrow.setDeadType(DeadType.HIGH);
 				}
 				break;
 			case R.id.gip_button_right:
-				if (currentDeadType == DeadType.RIGHT) {
-					currentDeadType = DeadType.ALIVE;
+				if (uiThrow.getDeadType() == DeadType.RIGHT) {
+					uiThrow.setDeadType(DeadType.ALIVE);
 				} else {
-					currentDeadType = DeadType.RIGHT;
+					uiThrow.setDeadType(DeadType.RIGHT);
 				}
 				break;
 			case R.id.gip_button_low:
-				if (currentDeadType == DeadType.LOW) {
-					currentDeadType = DeadType.ALIVE;
+				if (uiThrow.getDeadType() == DeadType.LOW) {
+					uiThrow.setDeadType(DeadType.ALIVE);
 				} else {
-					currentDeadType = DeadType.LOW;
+					uiThrow.setDeadType(DeadType.LOW);
 				}
 				break;
 			case R.id.gip_button_left:
-				if (currentDeadType == DeadType.LEFT) {
-					currentDeadType = DeadType.ALIVE;
+				if (uiThrow.getDeadType() == DeadType.LEFT) {
+					uiThrow.setDeadType(DeadType.ALIVE);
 				} else {
-					currentDeadType = DeadType.LEFT;
+					uiThrow.setDeadType(DeadType.LEFT);
 				}
 				break;
 			default:
@@ -196,7 +191,7 @@ public class GameInProgress extends MenuContainerActivity implements
 			switch (buttonId) {
 			case R.id.gip_button_trap:
 				uiThrow.setThrowType(ThrowType.NOT_THROWN);
-				currentThrowResult = getThrowResultFromNP();
+				uiThrow.setThrowResult(getThrowResultFromNP());
 				((ImageView) view).getDrawable().setLevel(0);
 				break;
 			case R.id.gip_button_bottle:
@@ -760,7 +755,7 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	private void setThrowResult(Throw t) {
 		setThrowResultToNP(t.getThrowResult());
-		currentThrowResult = t.getThrowResult();
+		uiThrow.setThrowResult(t.getThrowResult());
 	}
 
 	private void setThrowType(Throw t) {
@@ -786,9 +781,9 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	private void setSpecialMarks(Throw t) {
-		currentIsTipped = t.isTipped;
-		currentFireCounts = t.getFireCounts();
-		currentDeadType = t.getDeadType();
+		uiThrow.isTipped = t.isTipped;
+		uiThrow.setFireCounts(t.getFireCounts());
+		uiThrow.setDeadType(t.getDeadType());
 		for (View vw : deadViews) {
 			vw.setBackgroundColor(Color.LTGRAY);
 		}
@@ -926,7 +921,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		Drawable bottleDwl = ((ImageView) findViewById(R.id.gip_button_bottle))
 				.getDrawable();
 
-		if (currentThrowResult == ThrowResult.BROKEN) {
+		if (uiThrow.getThrowResult() == ThrowResult.BROKEN) {
 			switch (throwType) {
 			case ThrowType.POLE:
 				poleDwl.setLevel(3);
