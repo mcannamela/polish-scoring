@@ -400,7 +400,11 @@ public class GameInProgress extends MenuContainerActivity implements
 		Intent intent = getIntent();
 		Long gId = intent.getLongExtra("GID", -1);
 
-		initGame(gId);
+		Context context = getApplicationContext();
+		tDao = Throw.getDao(context);
+		ag = new ActiveGame(gId, context);
+		uiThrow = ag.getActiveThrow();
+
 		initMetadata();
 		initNumPickers();
 		initListeners();
@@ -441,14 +445,6 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	// INITIALIZATION =========================================================
-	private void initGame(long gId) {
-		Context context = getApplicationContext();
-		tDao = Throw.getDao(context);
-
-		ag = new ActiveGame(gId, context);
-		uiThrow = ag.getActiveThrow();
-	}
-
 	private void initMetadata() {
 		DateFormat df = new SimpleDateFormat("EEE MMM dd, yyyy @HH:mm",
 				Locale.US);
@@ -497,22 +493,6 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	private void initNumPickers() {
-		// eventually will use hashtables for errors...
-		// currentOwnGoal.put("linefault", false);
-		// currentOwnGoal.put("drinkdrop", false);
-		// currentOwnGoal.put("knockpole", false);
-		// currentOwnGoal.put("knockbottle", false);
-		// currentOwnGoal.put("breakbottle", false);
-		//
-		// currentDefError.put("goaltend", false);
-		// currentDefError.put("grabbed", false);
-		// currentDefError.put("drinkhit", false);
-		// currentDefError.put("drinkdrop", false);
-		// currentDefError.put("knockpole", false);
-		// currentDefError.put("knockbottle", false);
-		// currentDefError.put("breakbottle", false);
-
-		// catch type numberpicker
 		resultNp = (NumberPicker) findViewById(R.id.numPicker_catch);
 		resultNp.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 		String[] catchText = new String[3];
@@ -524,7 +504,6 @@ public class GameInProgress extends MenuContainerActivity implements
 		resultNp.setValue(1);
 		resultNp.setDisplayedValues(catchText);
 		resultNp.setOnValueChangedListener(numberPickerChangeListener);
-
 	}
 
 	private void initListeners() {
@@ -628,18 +607,7 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	// UI to AG ===============================================================
 	private void uiThrowToActiveThrow() {
-		applyUIStateToThrow(uiThrow);
 		ag.updateActiveThrow(uiThrow);
-	}
-
-	private void applyUIStateToThrow(Throw t) {
-		log("applyUIStateToCurrentThrow() - Applying state to throw idx "
-				+ t.getThrowIdx());
-		applyUISpecialMarksToThrow(t);
-	}
-
-	private void applyUISpecialMarksToThrow(Throw t) {
-
 	}
 
 	// AG to UI ===============================================================
@@ -855,7 +823,6 @@ public class GameInProgress extends MenuContainerActivity implements
 				break;
 			}
 		}
-
 	}
 
 	private void setErrorButtonState() {
