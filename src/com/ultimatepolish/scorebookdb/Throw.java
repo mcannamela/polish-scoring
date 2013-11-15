@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -748,7 +750,11 @@ public class Throw implements Comparable<Throw> {
 	}
 
 	public void setThrowType(int throwType) {
-		this.throwType = throwType;
+		if (offenseFireCount >= 3) {
+			this.throwType = ThrowType.FIRED_ON;
+		} else {
+			this.throwType = throwType;
+		}
 	}
 
 	public int getThrowResult() {
@@ -756,7 +762,45 @@ public class Throw implements Comparable<Throw> {
 	}
 
 	public void setThrowResult(int throwResult) {
-		this.throwResult = throwResult;
+		if (offenseFireCount >= 3) {
+			this.throwResult = ThrowResult.NA;
+			// naView.setBackgroundColor(Color.RED);
+		} else {
+			// some error checking
+			switch (throwType) {
+			case ThrowType.BALL_HIGH:
+			case ThrowType.BALL_RIGHT:
+			case ThrowType.BALL_LOW:
+			case ThrowType.BALL_LEFT:
+			case ThrowType.STRIKE:
+				if (throwResult != ThrowResult.DROP
+						&& throwResult != ThrowResult.CATCH) {
+					throwResult = ThrowResult.CATCH;
+					// setThrowResultToNP(ThrowResult.CATCH);
+				}
+				break;
+			case ThrowType.TRAP:
+			case ThrowType.TRAP_REDEEMED:
+			case ThrowType.SHORT:
+			case ThrowType.FIRED_ON:
+				throwResult = ThrowResult.NA;
+				// naView.setBackgroundColor(Color.RED);
+				break;
+			default:
+				break;
+			}
+			if (defenseFireCount >= 3) {
+				throwResult = ThrowResult.NA;
+				// naView.setBackgroundColor(Color.RED);
+			}
+
+			if (throwResult == ThrowResult.BROKEN) {
+				this.throwResult = ThrowResult.BROKEN;
+			} else if (throwResult == ThrowResult.NA) {
+				this.throwResult = ThrowResult.NA;
+				// naView.setBackgroundColor(Color.RED);
+			}
+		}
 	}
 
 	public int getDeadType() {
@@ -805,11 +849,28 @@ public class Throw implements Comparable<Throw> {
 	}
 
 	public void setOwnGoals(boolean[] ownGoals) {
-		isLineFault = ownGoals[0];
-		isOffensiveDrinkDropped = ownGoals[1];
-		isOffensivePoleKnocked = ownGoals[2];
-		isOffensiveBottleKnocked = ownGoals[3];
-		isOffensiveBreakError = ownGoals[4];
+		if (offenseFireCount >= 3) {
+			isTipped = false;
+			setDeadType(DeadType.ALIVE);
+			isLineFault = false;
+			isGoaltend = false;
+			isDrinkHit = false;
+		} else {
+			isTipped = currentIsTipped;
+			t.setDeadType(currentDeadType);
+			for (View vw : deadViews) {
+				vw.setBackgroundColor(Color.LTGRAY);
+			}
+			if (currentDeadType > 0) {
+				deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
+			}
+			isLineFault = ownGoals[0];
+			isOffensiveDrinkDropped = ownGoals[1];
+			isOffensivePoleKnocked = ownGoals[2];
+			isOffensiveBottleKnocked = ownGoals[3];
+			isOffensiveBreakError = ownGoals[4];
+		}
+
 	}
 
 	public boolean[] getDefErrors() {
@@ -820,13 +881,28 @@ public class Throw implements Comparable<Throw> {
 	}
 
 	public void setDefErrors(boolean[] defErrors) {
-		isGoaltend = defErrors[0];
-		isGrabbed = defErrors[1];
-		isDrinkHit = defErrors[2];
-		isDefensiveDrinkDropped = defErrors[3];
-		isDefensivePoleKnocked = defErrors[4];
-		isDefensiveBottleKnocked = defErrors[5];
-		isDefensiveBreakError = defErrors[6];
+		if (offenseFireCount >= 3) {
+			isTipped = false;
+			setDeadType(DeadType.ALIVE);
+			isLineFault = false;
+			isGoaltend = false;
+			isDrinkHit = false;
+		} else {
+			isTipped = currentIsTipped;
+			t.setDeadType(currentDeadType);
+			for (View vw : deadViews) {
+				vw.setBackgroundColor(Color.LTGRAY);
+			}
+			if (currentDeadType > 0) {
+				deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
+			}
+			isGoaltend = defErrors[0];
+			isGrabbed = defErrors[1];
+			isDrinkHit = defErrors[2];
+			isDefensiveDrinkDropped = defErrors[3];
+			isDefensivePoleKnocked = defErrors[4];
+			isDefensiveBottleKnocked = defErrors[5];
+			isDefensiveBreakError = defErrors[6];
 	}
 
 	public void setInitialOffensivePlayerScore(int initialOffensivePlayerScore) {
