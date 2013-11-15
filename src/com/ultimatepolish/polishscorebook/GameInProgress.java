@@ -586,7 +586,7 @@ public class GameInProgress extends MenuContainerActivity implements
 
 		uiThrowToActiveThrow();
 		ag.setActiveIdx(newActiveIdx);
-		applyActiveThrowToUIState();
+		activeThrowToUiThrow();
 
 		int idx = ag.getActiveIdx();
 		assert idx == newActiveIdx;
@@ -605,32 +605,18 @@ public class GameInProgress extends MenuContainerActivity implements
 		frag.show(getFragmentManager(), "gentlemens");
 	}
 
-	// UI to AG ===============================================================
+	// UI <--> AG =============================================================
 	private void uiThrowToActiveThrow() {
 		ag.updateActiveThrow(uiThrow);
 	}
 
-	// AG to UI ===============================================================
-	private void applyActiveThrowToUIState() {
+	private void activeThrowToUiThrow() {
 		uiThrow = ag.getActiveThrow();
-		applyThrowToUIState(uiThrow);
+		refreshUI();
 	}
 
-	private void applyThrowToUIState(Throw t) {
-		setThrowResult(t);
-		setThrowType(t);
-		setSpecialMarks(t);
-	}
-
-	private void setThrowResult(Throw t) {
-		setThrowResultToNP(t.getThrowResult());
-		uiThrow.setThrowResult(t.getThrowResult());
-	}
-
-	private void setThrowType(Throw t) {
-		uiThrow.setThrowType(t.getThrowType());
-
-		// wait until after click event?
+	private void refreshUI() {
+		setThrowResultToNP(uiThrow.getThrowResult());
 		setThrowButtonState(ThrowType.BALL_HIGH, R.id.gip_button_high);
 		setThrowButtonState(ThrowType.BALL_LOW, R.id.gip_button_low);
 		setThrowButtonState(ThrowType.BALL_LEFT, R.id.gip_button_left);
@@ -641,40 +627,20 @@ public class GameInProgress extends MenuContainerActivity implements
 		setThrowButtonState(ThrowType.BOTTLE, R.id.gip_button_bottle);
 		setThrowButtonState(ThrowType.POLE, R.id.gip_button_pole);
 		setThrowButtonState(ThrowType.CUP, R.id.gip_button_cup);
-		if (t.isTipped) {
+		setBrokenButtonState(uiThrow.getThrowType());
+		setErrorButtonState();
+
+		if (uiThrow.isTipped) {
 			((ImageView) findViewById(R.id.gip_button_strike)).getDrawable()
 					.setLevel(3);
 		}
 
-		setBrokenButtonState(uiThrow.getThrowType());
-	}
-
-	private void setSpecialMarks(Throw t) {
-		uiThrow.isTipped = t.isTipped;
-		uiThrow.setFireCounts(t.getFireCounts());
-		uiThrow.setDeadType(t.getDeadType());
 		for (View vw : deadViews) {
 			vw.setBackgroundColor(Color.LTGRAY);
 		}
-		if (t.getDeadType() > 0) {
-			deadViews[t.getDeadType() - 1].setBackgroundColor(Color.RED);
+		if (uiThrow.getDeadType() > 0) {
+			deadViews[uiThrow.getDeadType() - 1].setBackgroundColor(Color.RED);
 		}
-
-		uiThrow.isLineFault = t.isLineFault;
-		uiThrow.isOffensiveDrinkDropped = t.isOffensiveDrinkDropped;
-		uiThrow.isOffensivePoleKnocked = t.isOffensivePoleKnocked;
-		uiThrow.isOffensiveBottleKnocked = t.isOffensiveBottleKnocked;
-		uiThrow.isOffensiveBreakError = t.isOffensiveBreakError;
-
-		uiThrow.isGoaltend = t.isGoaltend;
-		uiThrow.isGrabbed = t.isGrabbed;
-		uiThrow.isDrinkHit = t.isDrinkHit;
-		uiThrow.isDefensiveDrinkDropped = t.isDefensiveDrinkDropped;
-		uiThrow.isDefensivePoleKnocked = t.isDefensivePoleKnocked;
-		uiThrow.isDefensiveBottleKnocked = t.isDefensiveBottleKnocked;
-		uiThrow.isDefensiveBreakError = t.isDefensiveBreakError;
-
-		setErrorButtonState();
 	}
 
 	// Draw the scores ========================================================
