@@ -635,104 +635,11 @@ public class GameInProgress extends MenuContainerActivity implements
 	private void applyUIStateToThrow(Throw t) {
 		log("applyUIStateToCurrentThrow() - Applying state to throw idx "
 				+ t.getThrowIdx());
-		applyUIThrowTypeToThrow(t);
-		applyUIThrowResultToThrow(t);
 		applyUISpecialMarksToThrow(t);
 	}
 
-	private void applyUIThrowTypeToThrow(Throw t) {
-		if (currentFireCounts[1] >= 3) {
-			t.setThrowType(ThrowType.FIRED_ON);
-		} else {
-			t.setThrowType(currentThrowType);
-		}
-	}
-
-	private void applyUIThrowResultToThrow(Throw t) {
-		if (currentFireCounts[1] >= 3) {
-			t.setThrowResult(ThrowResult.NA);
-			naView.setBackgroundColor(Color.RED);
-		} else {
-			// some error checking
-			switch (currentThrowType) {
-			case ThrowType.BALL_HIGH:
-			case ThrowType.BALL_RIGHT:
-			case ThrowType.BALL_LOW:
-			case ThrowType.BALL_LEFT:
-			case ThrowType.STRIKE:
-				if (currentThrowResult != ThrowResult.DROP
-						&& currentThrowResult != ThrowResult.CATCH) {
-					currentThrowResult = ThrowResult.CATCH;
-					setThrowResultToNP(ThrowResult.CATCH);
-				}
-				break;
-			case ThrowType.TRAP:
-			case ThrowType.TRAP_REDEEMED:
-			case ThrowType.SHORT:
-			case ThrowType.FIRED_ON:
-				currentThrowResult = ThrowResult.NA;
-				naView.setBackgroundColor(Color.RED);
-				break;
-			default:
-				break;
-			}
-			// log("currentFireCounts: " + currentFireCounts[0] + ", " +
-			// currentFireCounts[1]);
-			if (currentFireCounts[0] >= 3) {
-				currentThrowResult = ThrowResult.NA;
-				naView.setBackgroundColor(Color.RED);
-			}
-
-			if (currentThrowResult == ThrowResult.BROKEN) {
-				t.setThrowResult(ThrowResult.BROKEN);
-			} else if (currentThrowResult == ThrowResult.NA) {
-				t.setThrowResult(ThrowResult.NA);
-				naView.setBackgroundColor(Color.RED);
-			} else {
-				t.setThrowResult(getThrowResultFromNP());
-			}
-			log("throw type is " + ThrowResult.typeString[t.getThrowResult()]);
-		}
-	}
-
 	private void applyUISpecialMarksToThrow(Throw t) {
-		if (currentFireCounts[1] >= 3) {
-			t.isTipped = false;
-			t.setDeadType(DeadType.ALIVE);
-			t.isLineFault = false;
-			t.isGoaltend = false;
-			t.isDrinkHit = false;
-		} else {
-			t.isTipped = currentIsTipped;
-			t.setDeadType(currentDeadType);
-			for (View vw : deadViews) {
-				vw.setBackgroundColor(Color.LTGRAY);
-			}
-			if (currentDeadType > 0) {
-				deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
-			}
 
-			// ownGoals: 0) linefault, 1) drink drop, 2) knocked pole, 3)
-			// knocked bottle, 4) bottle break
-			t.isLineFault = currentOwnGoals[0];
-			t.isOffensiveDrinkDropped = currentOwnGoals[1];
-			t.isOffensivePoleKnocked = currentOwnGoals[2];
-			t.isOffensiveBottleKnocked = currentOwnGoals[3];
-			t.isOffensiveBreakError = currentOwnGoals[4];
-
-			// defErrors: 0) goaltend, 1) drink hit, 2) drink drop, 3) knocked
-			// pole, 4) knocked bottle, 5) bottle break
-			t.isGoaltend = currentDefErrors[0];
-			t.isGrabbed = currentDefErrors[1];
-			t.isDrinkHit = currentDefErrors[2];
-			t.isDefensiveDrinkDropped = currentDefErrors[3];
-			t.isDefensivePoleKnocked = currentDefErrors[4];
-			t.isDefensiveBottleKnocked = currentDefErrors[5];
-			t.isDefensiveBreakError = currentDefErrors[6];
-
-			setErrorButtonState();
-
-		}
 	}
 
 	// AG to UI ===============================================================
@@ -785,23 +692,19 @@ public class GameInProgress extends MenuContainerActivity implements
 			deadViews[t.getDeadType() - 1].setBackgroundColor(Color.RED);
 		}
 
-		// ownGoals: 0) linefault, 1) drink drop, 2) knocked pole, 3) knocked
-		// bottle, 4) bottle break
-		currentOwnGoals[0] = t.isLineFault;
-		currentOwnGoals[1] = t.isOffensiveDrinkDropped;
-		currentOwnGoals[2] = t.isOffensivePoleKnocked;
-		currentOwnGoals[3] = t.isOffensiveBottleKnocked;
-		currentOwnGoals[4] = t.isOffensiveBreakError;
+		uiThrow.isLineFault = t.isLineFault;
+		uiThrow.isOffensiveDrinkDropped = t.isOffensiveDrinkDropped;
+		uiThrow.isOffensivePoleKnocked = t.isOffensivePoleKnocked;
+		uiThrow.isOffensiveBottleKnocked = t.isOffensiveBottleKnocked;
+		uiThrow.isOffensiveBreakError = t.isOffensiveBreakError;
 
-		// defErrors: 0) goaltend, 1) drink hit, 2) drink drop, 3) knocked pole,
-		// 4) knocked bottle, 5) bottle break
-		currentDefErrors[0] = t.isGoaltend;
-		currentDefErrors[1] = t.isGrabbed;
-		currentDefErrors[2] = t.isDrinkHit;
-		currentDefErrors[3] = t.isDefensiveDrinkDropped;
-		currentDefErrors[4] = t.isDefensivePoleKnocked;
-		currentDefErrors[5] = t.isDefensiveBottleKnocked;
-		currentDefErrors[6] = t.isDefensiveBreakError;
+		uiThrow.isGoaltend = t.isGoaltend;
+		uiThrow.isGrabbed = t.isGrabbed;
+		uiThrow.isDrinkHit = t.isDrinkHit;
+		uiThrow.isDefensiveDrinkDropped = t.isDefensiveDrinkDropped;
+		uiThrow.isDefensivePoleKnocked = t.isDefensivePoleKnocked;
+		uiThrow.isDefensiveBottleKnocked = t.isDefensiveBottleKnocked;
+		uiThrow.isDefensiveBreakError = t.isDefensiveBreakError;
 
 		setErrorButtonState();
 	}
