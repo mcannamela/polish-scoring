@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -853,22 +851,23 @@ public class Throw implements Comparable<Throw> {
 			isTipped = false;
 			setDeadType(DeadType.ALIVE);
 			isLineFault = false;
-			isGoaltend = false;
-			isDrinkHit = false;
 		} else {
-			isTipped = currentIsTipped;
-			t.setDeadType(currentDeadType);
-			for (View vw : deadViews) {
-				vw.setBackgroundColor(Color.LTGRAY);
-			}
-			if (currentDeadType > 0) {
-				deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
-			}
+			// isTipped = currentIsTipped;
+			// t.setDeadType(currentDeadType);
+			// for (View vw : deadViews) {
+			// vw.setBackgroundColor(Color.LTGRAY);
+			// }
+			// if (currentDeadType > 0) {
+			// deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
+			// }
 			isLineFault = ownGoals[0];
 			isOffensiveDrinkDropped = ownGoals[1];
 			isOffensivePoleKnocked = ownGoals[2];
 			isOffensiveBottleKnocked = ownGoals[3];
 			isOffensiveBreakError = ownGoals[4];
+
+			// setErrorButtonState();
+
 		}
 
 	}
@@ -884,18 +883,17 @@ public class Throw implements Comparable<Throw> {
 		if (offenseFireCount >= 3) {
 			isTipped = false;
 			setDeadType(DeadType.ALIVE);
-			isLineFault = false;
 			isGoaltend = false;
 			isDrinkHit = false;
 		} else {
-			isTipped = currentIsTipped;
-			t.setDeadType(currentDeadType);
-			for (View vw : deadViews) {
-				vw.setBackgroundColor(Color.LTGRAY);
-			}
-			if (currentDeadType > 0) {
-				deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
-			}
+			// isTipped = currentIsTipped;
+			// t.setDeadType(currentDeadType);
+			// for (View vw : deadViews) {
+			// vw.setBackgroundColor(Color.LTGRAY);
+			// }
+			// if (currentDeadType > 0) {
+			// deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
+
 			isGoaltend = defErrors[0];
 			isGrabbed = defErrors[1];
 			isDrinkHit = defErrors[2];
@@ -903,6 +901,7 @@ public class Throw implements Comparable<Throw> {
 			isDefensivePoleKnocked = defErrors[4];
 			isDefensiveBottleKnocked = defErrors[5];
 			isDefensiveBreakError = defErrors[6];
+		}
 	}
 
 	public void setInitialOffensivePlayerScore(int initialOffensivePlayerScore) {
