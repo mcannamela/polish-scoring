@@ -258,7 +258,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:onClick="errorButtonPressed"
+        android:onClick="OwnGoalDialog"
         android:text="OG"
         android:contentDescription="ownGoal" />
     
@@ -269,7 +269,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:onClick="errorButtonPressed"
+        android:onClick="PlayerErrorDialog"
         android:text="Err"
         android:contentDescription="playerError" />
   

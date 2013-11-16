@@ -51,43 +51,43 @@ public class Throw implements Comparable<Throw> {
 	private int deadType = DeadType.ALIVE;
 
 	@DatabaseField
-	public boolean isTipped = false;
+	private boolean isTipped = false;
 
 	@DatabaseField
-	public boolean isGoaltend = false;
+	private boolean isGoaltend = false;
 
 	@DatabaseField
-	public boolean isGrabbed = false;
+	private boolean isGrabbed = false;
 
 	@DatabaseField
-	public boolean isDrinkHit = false;
+	private boolean isDrinkHit = false;
 
 	@DatabaseField
-	public boolean isLineFault = false;
+	private boolean isLineFault = false;
 
 	@DatabaseField
-	public boolean isOffensiveDrinkDropped = false;
+	private boolean isOffensiveDrinkDropped = false;
 
 	@DatabaseField
-	public boolean isOffensivePoleKnocked = false;
+	private boolean isOffensivePoleKnocked = false;
 
 	@DatabaseField
-	public boolean isOffensiveBottleKnocked = false;
+	private boolean isOffensiveBottleKnocked = false;
 
 	@DatabaseField
-	public boolean isOffensiveBreakError = false;
+	private boolean isOffensiveBreakError = false;
 
 	@DatabaseField
-	public boolean isDefensiveDrinkDropped = false;
+	private boolean isDefensiveDrinkDropped = false;
 
 	@DatabaseField
-	public boolean isDefensivePoleKnocked = false;
+	private boolean isDefensivePoleKnocked = false;
 
 	@DatabaseField
-	public boolean isDefensiveBottleKnocked = false;
+	private boolean isDefensiveBottleKnocked = false;
 
 	@DatabaseField
-	public boolean isDefensiveBreakError = false;
+	private boolean isDefensiveBreakError = false;
 
 	@DatabaseField
 	private int offenseFireCount = 0;
@@ -760,6 +760,21 @@ public class Throw implements Comparable<Throw> {
 	}
 
 	public void setThrowResult(int throwResult) {
+		this.throwResult = throwResult;
+	}
+
+	public void trySetThrowResult(int throwResult) {
+		switch (throwResult) {
+		case ThrowResult.BROKEN:
+			if (throwResult == ThrowResult.BROKEN
+					&& this.throwResult == ThrowResult.BROKEN) {
+				this.throwResult = ThrowResult.CATCH;
+			} else {
+				this.throwResult = ThrowResult.BROKEN;
+			}
+			break;
+		}
+
 		if (offenseFireCount >= 3) {
 			this.throwResult = ThrowResult.NA;
 			// naView.setBackgroundColor(Color.RED);
@@ -807,6 +822,22 @@ public class Throw implements Comparable<Throw> {
 
 	public void setDeadType(int deadType) {
 		this.deadType = deadType;
+	}
+
+	public void trySetDeadType(int deadType) {
+		if (this.deadType == deadType) {
+			this.deadType = DeadType.ALIVE;
+		} else {
+			this.deadType = deadType;
+		}
+	}
+
+	public boolean getIsTipped() {
+		return isTipped;
+	}
+
+	public void tryToggleIsTipped() {
+		isTipped = !isTipped;
 	}
 
 	public int[] getFireCounts() {
