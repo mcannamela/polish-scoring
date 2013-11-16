@@ -526,8 +526,9 @@ public class GameInProgress extends MenuContainerActivity implements
 	// STATE LOGIC AND PROGRAM FLOW ===========================================
 	void updateActiveThrow() {
 		log("updateThrow(): Updating throw at idx " + ag.getActiveIdx());
-		uiThrowToActiveThrow();
+		ag.updateActiveThrow(uiThrow);
 		renderPage(getPageIdx(ag.getActiveIdx()));
+		refreshUI();
 	}
 
 	void confirmThrow() {
@@ -536,7 +537,8 @@ public class GameInProgress extends MenuContainerActivity implements
 			Toast.makeText(getApplicationContext(), "GTO in 3 innings",
 					Toast.LENGTH_LONG).show();
 		} else if ((activeIdx + 1) % 70 == 0) {
-			respectGentlemens();
+			GentlemensDialogFragment frag = new GentlemensDialogFragment();
+			frag.show(getFragmentManager(), "gentlemens");
 		}
 		gotoThrowIdx(activeIdx + 1);
 	}
@@ -545,7 +547,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		log("gotoThrow() - Going from throw idx " + ag.getActiveIdx()
 				+ " to throw idx " + newActiveIdx + ".");
 
-		uiThrowToActiveThrow();
+		ag.updateActiveThrow(uiThrow);
 		ag.setActiveIdx(newActiveIdx);
 		activeThrowToUiThrow();
 
@@ -561,16 +563,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		ag.saveGame();
 	}
 
-	private void respectGentlemens() {
-		GentlemensDialogFragment frag = new GentlemensDialogFragment();
-		frag.show(getFragmentManager(), "gentlemens");
-	}
-
 	// UI <--> AG =============================================================
-	private void uiThrowToActiveThrow() {
-		ag.updateActiveThrow(uiThrow);
-	}
-
 	private void activeThrowToUiThrow() {
 		uiThrow = ag.getActiveThrow();
 		refreshUI();
@@ -588,7 +581,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		setThrowButtonState(ThrowType.BOTTLE, ivBottle);
 		setThrowButtonState(ThrowType.POLE, ivPole);
 		setThrowButtonState(ThrowType.CUP, ivCup);
-		setBrokenButtonState(uiThrow.getThrowType());
+		setBrokenButtonState();
 		setErrorButtonState();
 
 		if (uiThrow.getIsTipped()) {
@@ -614,13 +607,13 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	}
 
-	private void setBrokenButtonState(int throwType) {
+	private void setBrokenButtonState() {
 		Drawable poleDwl = ivPole.getDrawable();
 		Drawable cupDwl = ivCup.getDrawable();
 		Drawable bottleDwl = ivBottle.getDrawable();
 
 		if (uiThrow.getThrowResult() == ThrowResult.BROKEN) {
-			switch (throwType) {
+			switch (uiThrow.getThrowType()) {
 			case ThrowType.POLE:
 				poleDwl.setLevel(3);
 				cupDwl.setLevel(2);
@@ -638,7 +631,7 @@ public class GameInProgress extends MenuContainerActivity implements
 				break;
 			}
 		} else {
-			switch (throwType) {
+			switch (uiThrow.getThrowType()) {
 			case ThrowType.POLE:
 				poleDwl.setLevel(1);
 				cupDwl.setLevel(0);
