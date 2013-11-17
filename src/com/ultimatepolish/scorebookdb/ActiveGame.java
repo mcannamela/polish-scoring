@@ -74,6 +74,7 @@ public class ActiveGame {
 					15, 70, new byte[0], Color.RED);
 			p[1] = new Player("Bum", "Bumb", "P2", false, true, false, true,
 					15, 70, new byte[0], Color.BLUE);
+			ruleSet = RuleType.RS01;
 			g = new Game(p[0], p[1], s, v, true, new Date());
 			tArray = new ArrayList<Throw>();
 		}
@@ -362,5 +363,4 @@ public class ActiveGame {
 			}
 		}
 	}
-
 }

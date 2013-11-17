@@ -19,30 +19,33 @@ public class RuleSet01 extends RuleSet00 {
 	public void setThrowType(Throw t, int throwType) {
 		if (t.defenseFireCount >= 3) {
 			t.throwType = ThrowType.FIRED_ON;
+			t.throwResult = ThrowResult.NA;
 			setDeadType(t, DeadType.ALIVE);
 		} else {
 			t.throwType = throwType;
-		}
 
-		switch (throwType) {
-		case ThrowType.BALL_HIGH:
-		case ThrowType.BALL_RIGHT:
-		case ThrowType.BALL_LOW:
-		case ThrowType.BALL_LEFT:
-		case ThrowType.STRIKE:
-			if (t.throwResult != ThrowResult.DROP
-					&& t.throwResult != ThrowResult.CATCH) {
-				t.throwResult = ThrowResult.CATCH;
+			if (t.offenseFireCount >= 3) {
+				setThrowResult(t, ThrowResult.NA);
+			} else {
+				switch (throwType) {
+				case ThrowType.BALL_HIGH:
+				case ThrowType.BALL_RIGHT:
+				case ThrowType.BALL_LOW:
+				case ThrowType.BALL_LEFT:
+				case ThrowType.STRIKE:
+					if (t.throwResult != ThrowResult.DROP
+							&& t.throwResult != ThrowResult.CATCH) {
+						t.throwResult = ThrowResult.CATCH;
+					}
+					break;
+				case ThrowType.SHORT:
+				case ThrowType.TRAP:
+				case ThrowType.TRAP_REDEEMED:
+					// TODO: what if redeemed trap breaks bottle?
+					setThrowResult(t, ThrowResult.NA);
+					break;
+				}
 			}
-			break;
-		case ThrowType.SHORT:
-		case ThrowType.TRAP:
-		case ThrowType.TRAP_REDEEMED:
-		case ThrowType.FIRED_ON:
-		case ThrowType.NOT_THROWN:
-			// TODO: what if redeemed trap breaks bottle?
-			setThrowResult(t, ThrowResult.NA);
-			break;
 		}
 	}
 
@@ -50,7 +53,7 @@ public class RuleSet01 extends RuleSet00 {
 	public boolean stokesOffensiveFire(Throw t) {
 		// you didn't quench yourself, hit the stack, your opponent didn't
 		// stalwart
-		boolean stokes = (!quenchesOffensiveFire(t) && isStackHit(t) && !(t.throwResult == ThrowResult.STALWART));
+		boolean stokes = (!quenchesOffensiveFire(t) && isStackHit(t) && t.throwResult != ThrowResult.STALWART);
 		return stokes;
 	}
 
@@ -66,48 +69,37 @@ public class RuleSet01 extends RuleSet00 {
 		// offense hit the stack and defense failed to defend, or offense was on
 		// fire
 
-		boolean defenseFailed = (t.throwResult == ThrowResult.DROP)
-				|| (t.throwResult == ThrowResult.BROKEN)
-				|| (isOnFire(t) && !t.isTipped);
-
-		boolean quenches = isStackHit(t) && defenseFailed;
-
-		// defensive error will also quench
-		quenches = quenches || isDefensiveError(t);
+		// boolean defenseFailed = (t.throwResult == ThrowResult.DROP)
+		// || (t.throwResult == ThrowResult.BROKEN)
+		// || (isOnFire(t) && !t.isTipped);
+		//
+		// boolean quenches = isStackHit(t) && defenseFailed;
+		//
+		// // defensive error will also quench
+		// quenches = quenches || isDefensiveError(t);
+		boolean quenches = false;
 
 		return quenches;
 	}
 
 	@Override
 	public void setFireCounts(Throw t, Throw previousThrow) {
-		int oldOffenseCount = previousThrow.defenseFireCount;
-		int oldDefenseCount = previousThrow.offenseFireCount;
-		int newOffenseCount = oldOffenseCount;
-		int newDefenseCount = oldDefenseCount;
+		int prevOffCount = previousThrow.offenseFireCount;
+		int prevDefCount = previousThrow.defenseFireCount;
 
-		// previous throw, opponent was or went on fire
-		if (oldDefenseCount >= 3) {
-			newOffenseCount = oldOffenseCount;
-			newDefenseCount = oldDefenseCount;
+		if (stokesOffensiveFire(previousThrow)) {
+			prevOffCount++;
+		} else {
+			prevOffCount = 0;
 		}
-		// opponent not on fire last throw so we have a chance to change things
-		else {
-			if (oldOffenseCount == 3) {
-				newOffenseCount++;
-			} else if (stokesOffensiveFire(t)) {
-				newOffenseCount++;
-			} else {
-				newOffenseCount = 0;
-			}
-			if (quenchesDefensiveFire(t)) {
-				newDefenseCount = 0;
-			}
+		if (quenchesDefensiveFire(t)) {
+			prevDefCount = 0;
 		}
 
-		t.offenseFireCount = newOffenseCount;
-		t.defenseFireCount = newDefenseCount;
+		t.offenseFireCount = prevDefCount;
+		t.defenseFireCount = prevOffCount;
 
-		Log.i("Throw.setFireCounts()", "o=" + newOffenseCount + ", d="
-				+ newDefenseCount);
+		Log.i("Throw.setFireCounts()", "o=" + prevDefCount + ", d="
+				+ prevOffCount);
 	}
 }
