@@ -12,6 +12,8 @@ import android.content.Context;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.ultimatepolish.scorebookdb.enums.ThrowResult;
+import com.ultimatepolish.scorebookdb.enums.ThrowType;
 
 @DatabaseTable
 public class Game {
@@ -104,7 +106,7 @@ public class Game {
 
 	public boolean isValidThrow(Throw t) {
 		boolean isValid = true;
-		int idx = t.getThrowIdx();
+		int idx = t.throwIdx;
 		switch (idx % 2) {
 		// TODO: do players need to be refreshed now that foreign variable is
 		// used?
@@ -138,7 +140,7 @@ public class Game {
 			Collections.sort(dbThrows);
 
 			for (Throw t : dbThrows) {
-				tidx = t.getThrowIdx();
+				tidx = t.throwIdx;
 
 				// purge any throws with negative index
 				if (tidx < 0) {
@@ -161,8 +163,8 @@ public class Game {
 				// infill with a caught strike if necessary
 				if (t == null) {
 					t = makeNewThrow(i);
-					t.setThrowType(ThrowType.STRIKE);
-					t.setThrowResult(ThrowResult.CATCH);
+					t.throwType = ThrowType.STRIKE;
+					t.throwResult = ThrowResult.CATCH;
 				}
 				throwArray.add(t);
 			}

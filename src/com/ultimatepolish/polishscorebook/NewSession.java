@@ -29,8 +29,8 @@ import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Player;
 import com.ultimatepolish.scorebookdb.Session;
 import com.ultimatepolish.scorebookdb.SessionMember;
-import com.ultimatepolish.scorebookdb.SessionType;
 import com.ultimatepolish.scorebookdb.Team;
+import com.ultimatepolish.scorebookdb.enums.SessionType;
 
 public class NewSession extends MenuContainerActivity {
 	Long sId;

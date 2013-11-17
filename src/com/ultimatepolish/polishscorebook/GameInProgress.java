@@ -30,10 +30,11 @@ import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.ActiveGame;
-import com.ultimatepolish.scorebookdb.DeadType;
 import com.ultimatepolish.scorebookdb.Throw;
-import com.ultimatepolish.scorebookdb.ThrowResult;
-import com.ultimatepolish.scorebookdb.ThrowType;
+import com.ultimatepolish.scorebookdb.enums.DeadType;
+import com.ultimatepolish.scorebookdb.enums.ThrowResult;
+import com.ultimatepolish.scorebookdb.enums.ThrowType;
+import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class GameInProgress extends MenuContainerActivity implements
 		ThrowTableFragment.OnTableRowClickedListener {
@@ -60,13 +61,24 @@ public class GameInProgress extends MenuContainerActivity implements
 	NumberPicker resultNp;
 
 	public ActiveGame ag;
+	public RuleSet ruleSet;
 	Dao<Throw, Long> tDao;
 	Throw uiThrow;
 
 	// LISTENERS ==============================================================
-	private OnValueChangeListener numberPickerChangeListener = new OnValueChangeListener() {
+	private OnValueChangeListener resultNPChangeListener = new OnValueChangeListener() {
 		public void onValueChange(NumberPicker parent, int oldVal, int newVal) {
-			uiThrow.setThrowResult(getThrowResultFromNP());
+			switch (newVal) {
+			case 0:
+				uiThrow.throwResult = ThrowResult.DROP;
+				break;
+			case 1:
+				uiThrow.throwResult = ThrowResult.CATCH;
+				break;
+			case 2:
+				uiThrow.throwResult = ThrowResult.STALWART;
+				break;
+			}
 			updateActiveThrow();
 		}
 	};
@@ -80,36 +92,36 @@ public class GameInProgress extends MenuContainerActivity implements
 
 			switch (buttonId) {
 			case R.id.gip_button_strike:
-				uiThrow.tryToggleIsTipped();
-				if (uiThrow.getIsTipped()) {
+				ruleSet.toggleIsTipped(uiThrow);
+				if (uiThrow.isTipped) {
 					ivStrike.getDrawable().setLevel(2);
 				} else {
 					ivStrike.getDrawable().setLevel(0);
 				}
 				break;
 			case R.id.gip_button_pole:
-				uiThrow.setThrowType(ThrowType.POLE);
-				uiThrow.trySetThrowResult(ThrowResult.BROKEN);
+				ruleSet.setThrowType(uiThrow, ThrowType.POLE);
+				ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_cup:
-				uiThrow.setThrowType(ThrowType.CUP);
-				uiThrow.trySetThrowResult(ThrowResult.BROKEN);
+				ruleSet.setThrowType(uiThrow, ThrowType.CUP);
+				ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_bottle:
-				uiThrow.setThrowType(ThrowType.BOTTLE);
-				uiThrow.trySetThrowResult(ThrowResult.BROKEN);
+				ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
+				ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_high:
-				uiThrow.trySetDeadType(DeadType.HIGH);
+				ruleSet.setDeadType(uiThrow, DeadType.HIGH);
 				break;
 			case R.id.gip_button_right:
-				uiThrow.trySetDeadType(DeadType.RIGHT);
+				ruleSet.setDeadType(uiThrow, DeadType.RIGHT);
 				break;
 			case R.id.gip_button_low:
-				uiThrow.trySetDeadType(DeadType.LOW);
+				ruleSet.setDeadType(uiThrow, DeadType.LOW);
 				break;
 			case R.id.gip_button_left:
-				uiThrow.trySetDeadType(DeadType.LEFT);
+				ruleSet.setDeadType(uiThrow, DeadType.LEFT);
 				break;
 			default:
 				break;
@@ -147,57 +159,57 @@ public class GameInProgress extends MenuContainerActivity implements
 		log("buttonPressed(): " + view.getContentDescription() + " was pressed");
 		int buttonId = view.getId();
 
-		if (uiThrow.getThrowType() == ThrowType.TRAP
-				|| uiThrow.getThrowType() == ThrowType.TRAP_REDEEMED) {
+		if (uiThrow.throwType == ThrowType.TRAP
+				|| uiThrow.throwType == ThrowType.TRAP_REDEEMED) {
 			switch (buttonId) {
 			case R.id.gip_button_trap:
-				uiThrow.setThrowType(ThrowType.NOT_THROWN);
-				uiThrow.setThrowResult(getThrowResultFromNP());
+				ruleSet.setThrowType(uiThrow, ThrowType.NOT_THROWN);
+				ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
 				((ImageView) view).getDrawable().setLevel(0);
 				break;
 			case R.id.gip_button_bottle:
 			case R.id.gip_button_pole:
 			case R.id.gip_button_cup:
-				uiThrow.setThrowType(ThrowType.TRAP_REDEEMED);
+				ruleSet.setThrowType(uiThrow, ThrowType.TRAP_REDEEMED);
 				confirmThrow();
 				break;
 			default:
-				uiThrow.setThrowType(ThrowType.TRAP);
+				ruleSet.setThrowType(uiThrow, ThrowType.TRAP);
 				confirmThrow();
 				break;
 			}
 		} else {
 			switch (buttonId) {
 			case R.id.gip_button_high:
-				uiThrow.setThrowType(ThrowType.BALL_HIGH);
+				ruleSet.setThrowType(uiThrow, ThrowType.BALL_HIGH);
 				break;
 			case R.id.gip_button_low:
-				uiThrow.setThrowType(ThrowType.BALL_LOW);
+				ruleSet.setThrowType(uiThrow, ThrowType.BALL_LOW);
 				break;
 			case R.id.gip_button_left:
-				uiThrow.setThrowType(ThrowType.BALL_LEFT);
+				ruleSet.setThrowType(uiThrow, ThrowType.BALL_LEFT);
 				break;
 			case R.id.gip_button_right:
-				uiThrow.setThrowType(ThrowType.BALL_RIGHT);
+				ruleSet.setThrowType(uiThrow, ThrowType.BALL_RIGHT);
 				break;
 			case R.id.gip_button_trap:
-				uiThrow.setThrowType(ThrowType.TRAP);
+				ruleSet.setThrowType(uiThrow, ThrowType.TRAP);
 				((ImageView) view).getDrawable().setLevel(2);
 				break;
 			case R.id.gip_button_short:
-				uiThrow.setThrowType(ThrowType.SHORT);
+				ruleSet.setThrowType(uiThrow, ThrowType.SHORT);
 				break;
 			case R.id.gip_button_strike:
-				uiThrow.setThrowType(ThrowType.STRIKE);
+				ruleSet.setThrowType(uiThrow, ThrowType.STRIKE);
 				break;
 			case R.id.gip_button_bottle:
-				uiThrow.setThrowType(ThrowType.BOTTLE);
+				ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
 				break;
 			case R.id.gip_button_pole:
-				uiThrow.setThrowType(ThrowType.POLE);
+				ruleSet.setThrowType(uiThrow, ThrowType.POLE);
 				break;
 			case R.id.gip_button_cup:
-				uiThrow.setThrowType(ThrowType.CUP);
+				ruleSet.setThrowType(uiThrow, ThrowType.CUP);
 				break;
 			}
 
@@ -497,7 +509,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		resultNp.setMaxValue(2);
 		resultNp.setValue(1);
 		resultNp.setDisplayedValues(catchText);
-		resultNp.setOnValueChangedListener(numberPickerChangeListener);
+		resultNp.setOnValueChangedListener(resultNPChangeListener);
 
 	}
 
@@ -547,12 +559,15 @@ public class GameInProgress extends MenuContainerActivity implements
 		log("gotoThrow() - Going from throw idx " + ag.getActiveIdx()
 				+ " to throw idx " + newActiveIdx + ".");
 
-		ag.updateActiveThrow(uiThrow);
-		ag.setActiveIdx(newActiveIdx);
-		activeThrowToUiThrow();
+		ag.updateActiveThrow(uiThrow); // ui -> ag
+		ag.setActiveIdx(newActiveIdx); // change index
+		uiThrow = ag.getActiveThrow(); // ag -> ui
+		refreshUI();
 
 		int idx = ag.getActiveIdx();
-		assert idx == newActiveIdx;
+		assert idx == newActiveIdx; // validation
+
+		// try to render the throw table
 		try {
 			renderPage(getPageIdx(idx));
 			log("gotoThrow() - Changed to page " + getPageIdx(idx) + ".");
@@ -560,17 +575,12 @@ public class GameInProgress extends MenuContainerActivity implements
 			loge("gotoThrow() - Failed to change to page " + getPageIdx(idx)
 					+ ".", e);
 		}
-		ag.saveGame();
+		ag.saveGame(); // save the game
 	}
 
-	// UI <--> AG =============================================================
-	private void activeThrowToUiThrow() {
-		uiThrow = ag.getActiveThrow();
-		refreshUI();
-	}
-
+	// UI =====================================================================
 	private void refreshUI() {
-		setThrowResultToNP(uiThrow.getThrowResult());
+		setThrowResultToNP(uiThrow.throwResult);
 		setThrowButtonState(ThrowType.BALL_HIGH, ivHigh);
 		setThrowButtonState(ThrowType.BALL_LOW, ivLow);
 		setThrowButtonState(ThrowType.BALL_LEFT, ivLeft);
@@ -584,23 +594,23 @@ public class GameInProgress extends MenuContainerActivity implements
 		setBrokenButtonState();
 		setErrorButtonState();
 
-		if (uiThrow.getIsTipped()) {
+		if (uiThrow.isTipped) {
 			ivStrike.getDrawable().setLevel(3);
 		}
 
 		for (View vw : deadViews) {
 			vw.setBackgroundColor(Color.LTGRAY);
 		}
-		if (uiThrow.getDeadType() > 0) {
-			deadViews[uiThrow.getDeadType() - 1].setBackgroundColor(Color.RED);
+		if (uiThrow.deadType > 0) {
+			deadViews[uiThrow.deadType - 1].setBackgroundColor(Color.RED);
 		}
 	}
 
 	private void setThrowButtonState(int throwType, ImageView iv) {
-		if (throwType == uiThrow.getThrowType()) {
+		if (throwType == uiThrow.throwType) {
 			iv.getDrawable().setLevel(1);
 		} else if (throwType == ThrowType.TRAP
-				&& uiThrow.getThrowType() == ThrowType.TRAP_REDEEMED) {
+				&& uiThrow.throwType == ThrowType.TRAP_REDEEMED) {
 			iv.getDrawable().setLevel(1);
 		} else {
 			iv.getDrawable().setLevel(0);
@@ -612,8 +622,8 @@ public class GameInProgress extends MenuContainerActivity implements
 		Drawable cupDwl = ivCup.getDrawable();
 		Drawable bottleDwl = ivBottle.getDrawable();
 
-		if (uiThrow.getThrowResult() == ThrowResult.BROKEN) {
-			switch (uiThrow.getThrowType()) {
+		if (uiThrow.throwResult == ThrowResult.BROKEN) {
+			switch (uiThrow.throwType) {
 			case ThrowType.POLE:
 				poleDwl.setLevel(3);
 				cupDwl.setLevel(2);
@@ -631,7 +641,7 @@ public class GameInProgress extends MenuContainerActivity implements
 				break;
 			}
 		} else {
-			switch (uiThrow.getThrowType()) {
+			switch (uiThrow.throwType) {
 			case ThrowType.POLE:
 				poleDwl.setLevel(1);
 				cupDwl.setLevel(0);
@@ -687,7 +697,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		logd("renderPage() - got fragment");
 		int[] range = ThrowTableFragment.throwIdxRange(pidx);
 		logd("renderPage() - got throw range");
-		frag.renderAsPage(pidx, ag.getThrows());
+		frag.renderAsPage(pidx, ag.getThrows(), ruleSet);
 		log("renderPage() - rendered as page " + pidx);
 		frag.clearHighlighted();
 		logd("renderPage() - cleared highlighted");
