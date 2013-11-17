@@ -396,7 +396,7 @@ public class RuleSet00 implements RuleSet {
 	}
 
 	public boolean isOnFire(Throw t) {
-		if (t.offenseFireCount > 3) {
+		if (t.offenseFireCount >= 3) {
 			assert t.defenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
 			return true;
 		} else {
@@ -485,6 +485,12 @@ public class RuleSet00 implements RuleSet {
 				t.invalidMessage += "OnFire => ThrowResult == NA or Broken. ";
 			}
 		}
+		if (isFiredOn(t)) {
+			if (t.throwType != ThrowType.FIRED_ON) {
+				valid = false;
+				t.invalidMessage += "ThrowType should be fired_on. ";
+			}
+		}
 		switch (t.throwType) {
 		case ThrowType.BALL_HIGH:
 		case ThrowType.BALL_RIGHT:
@@ -510,8 +516,8 @@ public class RuleSet00 implements RuleSet {
 				}
 				break;
 			}
-
 			break;
+
 		case ThrowType.POLE:
 		case ThrowType.CUP:
 		case ThrowType.BOTTLE:
