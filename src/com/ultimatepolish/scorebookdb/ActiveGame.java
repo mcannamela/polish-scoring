@@ -11,6 +11,9 @@ import android.content.Context;
 import android.graphics.Color;
 
 import com.j256.ormlite.dao.Dao;
+import com.ultimatepolish.scorebookdb.enums.RuleType;
+import com.ultimatepolish.scorebookdb.enums.SessionType;
+import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class ActiveGame {
 	private Context context;
@@ -22,6 +25,7 @@ public class ActiveGame {
 	private Session s;
 	private ArrayList<Throw> tArray;
 	private Venue v;
+	private RuleSet ruleSet;
 
 	private Dao<Game, Long> gDao;
 	private Dao<Player, Long> pDao;
@@ -57,6 +61,9 @@ public class ActiveGame {
 			v = g.getVenue();
 			p[0] = g.getFirstPlayer();
 			p[1] = g.getSecondPlayer();
+			// TODO: load ruleset from database once implemented
+			ruleSet = RuleType.RS00;
+
 		} else {
 			// if no game ID is passed in, this is for testing (or an error)
 			// so create dummy objects which won't be saved to database
@@ -88,13 +95,14 @@ public class ActiveGame {
 		for (int i = idx; i < nThrows(); i++) {
 			t = getThrow(i);
 			if (i == 0) {
-				t.setInitialScores();
-				t.setOffenseFireCount(0);
-				t.setDefenseFireCount(0);
+				ruleSet.setInitialScores(t);
+				// TODO: firecount changes should not be made here
+				t.offenseFireCount = 0;
+				t.defenseFireCount = 0;
 			} else {
 				u = getPreviousThrow(t);
-				t.setInitialScores(u);
-				t.setFireCounts(u);
+				ruleSet.setInitialScores(t, u);
+				ruleSet.setFireCounts(t, u);
 			}
 		}
 		updateGameScore();
@@ -105,9 +113,9 @@ public class ActiveGame {
 		if (nThrows() > 0) {
 			Throw lastThrow = getThrow(nThrows() - 1);
 			if (Throw.isP1Throw(lastThrow)) {
-				scores = lastThrow.getFinalScores();
+				scores = ruleSet.getFinalScores(lastThrow);
 			} else {
-				int[] tmp = lastThrow.getFinalScores();
+				int[] tmp = ruleSet.getFinalScores(lastThrow);
 				scores[1] = tmp[0];
 				scores[0] = tmp[1];
 			}
@@ -150,12 +158,12 @@ public class ActiveGame {
 			throw new RuntimeException("must have positive throw index, not: "
 					+ idx);
 		} else if (idx >= 0 && idx < nThrows()) {
-			t.setThrowIdx(idx);
+			t.throwIdx = idx;
 			assert g.isValidThrow(t) : "invalid throw for index " + idx;
 			t = tArray.set(idx, t);
 			saveThrow(t);
 		} else if (idx == nThrows()) {
-			t.setThrowIdx(idx);
+			t.throwIdx = idx;
 			assert g.isValidThrow(t) : "invalid throw for index " + idx;
 			tArray.add(t);
 			saveThrow(t);
@@ -176,10 +184,10 @@ public class ActiveGame {
 		} else if (idx == nThrows()) {
 			t = makeNextThrow();
 			if (idx == 0) {
-				t.setInitialScores();
+				ruleSet.setInitialScores(t);
 			} else {
 				Throw u = getPreviousThrow(t);
-				t.setInitialScores(u);
+				ruleSet.setInitialScores(t, u);
 			}
 
 			tArray.add(t);
@@ -195,7 +203,7 @@ public class ActiveGame {
 
 	public Throw getPreviousThrow(Throw t) {
 		Throw u = null;
-		int idx = t.getThrowIdx();
+		int idx = t.throwIdx;
 		if (idx <= 0) {
 			throw new RuntimeException("throw " + idx + " has no predecessor");
 		} else if (idx > 0 && idx <= nThrows()) {
@@ -284,22 +292,22 @@ public class ActiveGame {
 				tList = tDao.queryForFieldValuesArgs(m);
 			} catch (SQLException e) {
 				throw new RuntimeException("could not query for throw "
-						+ t.getThrowIdx() + ", game " + t.getGame().getId());
+						+ t.throwIdx + ", game " + t.getGame().getId());
 			}
 			try {
 				if (tList.isEmpty()) {
 					assert g.isValidThrow(t) : "invalid throw for index "
-							+ t.getThrowIdx() + ", not saving";
+							+ t.throwIdx + ", not saving";
 					tDao.create(t);
 				} else {
 					assert g.isValidThrow(t) : "invalid throw for index "
-							+ t.getThrowIdx() + ", not updating";
+							+ t.throwIdx + ", not updating";
 					t.setId(tList.get(0).getId());
 					tDao.update(t);
 				}
 			} catch (SQLException e) {
 				throw new RuntimeException("could not create/update throw "
-						+ t.getThrowIdx() + ", game " + t.getGame().getId());
+						+ t.throwIdx + ", game " + t.getGame().getId());
 			}
 		}
 	}

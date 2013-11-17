@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Bracket;
 import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.SessionType;
+import com.ultimatepolish.scorebookdb.enums.SessionType;
 
 public class Detail_Session extends MenuContainerActivity {
 	Long sId;

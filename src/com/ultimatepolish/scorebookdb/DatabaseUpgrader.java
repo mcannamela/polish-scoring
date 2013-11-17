@@ -12,6 +12,11 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import com.ultimatepolish.scorebookdb.enums.DeadType;
+import com.ultimatepolish.scorebookdb.enums.RuleType;
+import com.ultimatepolish.scorebookdb.enums.ThrowResult;
+import com.ultimatepolish.scorebookdb.enums.ThrowType;
+import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class DatabaseUpgrader {
 	public static void increment_09(ConnectionSource connectionSource,
@@ -307,9 +312,11 @@ public class DatabaseUpgrader {
 			throws SQLException {
 		String msg;
 		List<Long> badThrows = new ArrayList<Long>();
+		// TODO: make this dynamic once implemented in db
+		RuleSet rs = RuleType.RS00;
 		for (Throw t : tDao) {
-			if (!t.isValid()) {
-				msg = "bad throw: " + t.getId() + "- " + t.getInvalidMessage();
+			if (!rs.isValid(t)) {
+				msg = "bad throw: " + t.getId() + "- " + t.invalidMessage;
 				Log.w("DatabaseUpgrader.checkThrows()", msg);
 				badThrows.add(t.getId());
 			}
