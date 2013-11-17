@@ -98,16 +98,16 @@ public class GameInProgress extends MenuContainerActivity implements
 				}
 				break;
 			case R.id.gip_button_pole:
+				toggleBroken();
 				ag.ruleSet.setThrowType(uiThrow, ThrowType.POLE);
-				ag.ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_cup:
+				toggleBroken();
 				ag.ruleSet.setThrowType(uiThrow, ThrowType.CUP);
-				ag.ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_bottle:
+				toggleBroken();
 				ag.ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
-				ag.ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_high:
 				toggleDeadType(DeadType.HIGH);
@@ -745,6 +745,14 @@ public class GameInProgress extends MenuContainerActivity implements
 			ag.ruleSet.setDeadType(uiThrow, DeadType.ALIVE);
 		} else {
 			ag.ruleSet.setDeadType(uiThrow, deadType);
+		}
+	}
+
+	public void toggleBroken() {
+		if (uiThrow.throwResult == ThrowResult.BROKEN) {
+			ag.ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
+		} else {
+			ag.ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 		}
 	}
 
