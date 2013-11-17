@@ -25,7 +25,7 @@ public class ActiveGame {
 	private Session s;
 	private ArrayList<Throw> tArray;
 	private Venue v;
-	private RuleSet ruleSet;
+	public RuleSet ruleSet;
 
 	private Dao<Game, Long> gDao;
 	private Dao<Player, Long> pDao;
