@@ -34,7 +34,6 @@ import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.enums.DeadType;
 import com.ultimatepolish.scorebookdb.enums.ThrowResult;
 import com.ultimatepolish.scorebookdb.enums.ThrowType;
-import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class GameInProgress extends MenuContainerActivity implements
 		ThrowTableFragment.OnTableRowClickedListener {
@@ -61,7 +60,6 @@ public class GameInProgress extends MenuContainerActivity implements
 	NumberPicker resultNp;
 
 	public ActiveGame ag;
-	public RuleSet ruleSet;
 	Dao<Throw, Long> tDao;
 	Throw uiThrow;
 
@@ -92,7 +90,7 @@ public class GameInProgress extends MenuContainerActivity implements
 
 			switch (buttonId) {
 			case R.id.gip_button_strike:
-				ruleSet.setIsTipped(uiThrow, !uiThrow.isTipped);
+				ag.ruleSet.setIsTipped(uiThrow, !uiThrow.isTipped);
 				if (uiThrow.isTipped) {
 					ivStrike.getDrawable().setLevel(2);
 				} else {
@@ -100,16 +98,16 @@ public class GameInProgress extends MenuContainerActivity implements
 				}
 				break;
 			case R.id.gip_button_pole:
-				ruleSet.setThrowType(uiThrow, ThrowType.POLE);
-				ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.POLE);
+				ag.ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_cup:
-				ruleSet.setThrowType(uiThrow, ThrowType.CUP);
-				ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.CUP);
+				ag.ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_bottle:
-				ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
-				ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
+				ag.ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_high:
 				toggleDeadType(DeadType.HIGH);
@@ -163,53 +161,53 @@ public class GameInProgress extends MenuContainerActivity implements
 				|| uiThrow.throwType == ThrowType.TRAP_REDEEMED) {
 			switch (buttonId) {
 			case R.id.gip_button_trap:
-				ruleSet.setThrowType(uiThrow, ThrowType.NOT_THROWN);
-				ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.NOT_THROWN);
+				ag.ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
 				((ImageView) view).getDrawable().setLevel(0);
 				break;
 			case R.id.gip_button_bottle:
 			case R.id.gip_button_pole:
 			case R.id.gip_button_cup:
-				ruleSet.setThrowType(uiThrow, ThrowType.TRAP_REDEEMED);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.TRAP_REDEEMED);
 				confirmThrow();
 				break;
 			default:
-				ruleSet.setThrowType(uiThrow, ThrowType.TRAP);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.TRAP);
 				confirmThrow();
 				break;
 			}
 		} else {
 			switch (buttonId) {
 			case R.id.gip_button_high:
-				ruleSet.setThrowType(uiThrow, ThrowType.BALL_HIGH);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.BALL_HIGH);
 				break;
 			case R.id.gip_button_low:
-				ruleSet.setThrowType(uiThrow, ThrowType.BALL_LOW);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.BALL_LOW);
 				break;
 			case R.id.gip_button_left:
-				ruleSet.setThrowType(uiThrow, ThrowType.BALL_LEFT);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.BALL_LEFT);
 				break;
 			case R.id.gip_button_right:
-				ruleSet.setThrowType(uiThrow, ThrowType.BALL_RIGHT);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.BALL_RIGHT);
 				break;
 			case R.id.gip_button_trap:
-				ruleSet.setThrowType(uiThrow, ThrowType.TRAP);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.TRAP);
 				((ImageView) view).getDrawable().setLevel(2);
 				break;
 			case R.id.gip_button_short:
-				ruleSet.setThrowType(uiThrow, ThrowType.SHORT);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.SHORT);
 				break;
 			case R.id.gip_button_strike:
-				ruleSet.setThrowType(uiThrow, ThrowType.STRIKE);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.STRIKE);
 				break;
 			case R.id.gip_button_bottle:
-				ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
 				break;
 			case R.id.gip_button_pole:
-				ruleSet.setThrowType(uiThrow, ThrowType.POLE);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.POLE);
 				break;
 			case R.id.gip_button_cup:
-				ruleSet.setThrowType(uiThrow, ThrowType.CUP);
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.CUP);
 				break;
 			}
 
@@ -697,7 +695,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		logd("renderPage() - got fragment");
 		int[] range = ThrowTableFragment.throwIdxRange(pidx);
 		logd("renderPage() - got throw range");
-		frag.renderAsPage(pidx, ag.getThrows(), ruleSet);
+		frag.renderAsPage(pidx, ag.getThrows(), ag.ruleSet);
 		log("renderPage() - rendered as page " + pidx);
 		frag.clearHighlighted();
 		logd("renderPage() - cleared highlighted");
@@ -744,9 +742,9 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	public void toggleDeadType(int deadType) {
 		if (uiThrow.deadType == deadType) {
-			ruleSet.setDeadType(uiThrow, DeadType.ALIVE);
+			ag.ruleSet.setDeadType(uiThrow, DeadType.ALIVE);
 		} else {
-			ruleSet.setDeadType(uiThrow, deadType);
+			ag.ruleSet.setDeadType(uiThrow, deadType);
 		}
 	}
 
