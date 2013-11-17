@@ -163,16 +163,6 @@ public class Throw implements Comparable<Throw> {
 		return defensivePlayer;
 	}
 
-	public int[] getFireCounts() {
-		int[] fireCounts = { offenseFireCount, defenseFireCount };
-		return fireCounts;
-	}
-
-	public void setFireCounts(int[] fireCounts) {
-		this.offenseFireCount = fireCounts[0];
-		this.defenseFireCount = fireCounts[1];
-	}
-
 	public boolean[] getOwnGoals() {
 		boolean[] ownGoals = { isLineFault, isOffensiveDrinkDropped,
 				isOffensivePoleKnocked, isOffensiveBottleKnocked,
