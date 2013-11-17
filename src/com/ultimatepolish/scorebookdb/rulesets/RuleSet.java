@@ -23,41 +23,39 @@ public interface RuleSet {
 
 	public void setDefErrors(Throw t, boolean[] defErrors);
 
-	public int[] getScoreDifferentials();
+	public int[] getScoreDifferentials(Throw t);
 
-	public boolean isDropScoreBlocked();
+	public boolean isDropScoreBlocked(Throw t);
 
-	public boolean isOffensiveError();
+	public boolean isOffensiveError(Throw t);
 
-	public boolean isStackHit();
+	public boolean isStackHit(Throw t);
 
-	public boolean isOnFire();
+	public boolean isOnFire(Throw t);
 
-	public boolean isFiredOn();
+	public boolean isFiredOn(Throw t);
 
-	public boolean stokesOffensiveFire();
+	public boolean stokesOffensiveFire(Throw t);
 
-	public boolean quenchesOffensiveFire();
+	public boolean quenchesOffensiveFire(Throw t);
 
-	public boolean quenchesDefensiveFire();
+	public boolean quenchesDefensiveFire(Throw t);
 
-	public void toggleIsTipped(Throw t);
+	public void setIsTipped(Throw t, boolean isTipped);
 
 	public void setFireCounts(Throw t, Throw previousThrow);
 
-	public void setFireCounts(int[] fireCounts);
+	public void setFireCounts(Throw t, int[] fireCounts);
 
-	public void setOffenseFireCount(int offenseFireCount);
+	public void setOffenseFireCount(Throw t, int offenseFireCount);
 
-	public void setDefenseFireCount(int defenseFireCount);
+	public void setDefenseFireCount(Throw t, int defenseFireCount);
 
 	public String getSpecialString(Throw t);
 
 	public void setThrowDrawable(Throw t, ImageView iv);
 
-	public boolean isValid(Context context);
+	public boolean isValid(Throw t, Context context);
 
 	public boolean isValid(Throw t);
-
-	public String getInvalidMessage();
 }

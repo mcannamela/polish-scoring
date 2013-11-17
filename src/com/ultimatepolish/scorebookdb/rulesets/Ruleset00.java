@@ -17,145 +17,52 @@ import com.ultimatepolish.scorebookdb.enums.ThrowResult;
 import com.ultimatepolish.scorebookdb.enums.ThrowType;
 
 public final class Ruleset00 implements RuleSet {
+	public int test;
 
 	public Ruleset00() {
 	}
 
 	public void setThrowType(Throw t, int throwType) {
-		t.setThrowType(throwType);
+		t.throwType = throwType;
 	}
 
-	public void setThrowResult(int throwResult) {
-
-		switch (throwResult) {
-		case ThrowResult.BROKEN:
-			if (throwResult == ThrowResult.BROKEN
-					&& this.throwResult == ThrowResult.BROKEN) {
-				this.throwResult = ThrowResult.CATCH;
-			} else {
-				this.throwResult = ThrowResult.BROKEN;
-			}
-			break;
-		}
-
-		if (offenseFireCount >= 3) {
-			this.throwResult = ThrowResult.NA;
-		} else {
-			// some error checking
-			switch (throwType) {
-			case ThrowType.BALL_HIGH:
-			case ThrowType.BALL_RIGHT:
-			case ThrowType.BALL_LOW:
-			case ThrowType.BALL_LEFT:
-			case ThrowType.STRIKE:
-				if (throwResult != ThrowResult.DROP
-						&& throwResult != ThrowResult.CATCH) {
-					this.throwResult = ThrowResult.CATCH;
-				} else {
-					this.throwResult = throwResult;
-				}
-				break;
-			case ThrowType.TRAP:
-			case ThrowType.TRAP_REDEEMED:
-			case ThrowType.SHORT:
-			case ThrowType.FIRED_ON:
-				throwResult = ThrowResult.NA;
-				break;
-			default:
-				break;
-			}
-			if (defenseFireCount >= 3) {
-				throwResult = ThrowResult.NA;
-			}
-
-			if (throwResult == ThrowResult.BROKEN) {
-				this.throwResult = ThrowResult.BROKEN;
-			} else if (throwResult == ThrowResult.NA) {
-				this.throwResult = ThrowResult.NA;
-			}
-		}
+	public void setThrowResult(Throw t, int throwResult) {
+		t.throwResult = throwResult;
 	}
 
-	public void setDeadType(int deadType) {
-		if (this.deadType == deadType) {
-			this.deadType = DeadType.ALIVE;
-		} else {
-			this.deadType = deadType;
-		}
+	public void setDeadType(Throw t, int deadType) {
+		t.deadType = deadType;
 	}
 
-	public void setOwnGoals(boolean[] ownGoals) {
-		if (offenseFireCount >= 3) {
-			isTipped = false;
-			setDeadType(DeadType.ALIVE);
-			isLineFault = false;
-		} else {
-			// isTipped = currentIsTipped;
-			// t.setDeadType(currentDeadType);
-			// for (View vw : deadViews) {
-			// vw.setBackgroundColor(Color.LTGRAY);
-			// }
-			// if (currentDeadType > 0) {
-			// deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
-			// }
-			isLineFault = ownGoals[0];
-			isOffensiveDrinkDropped = ownGoals[1];
-			isOffensivePoleKnocked = ownGoals[2];
-			isOffensiveBottleKnocked = ownGoals[3];
-			isOffensiveBreakError = ownGoals[4];
-
-			// setErrorButtonState();
-
-		}
-
+	public void setOwnGoals(Throw t, boolean[] ownGoals) {
+		t.setOwnGoals(ownGoals);
 	}
 
-	public int[] getFinalScores() {
-		int[] diff = getScoreDifferentials();
-		int[] finalScores = { initialOffensivePlayerScore + diff[0],
-				initialDefensivePlayerScore + diff[1] };
+	public int[] getFinalScores(Throw t) {
+		int[] diff = getScoreDifferentials(t);
+		int[] finalScores = { t.initialOffensivePlayerScore + diff[0],
+				t.initialDefensivePlayerScore + diff[1] };
 		return finalScores;
 	}
 
-	public void setInitialScores(Throw previousThrow) {
-		int[] scores = previousThrow.getFinalScores();
-		setInitialDefensivePlayerScore(scores[0]);
-		setInitialOffensivePlayerScore(scores[1]);
+	public void setInitialScores(Throw t, Throw previousThrow) {
+		int[] scores = getFinalScores(previousThrow);
+		t.initialDefensivePlayerScore = scores[0];
+		t.initialOffensivePlayerScore = scores[1];
 	}
 
-	public void setInitialScores() {
-		setInitialDefensivePlayerScore(0);
-		setInitialOffensivePlayerScore(0);
+	public void setInitialScores(Throw t) {
+		t.initialDefensivePlayerScore = 0;
+		t.initialOffensivePlayerScore = 0;
 	}
 
-	public void setDefErrors(boolean[] defErrors) {
-		if (offenseFireCount >= 3) {
-			isTipped = false;
-			setDeadType(DeadType.ALIVE);
-			isGoaltend = false;
-			isDrinkHit = false;
-		} else {
-			// isTipped = currentIsTipped;
-			// t.setDeadType(currentDeadType);
-			// for (View vw : deadViews) {
-			// vw.setBackgroundColor(Color.LTGRAY);
-			// }
-			// if (currentDeadType > 0) {
-			// deadViews[currentDeadType - 1].setBackgroundColor(Color.RED);
-
-			isGoaltend = defErrors[0];
-			isGrabbed = defErrors[1];
-			isDrinkHit = defErrors[2];
-			isDefensiveDrinkDropped = defErrors[3];
-			isDefensivePoleKnocked = defErrors[4];
-			isDefensiveBottleKnocked = defErrors[5];
-			isDefensiveBreakError = defErrors[6];
-		}
+	public void setDefErrors(Throw t, boolean[] defErrors) {
+		t.setDefErrors(defErrors);
 	}
 
-	public void setFireCounts(Throw previousThrow) {
-		int oldOffenseCount = previousThrow.getDefenseFireCount();
-		int oldDefenseCount = previousThrow.getOffenseFireCount();
+	public void setFireCounts(Throw t, Throw previousThrow) {
+		int oldOffenseCount = previousThrow.defenseFireCount;
+		int oldDefenseCount = previousThrow.offenseFireCount;
 		int newOffenseCount = oldOffenseCount;
 		int newDefenseCount = oldDefenseCount;
 
@@ -168,32 +75,32 @@ public final class Ruleset00 implements RuleSet {
 		else {
 			if (oldOffenseCount == 3) {
 				newOffenseCount++;
-			} else if (stokesOffensiveFire()) {
+			} else if (stokesOffensiveFire(t)) {
 				newOffenseCount++;
 			} else {
 				newOffenseCount = 0;
 			}
-			if (quenchesDefensiveFire()) {
+			if (quenchesDefensiveFire(t)) {
 				newDefenseCount = 0;
 			}
 		}
 
-		setOffenseFireCount(newOffenseCount);
-		setDefenseFireCount(newDefenseCount);
+		setOffenseFireCount(t, newOffenseCount);
+		setDefenseFireCount(t, newDefenseCount);
 
 		Log.i("Throw.setFireCounts()", "o=" + newOffenseCount + ", d="
 				+ newDefenseCount);
 	}
 
-	private int[] getScoreDifferentials() {
+	public int[] getScoreDifferentials(Throw t) {
 		int[] diffs = { 0, 0 };
-		switch (throwResult) {
+		switch (t.throwResult) {
 		case ThrowResult.NA:
-			if (throwType == ThrowType.TRAP) {
+			if (t.throwType == ThrowType.TRAP) {
 				diffs[0] = -1;
-			} else if (isOnFire()) {
-				if (!isTipped) {
-					switch (throwType) {
+			} else if (isOnFire(t)) {
+				if (!t.isTipped) {
+					switch (t.throwType) {
 					case ThrowType.BOTTLE:
 						diffs[0] = 3;
 						break;
@@ -206,27 +113,27 @@ public final class Ruleset00 implements RuleSet {
 			}
 			break;
 		case ThrowResult.DROP:
-			if (!isLineFault) {
-				switch (throwType) {
+			if (!t.isLineFault) {
+				switch (t.throwType) {
 				case ThrowType.STRIKE:
-					if (!isDropScoreBlocked() && deadType == DeadType.ALIVE) {
+					if (!isDropScoreBlocked(t) && t.deadType == DeadType.ALIVE) {
 						diffs[0] = 1;
 					}
 					break;
 				case ThrowType.POLE:
 				case ThrowType.CUP:
-					if (!isTipped) {
+					if (!t.isTipped) {
 						diffs[0] = 2;
-						if (isGoaltend) {
+						if (t.isGoaltend) {
 							// if goaltended, an extra point for dropping disc
 							diffs[0] += 1;
 						}
 					}
 					break;
 				case ThrowType.BOTTLE:
-					if (!isTipped) {
+					if (!t.isTipped) {
 						diffs[0] = 3;
-						if (isGoaltend) {
+						if (t.isGoaltend) {
 							// if goaltended, an extra point for dropping disc
 							diffs[0] += 1;
 						}
@@ -238,20 +145,20 @@ public final class Ruleset00 implements RuleSet {
 			}
 			break;
 		case ThrowResult.CATCH:
-			if (!isLineFault) {
-				switch (throwType) {
+			if (!t.isLineFault) {
+				switch (t.throwType) {
 				case ThrowType.POLE:
 				case ThrowType.CUP:
-					if (!isTipped) {
-						if (isGoaltend) {
+					if (!t.isTipped) {
+						if (t.isGoaltend) {
 							// if goaltended, award points for hit
 							diffs[0] = 2;
 						}
 					}
 					break;
 				case ThrowType.BOTTLE:
-					if (!isTipped) {
-						if (isGoaltend) {
+					if (!t.isTipped) {
+						if (t.isGoaltend) {
 							// if goaltended, award points for hit
 							diffs[0] = 3;
 						}
@@ -263,12 +170,12 @@ public final class Ruleset00 implements RuleSet {
 			}
 			break;
 		case ThrowResult.STALWART:
-			if (isStackHit()) {
+			if (isStackHit(t)) {
 				diffs[1] = 1;
 			}
 			break;
 		case ThrowResult.BROKEN:
-			if (!isLineFault) {
+			if (!t.isLineFault) {
 				diffs[0] = 20;
 			}
 			break;
@@ -277,44 +184,44 @@ public final class Ruleset00 implements RuleSet {
 		}
 
 		// extra points for other modifiers
-		if (isDrinkHit) {
+		if (t.isDrinkHit) {
 			diffs[1] -= 1;
 		}
-		if (isGrabbed) {
+		if (t.isGrabbed) {
 			diffs[0] += 1;
 		}
-		if (isOffensiveDrinkDropped) {
+		if (t.isOffensiveDrinkDropped) {
 			diffs[0] -= 1;
 		}
-		if (isOffensivePoleKnocked) {
+		if (t.isOffensivePoleKnocked) {
 			diffs[1] += 2;
 		}
-		if (isOffensiveBottleKnocked) {
+		if (t.isOffensiveBottleKnocked) {
 			diffs[1] += 3;
 		}
-		if (isOffensiveBreakError) {
+		if (t.isOffensiveBreakError) {
 			diffs[1] += 20;
 		}
-		if (isDefensiveDrinkDropped) {
+		if (t.isDefensiveDrinkDropped) {
 			diffs[1] -= 1;
 		}
-		if (isDefensivePoleKnocked) {
+		if (t.isDefensivePoleKnocked) {
 			diffs[0] += 2;
 		}
-		if (isDefensiveBottleKnocked) {
+		if (t.isDefensiveBottleKnocked) {
 			diffs[0] += 3;
 		}
-		if (isDefensiveBreakError) {
+		if (t.isDefensiveBreakError) {
 			diffs[0] += 20;
 		}
 
 		return diffs;
 	}
 
-	private boolean isDropScoreBlocked() {
+	public boolean isDropScoreBlocked(Throw t) {
 		boolean isBlocked = false;
-		int oScore = initialOffensivePlayerScore;
-		int dScore = initialDefensivePlayerScore;
+		int oScore = t.initialOffensivePlayerScore;
+		int dScore = t.initialDefensivePlayerScore;
 
 		if (oScore < 10 && dScore < 10) {
 			isBlocked = false;
@@ -327,101 +234,102 @@ public final class Ruleset00 implements RuleSet {
 		return isBlocked;
 	}
 
-	public boolean isOffensiveError() {
-		return (isOffensiveBottleKnocked || isOffensivePoleKnocked
-				|| isOffensivePoleKnocked || isOffensiveBreakError
-				|| isOffensiveDrinkDropped || isLineFault);
+	public boolean isOffensiveError(Throw t) {
+		return (t.isOffensiveBottleKnocked || t.isOffensivePoleKnocked
+				|| t.isOffensivePoleKnocked || t.isOffensiveBreakError
+				|| t.isOffensiveDrinkDropped || t.isLineFault);
 	}
 
-	public boolean isDefensiveError() {
-		return (isDefensiveBottleKnocked || isDefensivePoleKnocked
-				|| isDefensivePoleKnocked || isDefensiveBreakError
-				|| isDefensiveDrinkDropped || isDrinkHit);
+	public boolean isDefensiveError(Throw t) {
+		return (t.isDefensiveBottleKnocked || t.isDefensivePoleKnocked
+				|| t.isDefensivePoleKnocked || t.isDefensiveBreakError
+				|| t.isDefensiveDrinkDropped || t.isDrinkHit);
 	}
 
-	public boolean isStackHit() {
-		return (throwType == ThrowType.POLE || throwType == ThrowType.CUP || throwType == ThrowType.BOTTLE);
+	public boolean isStackHit(Throw t) {
+		return (t.throwType == ThrowType.POLE || t.throwType == ThrowType.CUP || t.throwType == ThrowType.BOTTLE);
 	}
 
-	public boolean isOnFire() {
-		if (offenseFireCount > 3) {
-			assert defenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
+	public boolean isOnFire(Throw t) {
+		if (t.offenseFireCount > 3) {
+			assert t.defenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public boolean isFiredOn() {
-		if (defenseFireCount >= 3) {
-			assert offenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
+	public boolean isFiredOn(Throw t) {
+		if (t.defenseFireCount >= 3) {
+			assert t.offenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public boolean stokesOffensiveFire() {
+	public boolean stokesOffensiveFire(Throw t) {
 		// you didn't quench yourself, hit the stack, your opponent didn't
 		// stalwart
-		boolean stokes = (!quenchesOffensiveFire() && isStackHit() && !(throwResult == ThrowResult.STALWART));
+		boolean stokes = (!quenchesOffensiveFire(t) && isStackHit(t) && !(t.throwResult == ThrowResult.STALWART));
 		return stokes;
 	}
 
-	public boolean quenchesOffensiveFire() {
-		boolean quenches = isOffensiveError() || (deadType != DeadType.ALIVE);
+	public boolean quenchesOffensiveFire(Throw t) {
+		boolean quenches = isOffensiveError(t)
+				|| (t.deadType != DeadType.ALIVE);
 		return quenches;
 	}
 
-	public boolean quenchesDefensiveFire() {
+	public boolean quenchesDefensiveFire(Throw t) {
 		// offense hit the stack and defense failed to defend, or offense was on
 		// fire
 
-		boolean defenseFailed = (throwResult == ThrowResult.DROP)
-				|| (throwResult == ThrowResult.BROKEN)
-				|| (isOnFire() && !isTipped);
+		boolean defenseFailed = (t.throwResult == ThrowResult.DROP)
+				|| (t.throwResult == ThrowResult.BROKEN)
+				|| (isOnFire(t) && !t.isTipped);
 
-		boolean quenches = isStackHit() && defenseFailed;
+		boolean quenches = isStackHit(t) && defenseFailed;
 
 		// defensive error will also quench
-		quenches = quenches || isDefensiveError();
+		quenches = quenches || isDefensiveError(t);
 
 		return quenches;
 	}
 
-	public void toggleIsTipped() {
-		isTipped = !isTipped;
+	public void setIsTipped(Throw t, boolean isTipped) {
+		t.isTipped = isTipped;
 	}
 
-	public void setFireCounts(int[] fireCounts) {
-		this.offenseFireCount = fireCounts[0];
-		this.defenseFireCount = fireCounts[1];
+	public void setFireCounts(Throw t, int[] fireCounts) {
+		t.offenseFireCount = fireCounts[0];
+		t.defenseFireCount = fireCounts[1];
 	}
 
-	public void setOffenseFireCount(int offenseFireCount) {
-		this.offenseFireCount = offenseFireCount;
+	public void setOffenseFireCount(Throw t, int offenseFireCount) {
+		t.offenseFireCount = offenseFireCount;
 	}
 
-	public void setDefenseFireCount(int defenseFireCount) {
-		this.defenseFireCount = defenseFireCount;
+	public void setDefenseFireCount(Throw t, int defenseFireCount) {
+		t.defenseFireCount = defenseFireCount;
 	}
 
-	public String getSpecialString() {
+	public String getSpecialString(Throw t) {
 		String s = "";
 
-		if (isLineFault) {
+		if (t.isLineFault) {
 			s += "lf.";
 		}
 
-		if (isDrinkHit) {
+		if (t.isDrinkHit) {
 			s += "d.";
 		}
 
-		if (isGoaltend) {
+		if (t.isGoaltend) {
 			s += "gt.";
 		}
 
-		if (isGrabbed) {
+		if (t.isGrabbed) {
 			s += "g.";
 		}
 
@@ -430,16 +338,16 @@ public final class Ruleset00 implements RuleSet {
 		// but subtracting the value for display purposes would be more
 		// confusing
 		// this is really displaying the resulting differential due to og
-		if (isOffensiveDrinkDropped) {
+		if (t.isOffensiveDrinkDropped) {
 			og += 1;
 		}
-		if (isOffensivePoleKnocked) {
+		if (t.isOffensivePoleKnocked) {
 			og += 2;
 		}
-		if (isOffensiveBottleKnocked) {
+		if (t.isOffensiveBottleKnocked) {
 			og += 3;
 		}
-		if (isOffensiveBreakError) {
+		if (t.isOffensiveBreakError) {
 			og += 20;
 		}
 		if (og > 0) {
@@ -448,16 +356,16 @@ public final class Ruleset00 implements RuleSet {
 
 		int err = 0;
 		// same as for og
-		if (isDefensiveDrinkDropped) {
+		if (t.isDefensiveDrinkDropped) {
 			err += 1;
 		}
-		if (isDefensivePoleKnocked) {
+		if (t.isDefensivePoleKnocked) {
 			err += 2;
 		}
-		if (isDefensiveBottleKnocked) {
+		if (t.isDefensiveBottleKnocked) {
 			err += 3;
 		}
-		if (isDefensiveBreakError) {
+		if (t.isDefensiveBreakError) {
 			err += 20;
 		}
 		if (err > 0) {
@@ -473,14 +381,14 @@ public final class Ruleset00 implements RuleSet {
 		return s;
 	}
 
-	public void setThrowDrawable(ImageView iv) {
+	public void setThrowDrawable(Throw t, ImageView iv) {
 		List<Drawable> boxIconLayers = new ArrayList<Drawable>();
 
-		if (!isValid(iv.getContext())) {
+		if (!isValid(t, iv.getContext())) {
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_badthrow));
 		}
-		switch (throwType) {
+		switch (t.throwType) {
 		case ThrowType.BOTTLE:
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_under_bottle));
@@ -494,7 +402,7 @@ public final class Ruleset00 implements RuleSet {
 					R.drawable.bxs_under_pole));
 			break;
 		case ThrowType.STRIKE:
-			if (throwResult == ThrowResult.CATCH || isOnFire()) {
+			if (t.throwResult == ThrowResult.CATCH || isOnFire(t)) {
 				boxIconLayers.add(iv.getResources().getDrawable(
 						R.drawable.bxs_under_strike));
 			}
@@ -543,7 +451,7 @@ public final class Ruleset00 implements RuleSet {
 			break;
 		}
 
-		switch (throwResult) {
+		switch (t.throwResult) {
 		case ThrowResult.DROP:
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_over_drop));
@@ -558,7 +466,7 @@ public final class Ruleset00 implements RuleSet {
 			break;
 		}
 
-		switch (deadType) {
+		switch (t.deadType) {
 		case DeadType.HIGH:
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_dead_high));
@@ -577,11 +485,11 @@ public final class Ruleset00 implements RuleSet {
 			break;
 		}
 
-		if (isOnFire()) {
+		if (isOnFire(t)) {
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_over_fire));
 		}
-		if (isTipped) {
+		if (t.isTipped) {
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_over_tipped));
 		}
@@ -590,47 +498,48 @@ public final class Ruleset00 implements RuleSet {
 				.toArray(new Drawable[0])));
 	}
 
-	public boolean isValid(Context context) {
-		boolean valid = isValid();
+	public boolean isValid(Throw t, Context context) {
+		boolean valid = isValid(t);
 		if (!valid) {
-			Toast.makeText(context, invalidMessage, Toast.LENGTH_LONG).show();
+			Toast.makeText(context, t.invalidMessage, Toast.LENGTH_LONG).show();
 		}
 		return valid;
 	}
 
-	public boolean isValid() {
+	public boolean isValid(Throw t) {
 		boolean valid = true;
-		invalidMessage = "(gameId=%d, throwIdx=%d)";
-		invalidMessage = String.format(invalidMessage, game.getId(), throwIdx);
-		if (isOnFire()) {
-			if (throwResult != ThrowResult.NA
-					&& throwResult != ThrowResult.BROKEN) {
+		t.invalidMessage = "(gameId=%d, throwIdx=%d)";
+		t.invalidMessage = String.format(t.invalidMessage, t.getId(),
+				t.throwIdx);
+		if (isOnFire(t)) {
+			if (t.throwResult != ThrowResult.NA
+					&& t.throwResult != ThrowResult.BROKEN) {
 				valid = false;
-				invalidMessage += "OnFire => ThrowResult == NA or Broken. ";
+				t.invalidMessage += "OnFire => ThrowResult == NA or Broken. ";
 			}
 		}
-		switch (throwType) {
+		switch (t.throwType) {
 		case ThrowType.BALL_HIGH:
 		case ThrowType.BALL_RIGHT:
 		case ThrowType.BALL_LOW:
 		case ThrowType.BALL_LEFT:
 		case ThrowType.STRIKE:
-			if (deadType != DeadType.ALIVE && isDrinkHit) {
+			if (t.deadType != DeadType.ALIVE && t.isDrinkHit) {
 				valid = false;
-				invalidMessage += "drinkHit => live throw";
-			} else if (isGoaltend || isTipped) {
+				t.invalidMessage += "drinkHit => live throw";
+			} else if (t.isGoaltend || t.isTipped) {
 				valid = false;
-				invalidMessage += "Goaltending || tipped => not SHRLL. ";
+				t.invalidMessage += "Goaltending || tipped => not SHRLL. ";
 			}
 
-			switch (throwResult) {
+			switch (t.throwResult) {
 			case ThrowResult.DROP:
 			case ThrowResult.CATCH:
 				break;
 			default:
-				if (!isOnFire()) {
+				if (!isOnFire(t)) {
 					valid = false;
-					invalidMessage += "SHRLL => drop or catch. ";
+					t.invalidMessage += "SHRLL => drop or catch. ";
 				}
 				break;
 			}
@@ -639,41 +548,41 @@ public final class Ruleset00 implements RuleSet {
 		case ThrowType.POLE:
 		case ThrowType.CUP:
 		case ThrowType.BOTTLE:
-			if (isGrabbed) {
+			if (t.isGrabbed) {
 				valid = false;
-				invalidMessage += "grabbing a PCB hit should be marked goaltending. ";
+				t.invalidMessage += "grabbing a PCB hit should be marked goaltending. ";
 			}
-			if (isDrinkHit) {
+			if (t.isDrinkHit) {
 				valid = false;
-				invalidMessage += "drink hit <=>  not PCB hit. ";
+				t.invalidMessage += "drink hit <=>  not PCB hit. ";
 			}
-			if (isTipped && isGoaltend) {
+			if (t.isTipped && t.isGoaltend) {
 				valid = false;
-				invalidMessage += "PCB throws cant be tipped and goaltended simultaneously. ";
+				t.invalidMessage += "PCB throws cant be tipped and goaltended simultaneously. ";
 			}
-			if (deadType != DeadType.ALIVE && isGoaltend) {
+			if (t.deadType != DeadType.ALIVE && t.isGoaltend) {
 				valid = false;
-				invalidMessage += "Dead <=> not goaltended. ";
+				t.invalidMessage += "Dead <=> not goaltended. ";
 			}
-			if (throwResult == ThrowResult.NA && !isOnFire()) {
+			if (t.throwResult == ThrowResult.NA && !isOnFire(t)) {
 				valid = false;
-				invalidMessage += "PCB and not onFire => not NA result. ";
+				t.invalidMessage += "PCB and not onFire => not NA result. ";
 			}
-			if (isTipped && throwResult == ThrowResult.STALWART) {
+			if (t.isTipped && t.throwResult == ThrowResult.STALWART) {
 				valid = false;
-				invalidMessage += "stalwart <=> not tip. ";
+				t.invalidMessage += "stalwart <=> not tip. ";
 			}
-			if (isGoaltend && throwResult == ThrowResult.STALWART) {
+			if (t.isGoaltend && t.throwResult == ThrowResult.STALWART) {
 				valid = false;
-				invalidMessage += "stalwart <=> not goaltend. ";
+				t.invalidMessage += "stalwart <=> not goaltend. ";
 			}
-			if (isTipped && throwResult == ThrowResult.BROKEN) {
+			if (t.isTipped && t.throwResult == ThrowResult.BROKEN) {
 				valid = false;
-				invalidMessage += "tip <=> not broken. ";
+				t.invalidMessage += "tip <=> not broken. ";
 			}
-			if (isGoaltend && throwResult == ThrowResult.BROKEN) {
+			if (t.isGoaltend && t.throwResult == ThrowResult.BROKEN) {
 				valid = false;
-				invalidMessage += "goaltend <=> not broken. ";
+				t.invalidMessage += "goaltend <=> not broken. ";
 			}
 
 			break;
@@ -681,12 +590,12 @@ public final class Ruleset00 implements RuleSet {
 		case ThrowType.TRAP:
 		case ThrowType.TRAP_REDEEMED:
 		case ThrowType.SHORT:
-			if (isGoaltend || isTipped || isDrinkHit) {
+			if (t.isGoaltend || t.isTipped || t.isDrinkHit) {
 				valid = false;
-				invalidMessage += "Goaltend or tip or drinkHit => not trap and not short. ";
-			} else if (throwResult != ThrowResult.NA) {
+				t.invalidMessage += "Goaltend or tip or drinkHit => not trap and not short. ";
+			} else if (t.throwResult != ThrowResult.NA) {
 				valid = false;
-				invalidMessage += "Trap or short => NA result. ";
+				t.invalidMessage += "Trap or short => NA result. ";
 			}
 
 			break;
@@ -695,22 +604,18 @@ public final class Ruleset00 implements RuleSet {
 			// must be NA
 			// errors could potentially happen while returning the disc, so
 			// those are allowed
-			if (isLineFault || isGoaltend || isTipped || isDrinkHit
-					|| deadType != DeadType.ALIVE) {
+			if (t.isLineFault || t.isGoaltend || t.isTipped || t.isDrinkHit
+					|| t.deadType != DeadType.ALIVE) {
 				valid = false;
-				invalidMessage += "Fired-on cannot be modified. ";
-			} else if (throwResult != ThrowResult.NA) {
+				t.invalidMessage += "Fired-on cannot be modified. ";
+			} else if (t.throwResult != ThrowResult.NA) {
 				valid = false;
-				invalidMessage += "Fired-on => NA result.";
+				t.invalidMessage += "Fired-on => NA result.";
 			}
 
 			break;
 		}
 		// logd("isValid",invalidMessage);
 		return valid;
-	}
-
-	public String getInvalidMessage() {
-		return invalidMessage;
 	}
 }

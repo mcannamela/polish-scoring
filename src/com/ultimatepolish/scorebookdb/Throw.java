@@ -49,40 +49,40 @@ public class Throw implements Comparable<Throw> {
 	public boolean isTipped = false;
 
 	@DatabaseField
-	private boolean isGoaltend = false;
+	public boolean isGoaltend = false;
 
 	@DatabaseField
-	private boolean isGrabbed = false;
+	public boolean isGrabbed = false;
 
 	@DatabaseField
-	private boolean isDrinkHit = false;
+	public boolean isDrinkHit = false;
 
 	@DatabaseField
-	private boolean isLineFault = false;
+	public boolean isLineFault = false;
 
 	@DatabaseField
-	private boolean isOffensiveDrinkDropped = false;
+	public boolean isOffensiveDrinkDropped = false;
 
 	@DatabaseField
-	private boolean isOffensivePoleKnocked = false;
+	public boolean isOffensivePoleKnocked = false;
 
 	@DatabaseField
-	private boolean isOffensiveBottleKnocked = false;
+	public boolean isOffensiveBottleKnocked = false;
 
 	@DatabaseField
-	private boolean isOffensiveBreakError = false;
+	public boolean isOffensiveBreakError = false;
 
 	@DatabaseField
-	private boolean isDefensiveDrinkDropped = false;
+	public boolean isDefensiveDrinkDropped = false;
 
 	@DatabaseField
-	private boolean isDefensivePoleKnocked = false;
+	public boolean isDefensivePoleKnocked = false;
 
 	@DatabaseField
-	private boolean isDefensiveBottleKnocked = false;
+	public boolean isDefensiveBottleKnocked = false;
 
 	@DatabaseField
-	private boolean isDefensiveBreakError = false;
+	public boolean isDefensiveBreakError = false;
 
 	@DatabaseField
 	public int offenseFireCount = 0;
@@ -91,10 +91,10 @@ public class Throw implements Comparable<Throw> {
 	public int defenseFireCount = 0;
 
 	@DatabaseField
-	private int initialOffensivePlayerScore = 0;
+	public int initialOffensivePlayerScore = 0;
 
 	@DatabaseField
-	private int initialDefensivePlayerScore = 0;
+	public int initialDefensivePlayerScore = 0;
 
 	public String invalidMessage = "";
 
