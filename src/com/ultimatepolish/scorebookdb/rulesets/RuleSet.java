@@ -7,33 +7,34 @@ import com.ultimatepolish.scorebookdb.Throw;
 
 public interface RuleSet {
 
+	// Primary setting functions ==============================================
 	public void setThrowType(Throw t, int throwType);
 
 	public void setThrowResult(Throw t, int throwResult);
 
 	public void setDeadType(Throw t, int deadType);
 
+	public void setIsTipped(Throw t, boolean isTipped);
+
 	public void setOwnGoals(Throw t, boolean[] ownGoals);
-
-	public int[] getFinalScores(Throw t);
-
-	public void setInitialScores(Throw t);
-
-	public void setInitialScores(Throw t, Throw previousThrow);
 
 	public void setDefErrors(Throw t, boolean[] defErrors);
 
+	// Scores and UI ==========================================================
 	public int[] getScoreDifferentials(Throw t);
 
+	public int[] getFinalScores(Throw t);
+
+	public String getSpecialString(Throw t);
+
+	public void setThrowDrawable(Throw t, ImageView iv);
+
+	// Special Rules ==========================================================
 	public boolean isDropScoreBlocked(Throw t);
 
-	public boolean isOffensiveError(Throw t);
-
-	public boolean isStackHit(Throw t);
+	public boolean isFiredOn(Throw t);
 
 	public boolean isOnFire(Throw t);
-
-	public boolean isFiredOn(Throw t);
 
 	public boolean stokesOffensiveFire(Throw t);
 
@@ -41,21 +42,17 @@ public interface RuleSet {
 
 	public boolean quenchesDefensiveFire(Throw t);
 
-	public void setIsTipped(Throw t, boolean isTipped);
-
 	public void setFireCounts(Throw t, Throw previousThrow);
 
-	public void setFireCounts(Throw t, int[] fireCounts);
-
-	public void setOffenseFireCount(Throw t, int offenseFireCount);
-
-	public void setDefenseFireCount(Throw t, int defenseFireCount);
-
-	public String getSpecialString(Throw t);
-
-	public void setThrowDrawable(Throw t, ImageView iv);
-
+	// Validation =============================================================
 	public boolean isValid(Throw t, Context context);
 
 	public boolean isValid(Throw t);
+
+	// Convenience Definitions ================================================
+	public boolean isStackHit(Throw t);
+
+	public boolean isOffensiveError(Throw t);
+
+	public boolean isDefensiveError(Throw t);
 }

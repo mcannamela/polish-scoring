@@ -16,10 +16,13 @@ import com.ultimatepolish.scorebookdb.enums.DeadType;
 import com.ultimatepolish.scorebookdb.enums.ThrowResult;
 import com.ultimatepolish.scorebookdb.enums.ThrowType;
 
-public final class Ruleset00 implements RuleSet {
-	public int test;
+public class RuleSet00 implements RuleSet {
+	/**
+	 * Standard rules without coercion. TODO: remove fire rules, add in manual
+	 * fire controls?
+	 */
 
-	public Ruleset00() {
+	public RuleSet00() {
 	}
 
 	public void setThrowType(Throw t, int throwType) {
@@ -34,62 +37,16 @@ public final class Ruleset00 implements RuleSet {
 		t.deadType = deadType;
 	}
 
+	public void setIsTipped(Throw t, boolean isTipped) {
+		t.isTipped = isTipped;
+	}
+
 	public void setOwnGoals(Throw t, boolean[] ownGoals) {
 		t.setOwnGoals(ownGoals);
 	}
 
-	public int[] getFinalScores(Throw t) {
-		int[] diff = getScoreDifferentials(t);
-		int[] finalScores = { t.initialOffensivePlayerScore + diff[0],
-				t.initialDefensivePlayerScore + diff[1] };
-		return finalScores;
-	}
-
-	public void setInitialScores(Throw t, Throw previousThrow) {
-		int[] scores = getFinalScores(previousThrow);
-		t.initialDefensivePlayerScore = scores[0];
-		t.initialOffensivePlayerScore = scores[1];
-	}
-
-	public void setInitialScores(Throw t) {
-		t.initialDefensivePlayerScore = 0;
-		t.initialOffensivePlayerScore = 0;
-	}
-
 	public void setDefErrors(Throw t, boolean[] defErrors) {
 		t.setDefErrors(defErrors);
-	}
-
-	public void setFireCounts(Throw t, Throw previousThrow) {
-		int oldOffenseCount = previousThrow.defenseFireCount;
-		int oldDefenseCount = previousThrow.offenseFireCount;
-		int newOffenseCount = oldOffenseCount;
-		int newDefenseCount = oldDefenseCount;
-
-		// previous throw, opponent was or went on fire
-		if (oldDefenseCount >= 3) {
-			newOffenseCount = oldOffenseCount;
-			newDefenseCount = oldDefenseCount;
-		}
-		// opponent not on fire last throw so we have a chance to change things
-		else {
-			if (oldOffenseCount == 3) {
-				newOffenseCount++;
-			} else if (stokesOffensiveFire(t)) {
-				newOffenseCount++;
-			} else {
-				newOffenseCount = 0;
-			}
-			if (quenchesDefensiveFire(t)) {
-				newDefenseCount = 0;
-			}
-		}
-
-		setOffenseFireCount(t, newOffenseCount);
-		setDefenseFireCount(t, newDefenseCount);
-
-		Log.i("Throw.setFireCounts()", "o=" + newOffenseCount + ", d="
-				+ newDefenseCount);
 	}
 
 	public int[] getScoreDifferentials(Throw t) {
@@ -182,7 +139,7 @@ public final class Ruleset00 implements RuleSet {
 		default:
 			break;
 		}
-
+	
 		// extra points for other modifiers
 		if (t.isDrinkHit) {
 			diffs[1] -= 1;
@@ -214,125 +171,36 @@ public final class Ruleset00 implements RuleSet {
 		if (t.isDefensiveBreakError) {
 			diffs[0] += 20;
 		}
-
+	
 		return diffs;
 	}
 
-	public boolean isDropScoreBlocked(Throw t) {
-		boolean isBlocked = false;
-		int oScore = t.initialOffensivePlayerScore;
-		int dScore = t.initialDefensivePlayerScore;
-
-		if (oScore < 10 && dScore < 10) {
-			isBlocked = false;
-		} else if (oScore >= 10 && dScore < oScore && dScore < 10) {
-			isBlocked = true;
-		} else if (oScore >= 10 && dScore >= 10 && oScore > dScore) {
-			isBlocked = true;
-		}
-
-		return isBlocked;
-	}
-
-	public boolean isOffensiveError(Throw t) {
-		return (t.isOffensiveBottleKnocked || t.isOffensivePoleKnocked
-				|| t.isOffensivePoleKnocked || t.isOffensiveBreakError
-				|| t.isOffensiveDrinkDropped || t.isLineFault);
-	}
-
-	public boolean isDefensiveError(Throw t) {
-		return (t.isDefensiveBottleKnocked || t.isDefensivePoleKnocked
-				|| t.isDefensivePoleKnocked || t.isDefensiveBreakError
-				|| t.isDefensiveDrinkDropped || t.isDrinkHit);
-	}
-
-	public boolean isStackHit(Throw t) {
-		return (t.throwType == ThrowType.POLE || t.throwType == ThrowType.CUP || t.throwType == ThrowType.BOTTLE);
-	}
-
-	public boolean isOnFire(Throw t) {
-		if (t.offenseFireCount > 3) {
-			assert t.defenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean isFiredOn(Throw t) {
-		if (t.defenseFireCount >= 3) {
-			assert t.offenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean stokesOffensiveFire(Throw t) {
-		// you didn't quench yourself, hit the stack, your opponent didn't
-		// stalwart
-		boolean stokes = (!quenchesOffensiveFire(t) && isStackHit(t) && !(t.throwResult == ThrowResult.STALWART));
-		return stokes;
-	}
-
-	public boolean quenchesOffensiveFire(Throw t) {
-		boolean quenches = isOffensiveError(t)
-				|| (t.deadType != DeadType.ALIVE);
-		return quenches;
-	}
-
-	public boolean quenchesDefensiveFire(Throw t) {
-		// offense hit the stack and defense failed to defend, or offense was on
-		// fire
-
-		boolean defenseFailed = (t.throwResult == ThrowResult.DROP)
-				|| (t.throwResult == ThrowResult.BROKEN)
-				|| (isOnFire(t) && !t.isTipped);
-
-		boolean quenches = isStackHit(t) && defenseFailed;
-
-		// defensive error will also quench
-		quenches = quenches || isDefensiveError(t);
-
-		return quenches;
-	}
-
-	public void setIsTipped(Throw t, boolean isTipped) {
-		t.isTipped = isTipped;
-	}
-
-	public void setFireCounts(Throw t, int[] fireCounts) {
-		t.offenseFireCount = fireCounts[0];
-		t.defenseFireCount = fireCounts[1];
-	}
-
-	public void setOffenseFireCount(Throw t, int offenseFireCount) {
-		t.offenseFireCount = offenseFireCount;
-	}
-
-	public void setDefenseFireCount(Throw t, int defenseFireCount) {
-		t.defenseFireCount = defenseFireCount;
+	public int[] getFinalScores(Throw t) {
+		int[] diff = getScoreDifferentials(t);
+		int[] finalScores = { t.initialOffensivePlayerScore + diff[0],
+				t.initialDefensivePlayerScore + diff[1] };
+		return finalScores;
 	}
 
 	public String getSpecialString(Throw t) {
 		String s = "";
-
+	
 		if (t.isLineFault) {
 			s += "lf.";
 		}
-
+	
 		if (t.isDrinkHit) {
 			s += "d.";
 		}
-
+	
 		if (t.isGoaltend) {
 			s += "gt.";
 		}
-
+	
 		if (t.isGrabbed) {
 			s += "g.";
 		}
-
+	
 		int og = 0;
 		// technically drink drops are -1 for player instead of +1 for opponent,
 		// but subtracting the value for display purposes would be more
@@ -353,7 +221,7 @@ public final class Ruleset00 implements RuleSet {
 		if (og > 0) {
 			s += "og" + String.valueOf(og) + '.';
 		}
-
+	
 		int err = 0;
 		// same as for og
 		if (t.isDefensiveDrinkDropped) {
@@ -371,7 +239,7 @@ public final class Ruleset00 implements RuleSet {
 		if (err > 0) {
 			s += "e" + String.valueOf(err) + '.';
 		}
-
+	
 		if (s.length() == 0) {
 			s = "--";
 		} else {
@@ -383,7 +251,7 @@ public final class Ruleset00 implements RuleSet {
 
 	public void setThrowDrawable(Throw t, ImageView iv) {
 		List<Drawable> boxIconLayers = new ArrayList<Drawable>();
-
+	
 		if (!isValid(t, iv.getContext())) {
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_badthrow));
@@ -450,7 +318,7 @@ public final class Ruleset00 implements RuleSet {
 					.getDrawable(R.drawable.bxs_oops));
 			break;
 		}
-
+	
 		switch (t.throwResult) {
 		case ThrowResult.DROP:
 			boxIconLayers.add(iv.getResources().getDrawable(
@@ -465,7 +333,7 @@ public final class Ruleset00 implements RuleSet {
 					R.drawable.bxs_over_break));
 			break;
 		}
-
+	
 		switch (t.deadType) {
 		case DeadType.HIGH:
 			boxIconLayers.add(iv.getResources().getDrawable(
@@ -484,7 +352,7 @@ public final class Ruleset00 implements RuleSet {
 					R.drawable.bxs_dead_left));
 			break;
 		}
-
+	
 		if (isOnFire(t)) {
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_over_fire));
@@ -493,9 +361,104 @@ public final class Ruleset00 implements RuleSet {
 			boxIconLayers.add(iv.getResources().getDrawable(
 					R.drawable.bxs_over_tipped));
 		}
-
+	
 		iv.setImageDrawable(new LayerDrawable(boxIconLayers
 				.toArray(new Drawable[0])));
+	}
+
+	public boolean isDropScoreBlocked(Throw t) {
+		boolean isBlocked = false;
+		int oScore = t.initialOffensivePlayerScore;
+		int dScore = t.initialDefensivePlayerScore;
+	
+		if (oScore < 10 && dScore < 10) {
+			isBlocked = false;
+		} else if (oScore >= 10 && dScore < oScore && dScore < 10) {
+			isBlocked = true;
+		} else if (oScore >= 10 && dScore >= 10 && oScore > dScore) {
+			isBlocked = true;
+		}
+	
+		return isBlocked;
+	}
+
+	public boolean isFiredOn(Throw t) {
+		if (t.defenseFireCount >= 3) {
+			assert t.offenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean isOnFire(Throw t) {
+		if (t.offenseFireCount > 3) {
+			assert t.defenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean stokesOffensiveFire(Throw t) {
+		// you didn't quench yourself, hit the stack, your opponent didn't
+		// stalwart
+		boolean stokes = (!quenchesOffensiveFire(t) && isStackHit(t) && !(t.throwResult == ThrowResult.STALWART));
+		return stokes;
+	}
+
+	public boolean quenchesOffensiveFire(Throw t) {
+		boolean quenches = isOffensiveError(t)
+				|| (t.deadType != DeadType.ALIVE);
+		return quenches;
+	}
+
+	public boolean quenchesDefensiveFire(Throw t) {
+		// offense hit the stack and defense failed to defend, or offense was on
+		// fire
+	
+		boolean defenseFailed = (t.throwResult == ThrowResult.DROP)
+				|| (t.throwResult == ThrowResult.BROKEN)
+				|| (isOnFire(t) && !t.isTipped);
+	
+		boolean quenches = isStackHit(t) && defenseFailed;
+	
+		// defensive error will also quench
+		quenches = quenches || isDefensiveError(t);
+	
+		return quenches;
+	}
+
+	public void setFireCounts(Throw t, Throw previousThrow) {
+		int oldOffenseCount = previousThrow.defenseFireCount;
+		int oldDefenseCount = previousThrow.offenseFireCount;
+		int newOffenseCount = oldOffenseCount;
+		int newDefenseCount = oldDefenseCount;
+	
+		// previous throw, opponent was or went on fire
+		if (oldDefenseCount >= 3) {
+			newOffenseCount = oldOffenseCount;
+			newDefenseCount = oldDefenseCount;
+		}
+		// opponent not on fire last throw so we have a chance to change things
+		else {
+			if (oldOffenseCount == 3) {
+				newOffenseCount++;
+			} else if (stokesOffensiveFire(t)) {
+				newOffenseCount++;
+			} else {
+				newOffenseCount = 0;
+			}
+			if (quenchesDefensiveFire(t)) {
+				newDefenseCount = 0;
+			}
+		}
+	
+		t.offenseFireCount = newOffenseCount;
+		t.defenseFireCount = newDefenseCount;
+	
+		Log.i("Throw.setFireCounts()", "o=" + newOffenseCount + ", d="
+				+ newDefenseCount);
 	}
 
 	public boolean isValid(Throw t, Context context) {
@@ -531,7 +494,7 @@ public final class Ruleset00 implements RuleSet {
 				valid = false;
 				t.invalidMessage += "Goaltending || tipped => not SHRLL. ";
 			}
-
+	
 			switch (t.throwResult) {
 			case ThrowResult.DROP:
 			case ThrowResult.CATCH:
@@ -543,7 +506,7 @@ public final class Ruleset00 implements RuleSet {
 				}
 				break;
 			}
-
+	
 			break;
 		case ThrowType.POLE:
 		case ThrowType.CUP:
@@ -584,9 +547,9 @@ public final class Ruleset00 implements RuleSet {
 				valid = false;
 				t.invalidMessage += "goaltend <=> not broken. ";
 			}
-
+	
 			break;
-
+	
 		case ThrowType.TRAP:
 		case ThrowType.TRAP_REDEEMED:
 		case ThrowType.SHORT:
@@ -597,7 +560,7 @@ public final class Ruleset00 implements RuleSet {
 				valid = false;
 				t.invalidMessage += "Trap or short => NA result. ";
 			}
-
+	
 			break;
 		case ThrowType.FIRED_ON:
 			// fired_on is a dummy throw, so modifiers dont count and result
@@ -612,10 +575,26 @@ public final class Ruleset00 implements RuleSet {
 				valid = false;
 				t.invalidMessage += "Fired-on => NA result.";
 			}
-
+	
 			break;
 		}
 		// logd("isValid",invalidMessage);
 		return valid;
+	}
+
+	public boolean isStackHit(Throw t) {
+		return (t.throwType == ThrowType.POLE || t.throwType == ThrowType.CUP || t.throwType == ThrowType.BOTTLE);
+	}
+
+	public boolean isOffensiveError(Throw t) {
+		return (t.isOffensiveBottleKnocked || t.isOffensivePoleKnocked
+				|| t.isOffensivePoleKnocked || t.isOffensiveBreakError
+				|| t.isOffensiveDrinkDropped || t.isLineFault);
+	}
+
+	public boolean isDefensiveError(Throw t) {
+		return (t.isDefensiveBottleKnocked || t.isDefensivePoleKnocked
+				|| t.isDefensivePoleKnocked || t.isDefensiveBreakError
+				|| t.isDefensiveDrinkDropped || t.isDrinkHit);
 	}
 }

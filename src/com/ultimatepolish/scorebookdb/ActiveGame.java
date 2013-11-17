@@ -90,18 +90,28 @@ public class ActiveGame {
 		return t;
 	}
 
+	private void setInitialScores(Throw t, Throw previousThrow) {
+		int[] scores = ruleSet.getFinalScores(previousThrow);
+		t.initialDefensivePlayerScore = scores[0];
+		t.initialOffensivePlayerScore = scores[1];
+	}
+
+	private void setInitialScores(Throw t) {
+		t.initialDefensivePlayerScore = 0;
+		t.initialOffensivePlayerScore = 0;
+	}
+
 	void updateScoresFrom(int idx) {
 		Throw t, u;
 		for (int i = idx; i < nThrows(); i++) {
 			t = getThrow(i);
 			if (i == 0) {
-				ruleSet.setInitialScores(t);
-				// TODO: firecount changes should not be made here
+				setInitialScores(t);
 				t.offenseFireCount = 0;
 				t.defenseFireCount = 0;
 			} else {
 				u = getPreviousThrow(t);
-				ruleSet.setInitialScores(t, u);
+				setInitialScores(t, u);
 				ruleSet.setFireCounts(t, u);
 			}
 		}
@@ -184,10 +194,10 @@ public class ActiveGame {
 		} else if (idx == nThrows()) {
 			t = makeNextThrow();
 			if (idx == 0) {
-				ruleSet.setInitialScores(t);
+				setInitialScores(t);
 			} else {
 				Throw u = getPreviousThrow(t);
-				ruleSet.setInitialScores(t, u);
+				setInitialScores(t, u);
 			}
 
 			tArray.add(t);
