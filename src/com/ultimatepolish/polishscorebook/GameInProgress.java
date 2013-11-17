@@ -92,7 +92,7 @@ public class GameInProgress extends MenuContainerActivity implements
 
 			switch (buttonId) {
 			case R.id.gip_button_strike:
-				ruleSet.toggleIsTipped(uiThrow);
+				ruleSet.setIsTipped(uiThrow, !uiThrow.isTipped);
 				if (uiThrow.isTipped) {
 					ivStrike.getDrawable().setLevel(2);
 				} else {
@@ -112,16 +112,16 @@ public class GameInProgress extends MenuContainerActivity implements
 				ruleSet.setThrowResult(uiThrow, ThrowResult.BROKEN);
 				break;
 			case R.id.gip_button_high:
-				ruleSet.setDeadType(uiThrow, DeadType.HIGH);
+				toggleDeadType(DeadType.HIGH);
 				break;
 			case R.id.gip_button_right:
-				ruleSet.setDeadType(uiThrow, DeadType.RIGHT);
+				toggleDeadType(DeadType.RIGHT);
 				break;
 			case R.id.gip_button_low:
-				ruleSet.setDeadType(uiThrow, DeadType.LOW);
+				toggleDeadType(DeadType.LOW);
 				break;
 			case R.id.gip_button_left:
-				ruleSet.setDeadType(uiThrow, DeadType.LEFT);
+				toggleDeadType(DeadType.LEFT);
 				break;
 			default:
 				break;
@@ -739,6 +739,14 @@ public class GameInProgress extends MenuContainerActivity implements
 		case ThrowResult.NA:
 			naView.setBackgroundColor(Color.RED);
 			break;
+		}
+	}
+
+	public void toggleDeadType(int deadType) {
+		if (uiThrow.deadType == deadType) {
+			ruleSet.setDeadType(uiThrow, DeadType.ALIVE);
+		} else {
+			ruleSet.setDeadType(uiThrow, deadType);
 		}
 	}
 
