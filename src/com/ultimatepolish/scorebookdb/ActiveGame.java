@@ -62,7 +62,7 @@ public class ActiveGame {
 			p[0] = g.getFirstPlayer();
 			p[1] = g.getSecondPlayer();
 			// TODO: load ruleset from database once implemented
-			ruleSet = RuleType.RS00;
+			ruleSet = RuleType.RS01;
 
 		} else {
 			// if no game ID is passed in, this is for testing (or an error)

@@ -17,95 +17,32 @@ public class RuleSet01 extends RuleSet00 {
 
 	@Override
 	public void setThrowType(Throw t, int throwType) {
-		if (t.offenseFireCount >= 3) {
+		if (t.defenseFireCount >= 3) {
 			t.throwType = ThrowType.FIRED_ON;
+			setDeadType(t, DeadType.ALIVE);
 		} else {
 			t.throwType = throwType;
-			if (throwType == ThrowType.SHORT || throwType == ThrowType.TRAP
-					|| throwType == ThrowType.TRAP_REDEEMED) {
-				t.throwResult = ThrowResult.NA;
-			}
 		}
-	}
 
-	@Override
-	public void setThrowResult(Throw t, int throwResult) {
-
-		// TODO: this block should probably be on UI side
-		switch (throwResult) {
-		case ThrowResult.BROKEN:
-			if (throwResult == ThrowResult.BROKEN
-					&& t.throwResult == ThrowResult.BROKEN) {
+		switch (throwType) {
+		case ThrowType.BALL_HIGH:
+		case ThrowType.BALL_RIGHT:
+		case ThrowType.BALL_LOW:
+		case ThrowType.BALL_LEFT:
+		case ThrowType.STRIKE:
+			if (t.throwResult != ThrowResult.DROP
+					&& t.throwResult != ThrowResult.CATCH) {
 				t.throwResult = ThrowResult.CATCH;
-			} else {
-				t.throwResult = ThrowResult.BROKEN;
 			}
 			break;
-		}
-
-		if (t.offenseFireCount >= 3) {
-			t.throwResult = ThrowResult.NA;
-		} else {
-			// some error checking
-			switch (t.throwType) {
-			case ThrowType.BALL_HIGH:
-			case ThrowType.BALL_RIGHT:
-			case ThrowType.BALL_LOW:
-			case ThrowType.BALL_LEFT:
-			case ThrowType.STRIKE:
-				if (throwResult != ThrowResult.DROP
-						&& throwResult != ThrowResult.CATCH) {
-					t.throwResult = ThrowResult.CATCH;
-				} else {
-					t.throwResult = throwResult;
-				}
-				break;
-			case ThrowType.TRAP:
-			case ThrowType.TRAP_REDEEMED:
-			case ThrowType.SHORT:
-			case ThrowType.FIRED_ON:
-				throwResult = ThrowResult.NA;
-				break;
-			default:
-				break;
-			}
-			if (t.defenseFireCount >= 3) {
-				throwResult = ThrowResult.NA;
-			}
-
-			if (throwResult == ThrowResult.BROKEN) {
-				t.throwResult = ThrowResult.BROKEN;
-			} else if (throwResult == ThrowResult.NA) {
-				t.throwResult = ThrowResult.NA;
-			}
-		}
-	}
-
-	@Override
-	public void setDeadType(Throw t, int deadType) {
-		t.deadType = deadType;
-	}
-
-	@Override
-	public void setOwnGoals(Throw t, boolean[] ownGoals) {
-		if (t.offenseFireCount >= 3) {
-			t.isTipped = false;
-			t.deadType = DeadType.ALIVE;
-			t.isLineFault = false;
-		} else {
-			t.setOwnGoals(ownGoals);
-		}
-	}
-
-	@Override
-	public void setDefErrors(Throw t, boolean[] defErrors) {
-		if (t.offenseFireCount >= 3) {
-			t.isTipped = false;
-			t.deadType = DeadType.ALIVE;
-			t.isGoaltend = false;
-			t.isDrinkHit = false;
-		} else {
-			t.setDefErrors(defErrors);
+		case ThrowType.SHORT:
+		case ThrowType.TRAP:
+		case ThrowType.TRAP_REDEEMED:
+		case ThrowType.FIRED_ON:
+		case ThrowType.NOT_THROWN:
+			// TODO: what if redeemed trap breaks bottle?
+			setThrowResult(t, ThrowResult.NA);
+			break;
 		}
 	}
 
