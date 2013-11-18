@@ -88,6 +88,39 @@ public class GameInProgress extends MenuContainerActivity implements
 					+ " was long pressed");
 			int buttonId = view.getId();
 
+			if (uiThrow.throwType == ThrowType.TRAP
+					|| uiThrow.throwType == ThrowType.TRAP_REDEEMED) {
+				switch (buttonId) {
+				case R.id.gip_button_pole:
+					toggleBroken();
+					ag.ruleSet.setThrowType(uiThrow, ThrowType.TRAP_REDEEMED);
+					break;
+				case R.id.gip_button_cup:
+					toggleBroken();
+					ag.ruleSet.setThrowType(uiThrow, ThrowType.TRAP_REDEEMED);
+					break;
+				case R.id.gip_button_bottle:
+					toggleBroken();
+					ag.ruleSet.setThrowType(uiThrow, ThrowType.TRAP_REDEEMED);
+					break;
+				}
+			} else {
+				switch (buttonId) {
+				case R.id.gip_button_pole:
+					toggleBroken();
+					ag.ruleSet.setThrowType(uiThrow, ThrowType.POLE);
+					break;
+				case R.id.gip_button_cup:
+					toggleBroken();
+					ag.ruleSet.setThrowType(uiThrow, ThrowType.CUP);
+					break;
+				case R.id.gip_button_bottle:
+					toggleBroken();
+					ag.ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
+					break;
+				}
+			}
+
 			switch (buttonId) {
 			case R.id.gip_button_strike:
 				ag.ruleSet.setIsTipped(uiThrow, !uiThrow.isTipped);
@@ -96,18 +129,6 @@ public class GameInProgress extends MenuContainerActivity implements
 				} else {
 					ivStrike.getDrawable().setLevel(0);
 				}
-				break;
-			case R.id.gip_button_pole:
-				toggleBroken();
-				ag.ruleSet.setThrowType(uiThrow, ThrowType.POLE);
-				break;
-			case R.id.gip_button_cup:
-				toggleBroken();
-				ag.ruleSet.setThrowType(uiThrow, ThrowType.CUP);
-				break;
-			case R.id.gip_button_bottle:
-				toggleBroken();
-				ag.ruleSet.setThrowType(uiThrow, ThrowType.BOTTLE);
 				break;
 			case R.id.gip_button_high:
 				toggleDeadType(DeadType.HIGH);
@@ -638,6 +659,12 @@ public class GameInProgress extends MenuContainerActivity implements
 				cupDwl.setLevel(2);
 				bottleDwl.setLevel(3);
 				break;
+			case ThrowType.TRAP:
+			case ThrowType.TRAP_REDEEMED:
+				poleDwl.setLevel(2);
+				cupDwl.setLevel(2);
+				bottleDwl.setLevel(2);
+				break;
 			}
 		} else {
 			switch (uiThrow.throwType) {
@@ -655,6 +682,12 @@ public class GameInProgress extends MenuContainerActivity implements
 				poleDwl.setLevel(0);
 				cupDwl.setLevel(0);
 				bottleDwl.setLevel(1);
+				break;
+			case ThrowType.TRAP:
+			case ThrowType.TRAP_REDEEMED:
+				poleDwl.setLevel(0);
+				cupDwl.setLevel(0);
+				bottleDwl.setLevel(0);
 				break;
 			}
 		}
