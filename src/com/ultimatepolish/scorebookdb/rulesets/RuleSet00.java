@@ -396,7 +396,7 @@ public class RuleSet00 implements RuleSet {
 
 	public boolean isFiredOn(Throw t) {
 		if (t.defenseFireCount >= 3) {
-			assert t.offenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
+			assert t.offenseFireCount < 3 : "both players cant be on fire";
 			return true;
 		} else {
 			return false;
@@ -405,72 +405,31 @@ public class RuleSet00 implements RuleSet {
 
 	public boolean isOnFire(Throw t) {
 		if (t.offenseFireCount >= 3) {
-			assert t.defenseFireCount < 3 : "should not be possible to have both players with fire counts >=3";
+			assert t.defenseFireCount < 3 : "both players cant be on fire";
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public boolean stokesOffensiveFire(Throw t) {
-		// you didn't quench yourself, hit the stack, your opponent didn't
-		// stalwart
-		boolean stokes = (!quenchesOffensiveFire(t) && isStackHit(t) && !(t.throwResult == ThrowResult.STALWART));
-		return stokes;
-	}
-
-	public boolean quenchesOffensiveFire(Throw t) {
-		boolean quenches = isOffensiveError(t)
-				|| (t.deadType != DeadType.ALIVE);
-		return quenches;
-	}
-
-	public boolean quenchesDefensiveFire(Throw t) {
-		// offense hit the stack and defense failed to defend, or offense was on
-		// fire
-
-		boolean defenseFailed = (t.throwResult == ThrowResult.DROP)
-				|| (t.throwResult == ThrowResult.BROKEN)
-				|| (isOnFire(t) && !t.isTipped);
-
-		boolean quenches = isStackHit(t) && defenseFailed;
-
-		// defensive error will also quench
-		quenches = quenches || isDefensiveError(t);
-
-		return quenches;
+	public void toggleOffenseFire(Throw t) {
+		// This is not required by ruleset but needed for manual fire
+		if (t.offenseFireCount >= 3) {
+			t.offenseFireCount = 0;
+		} else {
+			t.offenseFireCount = 3;
+		}
 	}
 
 	public void setFireCounts(Throw t, Throw previousThrow) {
-		int oldOffenseCount = previousThrow.defenseFireCount;
-		int oldDefenseCount = previousThrow.offenseFireCount;
-		int newOffenseCount = oldOffenseCount;
-		int newDefenseCount = oldDefenseCount;
+		int prevOffCount = previousThrow.offenseFireCount;
+		int prevDefCount = previousThrow.defenseFireCount;
 
-		// previous throw, opponent was or went on fire
-		if (oldDefenseCount >= 3) {
-			newOffenseCount = oldOffenseCount;
-			newDefenseCount = oldDefenseCount;
-		}
-		// opponent not on fire last throw so we have a chance to change things
-		else {
-			if (oldOffenseCount == 3) {
-				newOffenseCount++;
-			} else if (stokesOffensiveFire(t)) {
-				newOffenseCount++;
-			} else {
-				newOffenseCount = 0;
-			}
-			if (quenchesDefensiveFire(t)) {
-				newDefenseCount = 0;
-			}
-		}
+		t.offenseFireCount = prevDefCount;
+		t.defenseFireCount = prevOffCount;
 
-		t.offenseFireCount = newOffenseCount;
-		t.defenseFireCount = newDefenseCount;
-
-		Log.i("Throw.setFireCounts()", "o=" + newOffenseCount + ", d="
-				+ newDefenseCount);
+		Log.i("Throw.setFireCounts()", "o=" + prevDefCount + ", d="
+				+ prevOffCount);
 	}
 
 	public boolean isValid(Throw t, Context context) {
@@ -490,14 +449,14 @@ public class RuleSet00 implements RuleSet {
 			if (t.throwResult != ThrowResult.NA
 					&& t.throwResult != ThrowResult.BROKEN) {
 				valid = false;
-				t.invalidMessage += "OnFire => ThrowResult == NA or Broken. ";
+				t.invalidMessage += "OnFire => NA or Broken. ";
 			}
 		}
 		if (isFiredOn(t)) {
 			if (t.throwType != ThrowType.FIRED_ON
 					&& t.throwType != ThrowType.NOT_THROWN) {
 				valid = false;
-				t.invalidMessage += "ThrowType should be fired_on. ";
+				t.invalidMessage += "ThrowType should be Fired_on. ";
 			}
 		}
 		switch (t.throwType) {
@@ -508,10 +467,13 @@ public class RuleSet00 implements RuleSet {
 		case ThrowType.STRIKE:
 			if (t.deadType != DeadType.ALIVE && t.isDrinkHit) {
 				valid = false;
-				t.invalidMessage += "drinkHit => live throw";
-			} else if (t.isGoaltend || t.isTipped) {
+				t.invalidMessage += "Drink hit => Alive";
+			} else if (t.isGoaltend) {
 				valid = false;
-				t.invalidMessage += "Goaltending || tipped => not SHRLL. ";
+				t.invalidMessage += "SHRLL != Goaltend. ";
+			} else if (t.isTipped) {
+				valid = false;
+				t.invalidMessage += "SHRLL != Tipped. ";
 			}
 
 			switch (t.throwResult) {
@@ -521,7 +483,7 @@ public class RuleSet00 implements RuleSet {
 			default:
 				if (!isOnFire(t)) {
 					valid = false;
-					t.invalidMessage += "SHRLL => drop or catch. ";
+					t.invalidMessage += "SHRLL => Drop or catch. ";
 				}
 				break;
 			}
@@ -532,55 +494,69 @@ public class RuleSet00 implements RuleSet {
 		case ThrowType.BOTTLE:
 			if (t.isGrabbed) {
 				valid = false;
-				t.invalidMessage += "grabbing a PCB hit should be marked goaltending. ";
+				t.invalidMessage += "Grabbed + PCB should be Goaltend. ";
 			}
 			if (t.isDrinkHit) {
 				valid = false;
-				t.invalidMessage += "drink hit <=>  not PCB hit. ";
+				t.invalidMessage += "PCB != Drink hit. ";
 			}
 			if (t.isTipped && t.isGoaltend) {
 				valid = false;
-				t.invalidMessage += "PCB throws cant be tipped and goaltended simultaneously. ";
+				t.invalidMessage += "PCB != Tipped + goaltend simultaneously. ";
 			}
 			if (t.deadType != DeadType.ALIVE && t.isGoaltend) {
 				valid = false;
-				t.invalidMessage += "Dead <=> not goaltended. ";
+				t.invalidMessage += "Dead != Goaltend. ";
 			}
 			if (t.throwResult == ThrowResult.NA && !isOnFire(t)) {
 				valid = false;
-				t.invalidMessage += "PCB and not onFire => not NA result. ";
+				t.invalidMessage += "PCB w/o Fire != NA result. ";
 			}
 			if (t.isTipped && t.throwResult == ThrowResult.STALWART) {
 				valid = false;
-				t.invalidMessage += "stalwart <=> not tip. ";
+				t.invalidMessage += "Stalwart != Tipped. ";
 			}
 			if (t.isGoaltend && t.throwResult == ThrowResult.STALWART) {
 				valid = false;
-				t.invalidMessage += "stalwart <=> not goaltend. ";
+				t.invalidMessage += "Stalwart != Goaltend. ";
 			}
 			if (t.isTipped && t.throwResult == ThrowResult.BROKEN) {
 				valid = false;
-				t.invalidMessage += "tip <=> not broken. ";
+				t.invalidMessage += "Tipped != Broken. ";
 			}
 			if (t.isGoaltend && t.throwResult == ThrowResult.BROKEN) {
 				valid = false;
-				t.invalidMessage += "goaltend <=> not broken. ";
+				t.invalidMessage += "Goaltend != Broken. ";
 			}
-
 			break;
 
 		case ThrowType.TRAP:
-		case ThrowType.TRAP_REDEEMED:
 		case ThrowType.SHORT:
 			if (t.isGoaltend || t.isTipped || t.isDrinkHit) {
 				valid = false;
-				t.invalidMessage += "Goaltend or tip or drinkHit => not trap and not short. ";
+				t.invalidMessage += "Trap / short != Goaltend, tip or drinkHit. ";
 			} else if (t.throwResult != ThrowResult.NA) {
 				valid = false;
-				t.invalidMessage += "Trap or short => NA result. ";
+				t.invalidMessage += "Trap / short => NA result. ";
+			} else if (t.deadType == DeadType.ALIVE) {
+				valid = false;
+				t.invalidMessage += "Trap / short != Alive. ";
 			}
-
 			break;
+		case ThrowType.TRAP_REDEEMED:
+			if (t.isGoaltend || t.isTipped || t.isDrinkHit) {
+				valid = false;
+				t.invalidMessage += "Trap != Goaltend, tip or drinkHit. ";
+			} else if (t.throwResult != ThrowResult.NA
+					&& t.throwResult != ThrowResult.BROKEN) {
+				valid = false;
+				t.invalidMessage += "Redeemed Trap => Broken or NA result. ";
+			} else if (t.deadType == DeadType.ALIVE) {
+				valid = false;
+				t.invalidMessage += "Trap != Alive. ";
+			}
+			break;
+
 		case ThrowType.FIRED_ON:
 			// fired_on is a dummy throw, so modifiers dont count and result
 			// must be NA
@@ -589,7 +565,7 @@ public class RuleSet00 implements RuleSet {
 			if (t.isLineFault || t.isGoaltend || t.isTipped || t.isDrinkHit
 					|| t.deadType != DeadType.ALIVE) {
 				valid = false;
-				t.invalidMessage += "Fired-on cannot be modified. ";
+				t.invalidMessage += "Fired-on != any modifier. ";
 			} else if (t.throwResult != ThrowResult.NA) {
 				valid = false;
 				t.invalidMessage += "Fired-on => NA result.";

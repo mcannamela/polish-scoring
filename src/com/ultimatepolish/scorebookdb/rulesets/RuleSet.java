@@ -39,12 +39,6 @@ public interface RuleSet {
 
 	public boolean isOnFire(Throw t);
 
-	public boolean stokesOffensiveFire(Throw t);
-
-	public boolean quenchesOffensiveFire(Throw t);
-
-	public boolean quenchesDefensiveFire(Throw t);
-
 	public void setFireCounts(Throw t, Throw previousThrow);
 
 	// Validation =============================================================
