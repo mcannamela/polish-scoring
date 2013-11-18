@@ -49,47 +49,56 @@ public class RuleSet01 extends RuleSet00 {
 					}
 					break;
 				case ThrowType.SHORT:
-				case ThrowType.TRAP:
-				case ThrowType.TRAP_REDEEMED:
-					// TODO: what if redeemed trap breaks bottle?
+					if (t.deadType == DeadType.ALIVE) {
+						setDeadType(t, DeadType.LOW);
+					}
 					setThrowResult(t, ThrowResult.NA);
+					break;
+				case ThrowType.TRAP:
+					if (t.deadType == DeadType.ALIVE) {
+						setDeadType(t, DeadType.HIGH);
+					}
+					setThrowResult(t, ThrowResult.NA);
+					break;
+				case ThrowType.TRAP_REDEEMED:
+					if (t.deadType == DeadType.ALIVE) {
+						setDeadType(t, DeadType.HIGH);
+					}
+					if (t.throwResult != ThrowResult.BROKEN) {
+						setThrowResult(t, ThrowResult.NA);
+					}
 					break;
 				}
 			}
 		}
 	}
 
-	@Override
-	public boolean stokesOffensiveFire(Throw t) {
-		// you didn't quench yourself, hit the stack, your opponent didn't
-		// stalwart
-		boolean stokes = (!quenchesOffensiveFire(t) && isStackHit(t) && t.throwResult != ThrowResult.STALWART);
+	private boolean stokesOffensiveFire(Throw t) {
+		// quench caused by own goal or throwing dead
+		boolean quenches = isOffensiveError(t)
+				|| (t.deadType != DeadType.ALIVE);
+
+		// will stoke if all conditions are met:
+		// (a) not quenched, (b) hits the stack, (c) not stalwart
+		boolean stokes = !quenches && isStackHit(t)
+				&& t.throwResult != ThrowResult.STALWART;
+
 		return stokes;
 	}
 
-	@Override
-	public boolean quenchesOffensiveFire(Throw t) {
-		boolean quenches = isOffensiveError(t)
-				|| (t.deadType != DeadType.ALIVE);
-		return quenches;
-	}
+	private boolean quenchesDefensiveFire(Throw t) {
 
-	@Override
-	public boolean quenchesDefensiveFire(Throw t) {
-		// offense hit the stack and defense failed to defend, or offense was on
-		// fire
+		boolean fireHit = isOnFire(t) && isStackHit(t);
 
-		// boolean defenseFailed = (t.throwResult == ThrowResult.DROP)
-		// || (t.throwResult == ThrowResult.BROKEN)
-		// || (isOnFire(t) && !t.isTipped);
-		//
-		// boolean quenches = isStackHit(t) && defenseFailed;
-		//
-		// // defensive error will also quench
-		// quenches = quenches || isDefensiveError(t);
-		boolean quenches = false;
+		boolean defFail = (t.throwResult == ThrowResult.BROKEN)
+				|| (t.deadType == DeadType.ALIVE && t.throwResult == ThrowResult.DROP);
 
-		return quenches;
+		boolean quenches = isStackHit(t) && defFail;
+
+		// defensive error will also quench
+		quenches = quenches || isDefensiveError(t);
+
+		return false;
 	}
 
 	@Override
