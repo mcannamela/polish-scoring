@@ -6,6 +6,9 @@ import android.widget.ImageView;
 import com.ultimatepolish.scorebookdb.Throw;
 
 public interface RuleSet {
+	public int getId();
+
+	public String getDescription();
 
 	// Primary setting functions ==============================================
 	public void setThrowType(Throw t, int throwType);

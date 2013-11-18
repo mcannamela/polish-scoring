@@ -102,7 +102,7 @@ public class ActiveGame {
 		t.initialOffensivePlayerScore = 0;
 	}
 
-	void updateScoresFrom(int idx) {
+	public void updateScoresFrom(int idx) {
 		Throw t, u;
 		for (int i = idx; i < nThrows(); i++) {
 			t = getThrow(i);

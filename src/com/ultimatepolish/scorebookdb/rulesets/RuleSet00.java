@@ -25,6 +25,14 @@ public class RuleSet00 implements RuleSet {
 	public RuleSet00() {
 	}
 
+	public int getId() {
+		return 0;
+	}
+
+	public String getDescription() {
+		return "Standard ruleset with no coercion";
+	}
+
 	public void setThrowType(Throw t, int throwType) {
 		t.throwType = throwType;
 	}
@@ -486,7 +494,8 @@ public class RuleSet00 implements RuleSet {
 			}
 		}
 		if (isFiredOn(t)) {
-			if (t.throwType != ThrowType.FIRED_ON) {
+			if (t.throwType != ThrowType.FIRED_ON
+					&& t.throwType != ThrowType.NOT_THROWN) {
 				valid = false;
 				t.invalidMessage += "ThrowType should be fired_on. ";
 			}

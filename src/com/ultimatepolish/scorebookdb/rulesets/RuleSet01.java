@@ -16,10 +16,20 @@ public class RuleSet01 extends RuleSet00 {
 	}
 
 	@Override
+	public int getId() {
+		return 1;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Standard ruleset with coercion and autofire";
+	}
+
+	@Override
 	public void setThrowType(Throw t, int throwType) {
 		if (t.defenseFireCount >= 3) {
 			t.throwType = ThrowType.FIRED_ON;
-			t.throwResult = ThrowResult.NA;
+			setThrowResult(t, ThrowResult.NA);
 			setDeadType(t, DeadType.ALIVE);
 		} else {
 			t.throwType = throwType;
@@ -35,7 +45,7 @@ public class RuleSet01 extends RuleSet00 {
 				case ThrowType.STRIKE:
 					if (t.throwResult != ThrowResult.DROP
 							&& t.throwResult != ThrowResult.CATCH) {
-						t.throwResult = ThrowResult.CATCH;
+						setThrowResult(t, ThrowResult.CATCH);
 					}
 					break;
 				case ThrowType.SHORT:
