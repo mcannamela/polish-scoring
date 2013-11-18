@@ -161,8 +161,8 @@ public class GameInProgress extends MenuContainerActivity implements
 				|| uiThrow.throwType == ThrowType.TRAP_REDEEMED) {
 			switch (buttonId) {
 			case R.id.gip_button_trap:
-				ag.ruleSet.setThrowType(uiThrow, ThrowType.NOT_THROWN);
 				ag.ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.NOT_THROWN);
 				((ImageView) view).getDrawable().setLevel(0);
 				break;
 			case R.id.gip_button_bottle:
@@ -551,6 +551,7 @@ public class GameInProgress extends MenuContainerActivity implements
 			frag.show(getFragmentManager(), "gentlemens");
 		}
 		gotoThrowIdx(activeIdx + 1);
+		ag.updateScoresFrom(activeIdx + 1);
 	}
 
 	void gotoThrowIdx(int newActiveIdx) {
