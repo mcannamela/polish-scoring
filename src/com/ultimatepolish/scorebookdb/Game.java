@@ -40,6 +40,9 @@ public class Game {
 	private Venue venue;
 
 	@DatabaseField(canBeNull = false)
+	public int ruleSet;
+
+	@DatabaseField(canBeNull = false)
 	public boolean firstPlayerOnTop;
 
 	@DatabaseField(canBeNull = false)
@@ -62,24 +65,26 @@ public class Game {
 	}
 
 	public Game(Player firstPlayer, Player secondPlayer, Session session,
-			Venue venue, boolean isTracked, Date datePlayed) {
+			Venue venue, int ruleSet, boolean isTracked, Date datePlayed) {
 		super();
 		this.firstPlayer = firstPlayer;
 		this.secondPlayer = secondPlayer;
 		this.session = session;
 		this.venue = venue;
+		this.ruleSet = ruleSet;
 		this.isTracked = isTracked;
 		this.datePlayed = datePlayed;
 
 	}
 
 	public Game(Player firstPlayer, Player secondPlayer, Session session,
-			Venue venue, boolean isTracked) {
+			Venue venue, int ruleSet, boolean isTracked) {
 		super();
 		this.firstPlayer = firstPlayer;
 		this.secondPlayer = secondPlayer;
 		this.session = session;
 		this.venue = venue;
+		this.ruleSet = ruleSet;
 		this.isTracked = isTracked;
 		this.datePlayed = new Date();
 	}

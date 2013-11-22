@@ -291,7 +291,7 @@ public class DatabaseUpgrader {
 			oldScores[0] = g.getFirstPlayerScore();
 			oldScores[1] = g.getSecondPlayerScore();
 
-			ag = new ActiveGame(g.getId(), context);
+			ag = new ActiveGame(g.getId(), context, RuleType.rs00);
 			// saveAllThrows is extremely slow. any way to speed up?
 			ag.saveAllThrows(); // this also calls updateThrowsFrom(0)
 			ag.saveGame();
