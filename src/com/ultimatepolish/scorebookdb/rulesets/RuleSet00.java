@@ -442,8 +442,8 @@ public class RuleSet00 implements RuleSet {
 
 	public boolean isValid(Throw t) {
 		boolean valid = true;
-		t.invalidMessage = "(gameId=%d, throwIdx=%d)";
-		t.invalidMessage = String.format(t.invalidMessage, t.getId(),
+		t.invalidMessage = "(gameId=%d, throwIdx=%d) ";
+		t.invalidMessage = String.format(t.invalidMessage, t.getGame().getId(),
 				t.throwIdx);
 		if (isOnFire(t)) {
 			if (t.throwResult != ThrowResult.NA
@@ -562,13 +562,16 @@ public class RuleSet00 implements RuleSet {
 			// must be NA
 			// errors could potentially happen while returning the disc, so
 			// those are allowed
-			if (t.isLineFault || t.isGoaltend || t.isTipped || t.isDrinkHit
-					|| t.deadType != DeadType.ALIVE) {
+			if (t.defenseFireCount < 3) {
+				valid = false;
+				t.invalidMessage += "Fired-on but opponent not on fire. ";
+			} else if (t.isLineFault || t.isGoaltend || t.isTipped
+					|| t.isDrinkHit || t.deadType != DeadType.ALIVE) {
 				valid = false;
 				t.invalidMessage += "Fired-on != any modifier. ";
 			} else if (t.throwResult != ThrowResult.NA) {
 				valid = false;
-				t.invalidMessage += "Fired-on => NA result.";
+				t.invalidMessage += "Fired-on => NA result. ";
 			}
 
 			break;
