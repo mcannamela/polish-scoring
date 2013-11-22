@@ -56,7 +56,8 @@ public class GameInProgress extends MenuContainerActivity implements
 	private ImageView ivPole;
 	private TextView tvOwnGoal;
 	private TextView tvDefErr;
-	private View naView;
+	private View naViewL;
+	private View naViewR;
 	NumberPicker resultNp;
 
 	public ActiveGame ag;
@@ -516,7 +517,8 @@ public class GameInProgress extends MenuContainerActivity implements
 		tvOwnGoal = (TextView) findViewById(R.id.gip_ownGoal);
 		tvDefErr = (TextView) findViewById(R.id.gip_playerError);
 
-		naView = findViewById(R.id.gip_na_indicator);
+		naViewL = findViewById(R.id.gip_na_indicatorL);
+		naViewR = findViewById(R.id.gip_na_indicatorR);
 
 		resultNp = (NumberPicker) findViewById(R.id.numPicker_catch);
 		resultNp.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
@@ -757,7 +759,8 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	public void setThrowResultToNP(int result) {
-		naView.setBackgroundColor(Color.LTGRAY);
+		naViewL.setBackgroundColor(Color.LTGRAY);
+		naViewR.setBackgroundColor(Color.LTGRAY);
 		switch (result) {
 		case ThrowResult.DROP:
 			resultNp.setValue(0);
@@ -769,7 +772,8 @@ public class GameInProgress extends MenuContainerActivity implements
 			resultNp.setValue(2);
 			break;
 		case ThrowResult.NA:
-			naView.setBackgroundColor(Color.RED);
+			naViewL.setBackgroundColor(Color.RED);
+			naViewR.setBackgroundColor(Color.RED);
 			break;
 		}
 	}
