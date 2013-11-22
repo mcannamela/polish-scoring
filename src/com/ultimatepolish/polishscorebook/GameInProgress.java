@@ -393,10 +393,11 @@ public class GameInProgress extends MenuContainerActivity implements
 
 		Intent intent = getIntent();
 		Long gId = intent.getLongExtra("GID", -1);
+		int testRuleSetId = intent.getIntExtra("RSID", 0);
 
 		Context context = getApplicationContext();
 		tDao = Throw.getDao(context);
-		ag = new ActiveGame(gId, context);
+		ag = new ActiveGame(gId, context, testRuleSetId);
 		uiThrow = ag.getActiveThrow();
 
 		initMetadata();

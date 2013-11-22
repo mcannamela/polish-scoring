@@ -33,7 +33,7 @@ public class ActiveGame {
 	private Dao<Throw, Long> tDao;
 	private Dao<Venue, Long> vDao;
 
-	public ActiveGame(long gId, Context context) {
+	public ActiveGame(long gId, Context context, int testRuleSetId) {
 		super();
 
 		this.gId = gId;
@@ -61,8 +61,7 @@ public class ActiveGame {
 			v = g.getVenue();
 			p[0] = g.getFirstPlayer();
 			p[1] = g.getSecondPlayer();
-			// TODO: load ruleset from database once implemented
-			ruleSet = RuleType.RS01;
+			ruleSet = RuleType.map.get(g.ruleSet);
 
 		} else {
 			// if no game ID is passed in, this is for testing (or an error)
@@ -74,8 +73,8 @@ public class ActiveGame {
 					15, 70, new byte[0], Color.RED);
 			p[1] = new Player("Bum", "Bumb", "P2", false, true, false, true,
 					15, 70, new byte[0], Color.BLUE);
-			ruleSet = RuleType.RS01;
-			g = new Game(p[0], p[1], s, v, true, new Date());
+			g = new Game(p[0], p[1], s, v, RuleType.rs00, true, new Date());
+			ruleSet = RuleType.map.get(testRuleSetId);
 			tArray = new ArrayList<Throw>();
 		}
 

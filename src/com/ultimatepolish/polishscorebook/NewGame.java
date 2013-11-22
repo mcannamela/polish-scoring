@@ -23,26 +23,33 @@ import com.ultimatepolish.scorebookdb.Game;
 import com.ultimatepolish.scorebookdb.Player;
 import com.ultimatepolish.scorebookdb.Session;
 import com.ultimatepolish.scorebookdb.Venue;
+import com.ultimatepolish.scorebookdb.enums.RuleType;
+import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class NewGame extends MenuContainerActivity {
 	Spinner spinner_p1;
 	Spinner spinner_p2;
 	Spinner spinner_session;
 	Spinner spinner_venue;
+	Spinner spinner_ruleSet;
 	ListView lv_players;
 
 	int p1_pos = 0;
 	int p2_pos = 1;
 	int session_pos = 0;
 	int venue_pos = 1;
+	int ruleSet_pos = 0;
 
 	List<Player> players = new ArrayList<Player>();
 	List<Session> sessions = new ArrayList<Session>();
 	List<Venue> venues = new ArrayList<Venue>();
+	List<RuleSet> ruleSets = new ArrayList<RuleSet>();
 
 	List<String> playerNames = new ArrayList<String>();
 	List<String> sessionNames = new ArrayList<String>();
 	List<String> venueNames = new ArrayList<String>();
+	List<String> ruleSetDescriptions = new ArrayList<String>();
+	List<Integer> ruleSetIds = new ArrayList<Integer>();
 
 	Dao<Player, Long> pDao;
 	Dao<Session, Long> sDao;
@@ -56,13 +63,15 @@ public class NewGame extends MenuContainerActivity {
 		spinner_p2 = (Spinner) findViewById(R.id.spinner_player2);
 		spinner_session = (Spinner) findViewById(R.id.spinner_session);
 		spinner_venue = (Spinner) findViewById(R.id.spinner_venue);
+		spinner_ruleSet = (Spinner) findViewById(R.id.spinner_ruleSet);
 
-		refreshSpinners(spinner_p1);
+		refreshSpinners();
 
 		spinner_p1.setOnItemSelectedListener(mPlayerOneSelectedHandler);
 		spinner_p2.setOnItemSelectedListener(mPlayerTwoSelectedHandler);
 		spinner_session.setOnItemSelectedListener(mSessionSelectedHandler);
 		spinner_venue.setOnItemSelectedListener(mVenueSelectedHandler);
+		spinner_ruleSet.setOnItemSelectedListener(mRuleSetSelectedHandler);
 	}
 
 	@Override
@@ -111,8 +120,17 @@ public class NewGame extends MenuContainerActivity {
 		public void onNothingSelected(AdapterView<?> parent) {
 		}
 	};
+	private OnItemSelectedListener mRuleSetSelectedHandler = new OnItemSelectedListener() {
+		public void onItemSelected(AdapterView<?> parent, View v, int position,
+				long id) {
+			ruleSet_pos = position;
+		}
 
-	public void refreshSpinners(View view) {
+		public void onNothingSelected(AdapterView<?> parent) {
+		}
+	};
+
+	public void refreshSpinners() {
 		Context context = getApplicationContext();
 		try {
 			pDao = Player.getDao(context);
@@ -131,6 +149,9 @@ public class NewGame extends MenuContainerActivity {
 		playerNames.clear();
 		sessionNames.clear();
 		venueNames.clear();
+		ruleSetDescriptions.clear();
+		ruleSetIds.clear();
+
 		for (Player p : players) {
 			playerNames.add(p.getFirstName() + " " + p.getLastName());
 		}
@@ -141,29 +162,42 @@ public class NewGame extends MenuContainerActivity {
 		for (Venue v : venues) {
 			venueNames.add(String.valueOf(v.getId()) + " " + v.getName());
 		}
+		for (RuleSet rs : RuleType.map.values()) {
+			ruleSetDescriptions.add(rs.getDescription());
+			ruleSetIds.add(rs.getId());
+		}
 
 		ArrayAdapter<String> pAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_dropdown_item, playerNames);
 		pAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
 		ArrayAdapter<String> sAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_dropdown_item, sessionNames);
 		sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
 		ArrayAdapter<String> vAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_dropdown_item, venueNames);
 		vAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		ArrayAdapter<String> rsAdapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_dropdown_item,
+				ruleSetDescriptions);
+		rsAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 		spinner_p1.setAdapter(pAdapter);
 		spinner_p2.setAdapter(pAdapter);
 
 		spinner_session.setAdapter(sAdapter);
 		spinner_venue.setAdapter(vAdapter);
+		spinner_ruleSet.setAdapter(rsAdapter);
 	}
 
 	public void createGame(View view) {
 		Player p1 = players.get(p1_pos);
 		Player p2 = players.get(p2_pos);
 		Game g = new Game(p1, p2, sessions.get(session_pos),
-				venues.get(venue_pos), true);
+				venues.get(venue_pos), ruleSetIds.get(ruleSet_pos), true);
 		long gid;
 		g.setDatePlayed(new Date());
 
@@ -181,5 +215,4 @@ public class NewGame extends MenuContainerActivity {
 					Toast.LENGTH_LONG).show();
 		}
 	}
-
 }
