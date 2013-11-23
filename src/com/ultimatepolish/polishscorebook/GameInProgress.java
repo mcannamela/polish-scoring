@@ -22,11 +22,15 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnValueChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.ActiveGame;
@@ -56,6 +60,7 @@ public class GameInProgress extends MenuContainerActivity implements
 	private ImageView ivPole;
 	private TextView tvOwnGoal;
 	private TextView tvDefErr;
+	private ToggleButton tbFire;
 	private View naViewL;
 	private View naViewR;
 	NumberPicker resultNp;
@@ -157,6 +162,24 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	};
 
+	private OnCheckedChangeListener mCheckedChangeListener = new OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+
+			if (isChecked) {
+				uiThrow.offenseFireCount = 3;
+				if (uiThrow.throwResult != ThrowResult.BROKEN) {
+					ag.ruleSet.setThrowResult(uiThrow, ThrowResult.NA);
+				}
+			} else {
+				uiThrow.offenseFireCount = 0;
+				ag.ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
+			}
+			updateActiveThrow();
+		}
+	};
+
 	private class MyPageChangeListener extends
 			ViewPager.SimpleOnPageChangeListener {
 		@Override
@@ -175,7 +198,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		gotoThrowIdx(global_throw_idx);
 	}
 
-	public void buttonPressed(View view) {
+	public void throwTypePressed(View view) {
 		log("buttonPressed(): " + view.getContentDescription() + " was pressed");
 		int buttonId = view.getId();
 
@@ -236,6 +259,21 @@ public class GameInProgress extends MenuContainerActivity implements
 			if (buttonId != R.id.gip_button_trap) {
 				confirmThrow();
 			}
+		}
+	}
+
+	public void firedOnPressed(View view) {
+		log("buttonPressed(): " + view.getContentDescription() + " was pressed");
+
+		if (uiThrow.defenseFireCount == 0) {
+			uiThrow.defenseFireCount = 3;
+			ag.ruleSet.setThrowType(uiThrow, ThrowType.FIRED_ON);
+			confirmThrow();
+		} else {
+			uiThrow.defenseFireCount = 0;
+			ag.ruleSet.setThrowType(uiThrow, ThrowType.NOT_THROWN);
+			ag.ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
+			updateActiveThrow();
 		}
 	}
 
@@ -518,6 +556,15 @@ public class GameInProgress extends MenuContainerActivity implements
 		tvOwnGoal = (TextView) findViewById(R.id.gip_ownGoal);
 		tvDefErr = (TextView) findViewById(R.id.gip_playerError);
 
+		tbFire = (ToggleButton) findViewById(R.id.gip_toggle_fire);
+		tbFire.setOnCheckedChangeListener(mCheckedChangeListener);
+
+		if (ag.ruleSet.useAutoFire() == true) {
+			tbFire.setVisibility(View.GONE);
+			Button bFiredOn = (Button) findViewById(R.id.gip_button_fired_on);
+			bFiredOn.setVisibility(View.GONE);
+		}
+
 		naViewL = findViewById(R.id.gip_na_indicatorL);
 		naViewR = findViewById(R.id.gip_na_indicatorR);
 
@@ -615,7 +662,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		setThrowButtonState(ThrowType.POLE, ivPole);
 		setThrowButtonState(ThrowType.CUP, ivCup);
 		setBrokenButtonState();
-		setErrorButtonState();
+		setExtrasButtonState();
 
 		if (uiThrow.isTipped) {
 			ivStrike.getDrawable().setLevel(3);
@@ -696,7 +743,7 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	}
 
-	private void setErrorButtonState() {
+	private void setExtrasButtonState() {
 		tvOwnGoal.setTextColor(Color.BLACK);
 		tvDefErr.setTextColor(Color.BLACK);
 		for (boolean og : uiThrow.getOwnGoals()) {
@@ -709,6 +756,13 @@ public class GameInProgress extends MenuContainerActivity implements
 				tvDefErr.setTextColor(Color.RED);
 			}
 		}
+
+		if (uiThrow.offenseFireCount >= 3) {
+			tbFire.setChecked(true);
+		} else {
+			tbFire.setChecked(false);
+		}
+
 	}
 
 	private void renderPage(int pidx) {
