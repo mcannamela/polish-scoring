@@ -10,6 +10,8 @@ public interface RuleSet {
 
 	public String getDescription();
 
+	public boolean useAutoFire();
+
 	// Primary setting functions ==============================================
 	public void setThrowType(Throw t, int throwType);
 

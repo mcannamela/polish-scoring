@@ -6,7 +6,6 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -33,8 +32,15 @@ public class RuleSet00 implements RuleSet {
 		return "Standard ruleset with no coercion";
 	}
 
+	public boolean useAutoFire() {
+		return false;
+	}
+
 	public void setThrowType(Throw t, int throwType) {
 		t.throwType = throwType;
+		if (throwType == ThrowType.FIRED_ON) {
+			setThrowResult(t, ThrowResult.NA);
+		}
 	}
 
 	public void setThrowResult(Throw t, int throwResult) {
@@ -412,24 +418,7 @@ public class RuleSet00 implements RuleSet {
 		}
 	}
 
-	public void toggleOffenseFire(Throw t) {
-		// This is not required by ruleset but needed for manual fire
-		if (t.offenseFireCount >= 3) {
-			t.offenseFireCount = 0;
-		} else {
-			t.offenseFireCount = 3;
-		}
-	}
-
 	public void setFireCounts(Throw t, Throw previousThrow) {
-		int prevOffCount = previousThrow.offenseFireCount;
-		int prevDefCount = previousThrow.defenseFireCount;
-
-		t.offenseFireCount = prevDefCount;
-		t.defenseFireCount = prevOffCount;
-
-		Log.i("Throw.setFireCounts()", "o=" + prevDefCount + ", d="
-				+ prevOffCount);
 	}
 
 	public boolean isValid(Throw t, Context context) {

@@ -26,6 +26,11 @@ public class RuleSet01 extends RuleSet00 {
 	}
 
 	@Override
+	public boolean useAutoFire() {
+		return true;
+	}
+
+	@Override
 	public void setThrowType(Throw t, int throwType) {
 		if (t.defenseFireCount >= 3) {
 			t.throwType = ThrowType.FIRED_ON;
