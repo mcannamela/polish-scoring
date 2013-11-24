@@ -1,5 +1,5 @@
 #
-# generated on 2013/08/06 10:06:35
+# generated on 2013/11/22 10:05:03
 #
 # --table-start--
 dataClass=com.ultimatepolish.scorebookdb.Player
@@ -103,6 +103,10 @@ fieldName=venue
 foreign=true
 # --field-end--
 # --field-start--
+fieldName=ruleSet
+canBeNull=false
+# --field-end--
+# --field-start--
 fieldName=firstPlayerOnTop
 canBeNull=false
 # --field-end--
@@ -121,6 +125,104 @@ fieldName=isComplete
 # --field-end--
 # --field-start--
 fieldName=isTracked
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.ultimatepolish.scorebookdb.Throw
+tableName=throw
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=throwIdx
+canBeNull=false
+uniqueCombo=true
+# --field-end--
+# --field-start--
+fieldName=game
+canBeNull=false
+foreign=true
+uniqueCombo=true
+# --field-end--
+# --field-start--
+fieldName=offensivePlayer
+canBeNull=false
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=defensivePlayer
+canBeNull=false
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=timestamp
+canBeNull=false
+# --field-end--
+# --field-start--
+fieldName=throwType
+canBeNull=false
+# --field-end--
+# --field-start--
+fieldName=throwResult
+canBeNull=false
+# --field-end--
+# --field-start--
+fieldName=deadType
+# --field-end--
+# --field-start--
+fieldName=isTipped
+# --field-end--
+# --field-start--
+fieldName=isGoaltend
+# --field-end--
+# --field-start--
+fieldName=isGrabbed
+# --field-end--
+# --field-start--
+fieldName=isDrinkHit
+# --field-end--
+# --field-start--
+fieldName=isLineFault
+# --field-end--
+# --field-start--
+fieldName=isOffensiveDrinkDropped
+# --field-end--
+# --field-start--
+fieldName=isOffensivePoleKnocked
+# --field-end--
+# --field-start--
+fieldName=isOffensiveBottleKnocked
+# --field-end--
+# --field-start--
+fieldName=isOffensiveBreakError
+# --field-end--
+# --field-start--
+fieldName=isDefensiveDrinkDropped
+# --field-end--
+# --field-start--
+fieldName=isDefensivePoleKnocked
+# --field-end--
+# --field-start--
+fieldName=isDefensiveBottleKnocked
+# --field-end--
+# --field-start--
+fieldName=isDefensiveBreakError
+# --field-end--
+# --field-start--
+fieldName=offenseFireCount
+# --field-end--
+# --field-start--
+fieldName=defenseFireCount
+# --field-end--
+# --field-start--
+fieldName=initialOffensivePlayerScore
+# --field-end--
+# --field-start--
+fieldName=initialDefensivePlayerScore
 # --field-end--
 # --table-fields-end--
 # --table-end--

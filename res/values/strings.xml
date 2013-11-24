@@ -54,8 +54,6 @@
 	<string name="gip_drop">drop</string>
 	<string name="gip_catch">catch</string>
 	<string name="gip_stalwart">stalwart</string>
-	<string name="gip_broken">broken</string>
-	<string name="gip_NA">NA</string>
 	<string name="gip_ballRight_button">&gt;</string>
 	<string name="gip_ballLow_button">v</string>
 	<string name="gip_error_check">er</string>
