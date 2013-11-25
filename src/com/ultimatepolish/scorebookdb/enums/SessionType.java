@@ -1,4 +1,4 @@
-package com.ultimatepolish.scorebookdb;
+package com.ultimatepolish.scorebookdb.enums;
 
 public final class SessionType {
 	public static final int OPEN = 0;

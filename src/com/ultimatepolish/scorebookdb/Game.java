@@ -12,6 +12,8 @@ import android.content.Context;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.ultimatepolish.scorebookdb.enums.ThrowResult;
+import com.ultimatepolish.scorebookdb.enums.ThrowType;
 
 @DatabaseTable
 public class Game {
@@ -21,63 +23,68 @@ public class Game {
 	public static final String VENUE = "venue_id";
 	public static final String DATE_PLAYED = "datePlayed";
 	public static final String IS_COMPLETE = "isComplete";
-	
-	@DatabaseField(generatedId=true)
+
+	@DatabaseField(generatedId = true)
 	private long id;
-	
-	@DatabaseField(canBeNull=false, foreign=true)
+
+	@DatabaseField(canBeNull = false, foreign = true)
 	private Player firstPlayer;
-	
-	@DatabaseField(canBeNull=false, foreign=true)
+
+	@DatabaseField(canBeNull = false, foreign = true)
 	private Player secondPlayer;
-	
+
 	@DatabaseField(foreign = true)
 	private Session session;
-	
+
 	@DatabaseField(foreign = true)
 	private Venue venue;
-	
-	@DatabaseField(canBeNull=false)
+
+	@DatabaseField(canBeNull = false)
+	public int ruleSet;
+
+	@DatabaseField(canBeNull = false)
 	public boolean firstPlayerOnTop;
-	
-	@DatabaseField(canBeNull=false)
+
+	@DatabaseField(canBeNull = false)
 	private Date datePlayed;
-	
+
 	@DatabaseField
 	private int firstPlayerScore;
-	
+
 	@DatabaseField
 	private int secondPlayerScore;
 
 	@DatabaseField
 	private boolean isComplete = false;
-	
+
 	@DatabaseField
 	private boolean isTracked = true;
-	
+
 	public Game() {
 		super();
 	}
 
 	public Game(Player firstPlayer, Player secondPlayer, Session session,
-			Venue venue, boolean isTracked, Date datePlayed) {
+			Venue venue, int ruleSet, boolean isTracked, Date datePlayed) {
 		super();
 		this.firstPlayer = firstPlayer;
 		this.secondPlayer = secondPlayer;
 		this.session = session;
 		this.venue = venue;
+		this.ruleSet = ruleSet;
 		this.isTracked = isTracked;
 		this.datePlayed = datePlayed;
-		
+
 	}
-	
+
 	public Game(Player firstPlayer, Player secondPlayer, Session session,
-			Venue venue, boolean isTracked) {
+			Venue venue, int ruleSet, boolean isTracked) {
 		super();
 		this.firstPlayer = firstPlayer;
 		this.secondPlayer = secondPlayer;
 		this.session = session;
 		this.venue = venue;
+		this.ruleSet = ruleSet;
 		this.isTracked = isTracked;
 		this.datePlayed = new Date();
 	}
@@ -87,100 +94,103 @@ public class Game {
 		Dao<Game, Long> d = null;
 		try {
 			d = helper.getGameDao();
-		}
-		catch (SQLException e){
-			throw new RuntimeException("couldn't get dao: ", e);
+		} catch (SQLException e) {
+			throw new RuntimeException("Couldn't get game dao: ", e);
 		}
 		return d;
 	}
-	public static List<Game> getAll(Context context) throws SQLException{
+
+	public static List<Game> getAll(Context context) throws SQLException {
 		Dao<Game, Long> d = Game.getDao(context);
 		List<Game> games = new ArrayList<Game>();
-		for(Game g:d){
+		for (Game g : d) {
 			games.add(g);
 		}
 		return games;
 	}
-	public boolean isValidThrow(Throw t){
+
+	public boolean isValidThrow(Throw t) {
 		boolean isValid = true;
-		int idx = t.getThrowIdx();
-		switch (idx%2){
-		// TODO: do players need to be refreshed now that foreign variable is used?
-		    //first player is on offense
-			case 0:
-				isValid= isValid && (t.getOffensivePlayer()==firstPlayer);
-				break;
-		    //second player is on defense
-			case 1:
-				isValid= isValid && (t.getOffensivePlayer()==secondPlayer);
-				break;
-			default:
-				throw new RuntimeException("invalid index "+idx);
+		int idx = t.throwIdx;
+		switch (idx % 2) {
+		// TODO: do players need to be refreshed now that foreign variable is
+		// used?
+		// first player is on offense
+		case 0:
+			isValid = isValid && (t.getOffensivePlayer() == firstPlayer);
+			break;
+		// second player is on defense
+		case 1:
+			isValid = isValid && (t.getOffensivePlayer() == secondPlayer);
+			break;
+		default:
+			throw new RuntimeException("invalid index " + idx);
 		}
 		return isValid;
 	}
 
-	public ArrayList<Throw> getThrowList(Context context) throws SQLException{
+	public ArrayList<Throw> getThrowList(Context context) throws SQLException {
 		int tidx, maxThrowIndex;
 		ArrayList<Throw> throwArray = new ArrayList<Throw>();
-		
+
 		HashMap<Integer, Throw> throwMap = new HashMap<Integer, Throw>();
-		HashMap<String,Object> m = new HashMap<String,Object>();
+		HashMap<String, Object> m = new HashMap<String, Object>();
 		m.put("game_id", getId());
-		
-		Dao<Throw, Long> d = Throw.getDao(context);		
+
+		Dao<Throw, Long> d = Throw.getDao(context);
 		List<Throw> dbThrows = d.queryForFieldValuesArgs(m);
-		
+
 		maxThrowIndex = 0;
 		if (!dbThrows.isEmpty()) {
 			Collections.sort(dbThrows);
-			
-			for (Throw t:dbThrows){
-				tidx = t.getThrowIdx();
-				
-				//purge any throws with negative index
-				if (tidx<0){
+
+			for (Throw t : dbThrows) {
+				tidx = t.throwIdx;
+
+				// purge any throws with negative index
+				if (tidx < 0) {
 					d.delete(t);
 				}
-				
-				//populate the map
+
+				// populate the map
 				throwMap.put(tidx, t);
-				
-				//keep track of the maximum index
-				if (tidx>maxThrowIndex){
-					maxThrowIndex=tidx;
+
+				// keep track of the maximum index
+				if (tidx > maxThrowIndex) {
+					maxThrowIndex = tidx;
 				}
 			}
-			
-			//ensure throws in correct order and complete
+
+			// ensure throws in correct order and complete
 			Throw t = null;
-			for (int i=0;i<=maxThrowIndex;i++){
+			for (int i = 0; i <= maxThrowIndex; i++) {
 				t = throwMap.get(i);
-				//infill with a caught strike if necessary
-				if (t==null){
+				// infill with a caught strike if necessary
+				if (t == null) {
 					t = makeNewThrow(i);
-					t.setThrowType(ThrowType.STRIKE);
-					t.setThrowResult(ThrowResult.CATCH);
+					t.throwType = ThrowType.STRIKE;
+					t.throwResult = ThrowResult.CATCH;
 				}
 				throwArray.add(t);
 			}
 		}
-		
+
 		return throwArray;
 	}
-	public Throw makeNewThrow(int throwNumber){
+
+	public Throw makeNewThrow(int throwNumber) {
 		Player offensivePlayer, defensivePlayer;
-		if (throwNumber%2 == 0){
+		if (throwNumber % 2 == 0) {
 			offensivePlayer = getFirstPlayer();
 			defensivePlayer = getSecondPlayer();
-		}
-		else{
+		} else {
 			offensivePlayer = getSecondPlayer();
 			defensivePlayer = getFirstPlayer();
 		}
 		Date timestamp = new Date(System.currentTimeMillis());
-		Throw t = new Throw (throwNumber, this, offensivePlayer, defensivePlayer, timestamp);
-		
+		Throw t = new Throw(throwNumber, this, offensivePlayer,
+				defensivePlayer, timestamp);
+
 		return t;
 	}
 
@@ -249,7 +259,7 @@ public class Game {
 		this.secondPlayerScore = secondPlayerScore;
 		checkGameComplete();
 	}
-	
+
 	public boolean getIsComplete() {
 		return isComplete;
 	}
@@ -257,22 +267,21 @@ public class Game {
 	public void setIsComplete(boolean isComplete) {
 		this.isComplete = isComplete;
 	}
-	
+
 	public boolean getIsTracked() {
 		return isTracked;
 	}
-	
+
 	public void checkGameComplete() {
 		Integer s1 = getFirstPlayerScore();
 		Integer s2 = getSecondPlayerScore();
-		if (Math.abs(s1 - s2) >= 2 &&
-				(s1 >= 11 || s2 >= 11) ) {
+		if (Math.abs(s1 - s2) >= 2 && (s1 >= 11 || s2 >= 11)) {
 			setIsComplete(true);
 		} else {
 			setIsComplete(false);
 		}
 	}
-	
+
 	public Player getWinner() {
 		Player winner = firstPlayer;
 		if (getSecondPlayerScore() > getFirstPlayerScore()) {
@@ -280,7 +289,7 @@ public class Game {
 		}
 		return winner;
 	}
-	
+
 	public Player getLoser() {
 		Player loser = firstPlayer;
 		if (getSecondPlayerScore() < getFirstPlayerScore()) {

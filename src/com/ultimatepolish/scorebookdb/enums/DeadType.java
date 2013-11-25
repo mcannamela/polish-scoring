@@ -1,4 +1,4 @@
-package com.ultimatepolish.scorebookdb;
+package com.ultimatepolish.scorebookdb.enums;
 
 public final class DeadType {
 	public static final int ALIVE = 0;

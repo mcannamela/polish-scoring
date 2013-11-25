@@ -18,8 +18,8 @@
         android:id="@+id/textView_vs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/spinner_player1"
-        android:layout_toRightOf="@+id/spinner_player1"
+        android:layout_alignBottom="@id/spinner_player1"
+        android:layout_toRightOf="@id/spinner_player1"
         android:layout_marginLeft="40dp"
         android:text="VS."
         android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -28,8 +28,8 @@
         android:id="@+id/spinner_player2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/textView_vs"
-        android:layout_alignTop="@+id/spinner_player1"
+        android:layout_toRightOf="@id/textView_vs"
+        android:layout_alignTop="@id/spinner_player1"
         android:layout_marginLeft="40dp" />
 
     <Spinner
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView_vs"
+        android:layout_below="@id/textView_vs"
         android:layout_marginTop="50dp" />
 
     <Spinner
@@ -45,14 +45,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/spinner_venue" />
+        android:layout_below="@id/spinner_venue" />
+    
+    <Spinner
+        android:id="@+id/spinner_ruleSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/spinner_session" />
 
     <CheckBox
         android:id="@+id/checkBox_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/spinner_session"
+        android:layout_below="@id/spinner_ruleSet"
         android:layout_marginTop="50dp"
         android:text="p1 throws from top?" />
 
@@ -60,8 +67,8 @@
         android:id="@+id/button_createNewGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/checkBox_error"
-        android:layout_below="@+id/checkBox_error"
+        android:layout_alignLeft="@id/checkBox_error"
+        android:layout_below="@id/checkBox_error"
         android:layout_marginTop="50dp"
         android:onClick="createGame"
         android:text="Fight!" />
