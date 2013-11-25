@@ -16,7 +16,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="libs/dropbox-sync-sdk-android.jar"/>
 	<classpathentry kind="lib" path="libs/armeabi"/>
-	<classpathentry kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

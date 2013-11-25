@@ -99,7 +99,7 @@
         android:layout_height="75dp"
         android:layout_toRightOf="@id/gip_dead_left"
         android:layout_below="@id/gip_dead_high"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:paddingLeft="85dp"
         android:contentDescription="high" />
     
@@ -110,7 +110,7 @@
         android:layout_height="75dp"
         android:layout_toRightOf="@id/gip_button_high"
         android:layout_below="@id/gip_dead_high"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:padding="10dp"
         android:contentDescription="trap" />
 
@@ -123,7 +123,7 @@
         android:layout_height="100dp"
         android:padding="10dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:text="@string/gip_ballLeft_button"
         android:contentDescription="left" />
 
@@ -137,7 +137,7 @@
         android:layout_gravity="fill_horizontal"
         android:padding="10dp"
         android:textAppearance="?android:attr/textAppearanceLarge"                
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:text="@string/gip_strike_button"
         android:contentDescription="strike" />
     
@@ -150,7 +150,7 @@
         android:layout_height="100dp"
         android:padding="10dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:text="@string/gip_ballRight_button"
         android:contentDescription="right" />
     
@@ -162,7 +162,7 @@
         android:layout_width="150dp"
         android:layout_height="75dp"
         android:paddingLeft="85dp"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:contentDescription="low" />
     
     <ImageButton
@@ -173,7 +173,7 @@
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:padding="10dp"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:contentDescription="low" />
     
     <ImageView 
@@ -207,7 +207,7 @@
         android:layout_below="@id/gip_dead_low"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:contentDescription="pole" />
 	
     <ImageButton
@@ -217,7 +217,7 @@
         android:layout_below="@id/gip_dead_low"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:contentDescription="cup" />
     
 	<ImageButton
@@ -227,11 +227,11 @@
         android:layout_below="@id/gip_dead_low"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:onClick="throwTypeButtonPressed"
+        android:onClick="throwTypePressed"
         android:contentDescription="bottle" />
     
 	<ImageView 
-    	android:id="@+id/gip_na_indicator"
+    	android:id="@+id/gip_na_indicatorL"
     	android:layout_height="120dp"
     	android:layout_width = "4dp"
     	android:layout_alignParentLeft="true"
@@ -243,13 +243,25 @@
 	
      <NumberPicker
          android:id="@+id/numPicker_catch"
-         android:layout_toRightOf="@id/gip_na_indicator"
+         android:layout_toRightOf="@id/gip_na_indicatorL"
          android:layout_below="@+id/gip_button_bottle"
          android:layout_width="205dp"
          android:layout_height="120dp"
          android:layout_marginLeft="10dp"
+         android:layout_marginRight="10dp"
          android:layout_marginTop="25dp"
          android:layout_marginBottom="25dp" />
+     
+     <ImageView 
+    	android:id="@+id/gip_na_indicatorR"
+    	android:layout_height="120dp"
+    	android:layout_width = "4dp"
+    	android:layout_toRightOf="@id/numPicker_catch"
+    	android:layout_below="@id/gip_button_bottle"
+    	android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
+    	android:background="#00FF00"
+    	/>
 
     <Button
         android:id="@+id/gip_ownGoal"
@@ -258,7 +270,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:onClick="errorButtonPressed"
+        android:onClick="OwnGoalDialog"
         android:text="OG"
         android:contentDescription="ownGoal" />
     
@@ -269,9 +281,33 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:onClick="errorButtonPressed"
+        android:onClick="PlayerErrorDialog"
         android:text="Err"
         android:contentDescription="playerError" />
+    
+    <ToggleButton
+        android:id="@+id/gip_toggle_fire"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/gip_ownGoal"
+        android:layout_alignRight="@id/gip_ownGoal"
+        android:layout_below="@id/gip_ownGoal"
+        android:layout_marginTop="27dp"
+        android:text="Fire"
+        android:textOff="Fire"
+        android:textOn="Fire"
+        android:onClick="fireButtonPressed" />
+
+    <Button
+        android:id="@+id/gip_button_fired_on"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/gip_toggle_fire"
+        android:layout_alignBottom="@id/gip_toggle_fire"
+        android:layout_alignLeft="@id/gip_playerError"
+        android:layout_alignRight="@id/gip_playerError"
+        android:onClick="firedOnPressed"
+        android:text="Fired On" />
   
     <TableLayout
 		android:id="@+id/scoreTable_header"
@@ -314,13 +350,12 @@
 	
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager_throwsTables"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView_throwCount"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/scoreTable_header"
-        android:layout_toRightOf="@id/gip_dead_right"
-        android:gravity="top" >
+	    android:layout_toRightOf="@id/gip_dead_right"
+		android:layout_below="@+id/scoreTable_header"
+		android:layout_above="@+id/textView_throwCount"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:gravity="top" >
 	    
 	    <android.support.v4.view.PagerTitleStrip
 			android:id="@+id/pager_title_strip"
@@ -334,50 +369,4 @@
 	    
 	    </android.support.v4.view.ViewPager>
 
-    <TextView
-        android:id="@+id/textView_throwCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="30dp"
-        android:text="0"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <ToggleButton
-        android:id="@+id/gip_toggle_button_is_tipped"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/gip_ownGoal"
-        android:layout_alignRight="@+id/gip_ownGoal"
-        android:layout_alignParentBottom="true"
-        android:onClick="isTippedPressed"
-        android:text="isTipped"
-        android:textOff="isTipped"
-        android:textOn="isTipped" />
-
-    <ToggleButton
-        android:id="@+id/gip_toggle_button_on_fire"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/gip_ownGoal"
-        android:layout_alignRight="@+id/gip_ownGoal"
-        android:layout_below="@+id/gip_ownGoal"
-        android:layout_marginTop="27dp"
-        android:onClick="onFirePressed"
-        android:text="OnFire"
-        android:textOff="OnFire"
-        android:textOn="OnFire" />
-
-    <Button
-        android:id="@+id/gip_button_fired_on"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/gip_toggle_button_on_fire"
-        android:layout_alignBottom="@+id/gip_toggle_button_on_fire"
-        android:layout_alignLeft="@+id/gip_playerError"
-        android:layout_alignRight="@+id/gip_playerError"
-        android:onClick="throwTypeButtonPressed"
-        android:text="FiredOn" />
-	
 </RelativeLayout>
