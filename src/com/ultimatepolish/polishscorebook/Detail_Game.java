@@ -107,8 +107,8 @@ public class Detail_Game extends MenuContainerActivity {
 		gameVenue.setText(g.getVenue().getName());
 
 		TextView gameRuleSet = (TextView) findViewById(R.id.gDet_ruleSet);
-		gameRuleSet.setText("(" + RuleType.map.get(g.ruleSet).getId() + ") "
-				+ RuleType.map.get(g.ruleSet).getDescription());
+		gameRuleSet.setText("(" + RuleType.map.get(g.ruleSetId).getId() + ") "
+				+ RuleType.map.get(g.ruleSetId).getDescription());
 
 		TextView gameScore = (TextView) findViewById(R.id.gDet_score);
 		gameScore.setText(String.valueOf(g.getFirstPlayerScore()) + "/"

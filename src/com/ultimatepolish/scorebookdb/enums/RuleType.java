@@ -11,6 +11,7 @@ public final class RuleType {
 	public static final RuleSet RS00 = new RuleSet00();
 	public static final RuleSet RS01 = new RuleSet01();
 
+	public static final int rsNull = -1; // for sessions, no default rule set
 	public static final int rs00 = 0;
 	public static final int rs01 = 1;
 

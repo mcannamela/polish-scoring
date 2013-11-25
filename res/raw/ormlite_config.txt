@@ -1,5 +1,5 @@
 #
-# generated on 2013/11/22 10:05:03
+# generated on 2013/11/25 08:27:26
 #
 # --table-start--
 dataClass=com.ultimatepolish.scorebookdb.Player
@@ -103,7 +103,7 @@ fieldName=venue
 foreign=true
 # --field-end--
 # --field-start--
-fieldName=ruleSet
+fieldName=ruleSetId
 canBeNull=false
 # --field-end--
 # --field-start--
@@ -295,6 +295,9 @@ canBeNull=false
 # --field-start--
 fieldName=sessionType
 canBeNull=false
+# --field-end--
+# --field-start--
+fieldName=ruleSetId
 # --field-end--
 # --field-start--
 fieldName=startDate

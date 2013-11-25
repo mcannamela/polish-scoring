@@ -105,7 +105,14 @@ public class NewGame extends MenuContainerActivity {
 		public void onItemSelected(AdapterView<?> parent, View v, int position,
 				long id) {
 			session_pos = position;
-
+			if (sessions.get(position).getRuleSetId() == -1) {
+				spinner_ruleSet.setEnabled(true);
+			} else {
+				spinner_ruleSet.setEnabled(false);
+				int selectedId = sessions.get(position).getRuleSetId();
+				spinner_ruleSet.setSelection(ruleSetIds.indexOf(selectedId));
+				ruleSet_pos = ruleSetIds.indexOf(selectedId);
+			}
 		}
 
 		public void onNothingSelected(AdapterView<?> parent) {
@@ -196,8 +203,11 @@ public class NewGame extends MenuContainerActivity {
 	public void createGame(View view) {
 		Player p1 = players.get(p1_pos);
 		Player p2 = players.get(p2_pos);
+
+		int ruleSetId = ruleSetIds.get(ruleSet_pos);
+
 		Game g = new Game(p1, p2, sessions.get(session_pos),
-				venues.get(venue_pos), ruleSetIds.get(ruleSet_pos), true);
+				venues.get(venue_pos), ruleSetId, true);
 		long gid;
 		g.setDatePlayed(new Date());
 

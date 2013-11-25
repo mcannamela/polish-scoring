@@ -37,6 +37,7 @@ import com.ultimatepolish.scorebookdb.Player;
 import com.ultimatepolish.scorebookdb.Session;
 import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.Venue;
+import com.ultimatepolish.scorebookdb.enums.RuleType;
 
 public class DbSettings extends MenuContainerActivity {
 
@@ -198,8 +199,9 @@ public class DbSettings extends MenuContainerActivity {
 						true, false, 182, 63, emptyImage, getResources()
 								.getColor(R.color.Khaki)) };
 		Dao<Session, Long> sessionDao = null;
-		Session s1 = new Session("league", 1, new Date(), false);
-		Session s2 = new Session("side_books", 0, new Date(), false);
+		Session s1 = new Session("league", 1, RuleType.rs01, new Date(), false);
+		Session s2 = new Session("side_books", 0, RuleType.rsNull, new Date(),
+				false);
 		Dao<Venue, Long> venueDao = null;
 		Venue v1 = new Venue("cogswell", true);
 		Venue v2 = new Venue("verndale", true);

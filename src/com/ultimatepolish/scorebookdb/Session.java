@@ -26,6 +26,9 @@ public class Session {
 	@DatabaseField(canBeNull = false)
 	public int sessionType;
 
+	@DatabaseField
+	private int ruleSetId;
+
 	@DatabaseField(canBeNull = false)
 	private Date startDate;
 
@@ -44,12 +47,13 @@ public class Session {
 	public Session() {
 	}
 
-	public Session(String sessionName, int sessionType, Date startDate,
-			boolean isTeam) {
+	public Session(String sessionName, int sessionType, int ruleSetId,
+			Date startDate, boolean isTeam) {
 		super();
 		this.sessionName = sessionName;
-		this.startDate = startDate;
 		this.sessionType = sessionType;
+		this.ruleSetId = ruleSetId;
+		this.startDate = startDate;
 		this.isTeam = isTeam;
 
 	}
@@ -108,6 +112,10 @@ public class Session {
 
 	public int getSessionType() {
 		return sessionType;
+	}
+
+	public int getRuleSetId() {
+		return ruleSetId;
 	}
 
 	public void setSessionType(int sessionType) {
