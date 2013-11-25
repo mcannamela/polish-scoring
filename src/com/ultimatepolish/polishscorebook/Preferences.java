@@ -36,7 +36,7 @@ import com.ultimatepolish.scorebookdb.DatabaseHelper;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class Settings extends PreferenceActivity {
+public class Preferences extends PreferenceActivity {
 	/**
 	 * Determines whether to always show the simplified settings UI, where
 	 * settings are presented in a single list. When false, settings are shown
@@ -46,14 +46,13 @@ public class Settings extends PreferenceActivity {
 	private static final boolean ALWAYS_SIMPLE_PREFS = true;
 	private DatabaseHelper databaseHelper = null;
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setupActionBar();
-		
+
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -66,10 +65,11 @@ public class Settings extends PreferenceActivity {
 			databaseHelper = null;
 		}
 	}
-	
+
 	private DatabaseHelper getHelper() {
 		if (databaseHelper == null) {
-			databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+			databaseHelper = OpenHelperManager.getHelper(this,
+					DatabaseHelper.class);
 		}
 		return databaseHelper;
 	}
@@ -126,7 +126,7 @@ public class Settings extends PreferenceActivity {
 
 		// Add 'general' preferences.
 		addPreferencesFromResource(R.xml.pref_general);
-		
+
 		dbClear();
 
 		// Add 'notifications' preferences, and a corresponding header.
@@ -266,14 +266,14 @@ public class Settings extends PreferenceActivity {
 	 * activity is showing a two-pane settings UI.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class GeneralPreferenceFragment extends PreferenceFragment{
+	public static class GeneralPreferenceFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.pref_general);
-			
-//			dbClear();
-			
+
+			// dbClear();
+
 			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
 			// to their values. When their values change, their summaries are
 			// updated to reflect the new value, per the Android Design
@@ -321,19 +321,19 @@ public class Settings extends PreferenceActivity {
 			bindPreferenceSummaryToValue(findPreference("sync_frequency"));
 		}
 	}
-	
-	public void dbClear(){
-		Preference dbClear = (Preference)findPreference("dbClear");
+
+	public void dbClear() {
+		Preference dbClear = (Preference) findPreference("dbClear");
 		dbClear.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-	        @Override
-	        public boolean onPreferenceClick(Preference arg0) { 
-	            //code for what you want it to do
-	        	Log.i("Settings", "you pressed the button!");
-	        	DatabaseHelper h = getHelper();
-	    		h.dropAll();
-	    		h.createAll();
-	            return true;
-	        }
-	    });
-    }
+			@Override
+			public boolean onPreferenceClick(Preference arg0) {
+				// code for what you want it to do
+				Log.i("Settings", "you pressed the button!");
+				DatabaseHelper h = getHelper();
+				h.dropAll();
+				h.createAll();
+				return true;
+			}
+		});
+	}
 }
