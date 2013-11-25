@@ -29,10 +29,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     
+     <TextView
+        android:id="@+id/sDet_ruleSet"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/sDet_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+     
     <TextView
         android:id="@+id/sDet_startDate"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/sDet_type"
+        android:layout_below="@+id/sDet_ruleSet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     

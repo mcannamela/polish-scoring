@@ -61,13 +61,13 @@ public class ActiveGame {
 			v = g.getVenue();
 			p[0] = g.getFirstPlayer();
 			p[1] = g.getSecondPlayer();
-			ruleSet = RuleType.map.get(g.ruleSet);
+			ruleSet = RuleType.map.get(g.ruleSetId);
 
 		} else {
 			// if no game ID is passed in, this is for testing (or an error)
 			// so create dummy objects which won't be saved to database
-			s = new Session("DummySession", SessionType.LEAGUE, new Date(),
-					false);
+			s = new Session("DummySession", SessionType.LEAGUE,
+					RuleType.rsNull, new Date(), false);
 			v = new Venue("DummyVenue", true);
 			p[0] = new Player("Dum", "Dumb", "P1", false, true, false, true,
 					15, 70, new byte[0], Color.RED);

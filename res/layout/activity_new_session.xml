@@ -34,12 +34,29 @@
          android:layout_height="wrap_content"
          android:layout_marginTop="20dp"
          android:layout_marginBottom="20dp" />
+
+    <Switch
+        android:id="@+id/newSession_forceRuleSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/newSession_sessionType"
+        android:layout_marginTop="20dp"
+        android:text="Force Ruleset:"
+        android:checked="true" />
+    
+    <Spinner
+        android:id="@+id/newSession_spinner_ruleSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/newSession_forceRuleSet" />
     
     <CheckBox 
     	android:id="@+id/newSession_isTeam"
     	android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-    	android:layout_below="@id/newSession_sessionType"
+    	android:layout_below="@id/newSession_spinner_ruleSet"
     	android:layout_alignParentLeft="true"
     	android:layout_marginTop="20dp"
     	android:text="Teams" />
