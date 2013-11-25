@@ -295,7 +295,8 @@
         android:layout_marginTop="27dp"
         android:text="Fire"
         android:textOff="Fire"
-        android:textOn="Fire" />
+        android:textOn="Fire"
+        android:onClick="fireButtonPressed" />
 
     <Button
         android:id="@+id/gip_button_fired_on"

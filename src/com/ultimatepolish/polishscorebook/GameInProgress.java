@@ -23,8 +23,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnValueChangeListener;
@@ -162,24 +160,6 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	};
 
-	private OnCheckedChangeListener mCheckedChangeListener = new OnCheckedChangeListener() {
-		@Override
-		public void onCheckedChanged(CompoundButton buttonView,
-				boolean isChecked) {
-
-			if (isChecked) {
-				uiThrow.offenseFireCount = 3;
-				if (uiThrow.throwResult != ThrowResult.BROKEN) {
-					ag.ruleSet.setThrowResult(uiThrow, ThrowResult.NA);
-				}
-			} else {
-				uiThrow.offenseFireCount = 0;
-				ag.ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
-			}
-			updateActiveThrow();
-		}
-	};
-
 	private class MyPageChangeListener extends
 			ViewPager.SimpleOnPageChangeListener {
 		@Override
@@ -262,11 +242,32 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 	}
 
+	public void fireButtonPressed(View view) {
+		boolean isChecked = ((ToggleButton) view).isChecked();
+
+		if (isChecked) {
+			uiThrow.offenseFireCount = 3;
+			uiThrow.defenseFireCount = 0;
+			if (uiThrow.throwResult != ThrowResult.BROKEN) {
+				ag.ruleSet.setThrowResult(uiThrow, ThrowResult.NA);
+			}
+			if (uiThrow.throwType == ThrowType.FIRED_ON) {
+				ag.ruleSet.setThrowType(uiThrow, ThrowType.NOT_THROWN);
+			}
+		} else {
+			uiThrow.offenseFireCount = 0;
+			ag.ruleSet.setThrowResult(uiThrow, getThrowResultFromNP());
+		}
+		log("fire checked changed");
+		updateActiveThrow();
+	};
+
 	public void firedOnPressed(View view) {
 		log("buttonPressed(): " + view.getContentDescription() + " was pressed");
 
 		if (uiThrow.defenseFireCount == 0) {
 			uiThrow.defenseFireCount = 3;
+			uiThrow.offenseFireCount = 0;
 			ag.ruleSet.setThrowType(uiThrow, ThrowType.FIRED_ON);
 			confirmThrow();
 		} else {
@@ -557,7 +558,6 @@ public class GameInProgress extends MenuContainerActivity implements
 		tvDefErr = (TextView) findViewById(R.id.gip_playerError);
 
 		tbFire = (ToggleButton) findViewById(R.id.gip_toggle_fire);
-		tbFire.setOnCheckedChangeListener(mCheckedChangeListener);
 
 		if (ag.ruleSet.useAutoFire() == true) {
 			tbFire.setVisibility(View.GONE);
