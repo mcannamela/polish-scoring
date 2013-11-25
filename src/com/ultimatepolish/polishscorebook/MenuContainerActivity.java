@@ -47,8 +47,11 @@ public class MenuContainerActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		case R.id.modifyButton:
 			openModifyActivity();
 			return true;
-		case R.id.settings:
-			openSettingsActivity();
+		case R.id.dbSettings:
+			openDbSettingsActivity();
+			return true;
+		case R.id.preferences:
+			openPreferencesActivity();
 			return true;
 		case R.id.about:
 			openAboutActivity();
@@ -93,8 +96,13 @@ public class MenuContainerActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		startActivity(intent);
 	}
 
-	public void openSettingsActivity() {
-		Intent intent = new Intent(this, SimpleSettings.class);
+	public void openDbSettingsActivity() {
+		Intent intent = new Intent(this, DbSettings.class);
+		startActivity(intent);
+	}
+
+	public void openPreferencesActivity() {
+		Intent intent = new Intent(this, Preferences.class);
 		startActivity(intent);
 	}
 
