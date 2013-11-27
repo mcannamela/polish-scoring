@@ -27,6 +27,7 @@ public class DatabaseUpgrader {
 		String addGameColumn = "ALTER TABLE game ADD COLUMN ";
 		gDao.executeRaw(addGameColumn + "isComplete BOOLEAN DEFAULT 1;");
 		gDao.executeRaw(addGameColumn + "isTracked BOOLEAN DEFAULT 1;");
+		gDao.executeRaw(addGameColumn + "ruleSetId INTEGER;");
 
 		// clean out games with non-unique players
 		GenericRawResults<String[]> rawResults = gDao
@@ -71,6 +72,7 @@ public class DatabaseUpgrader {
 		sDao.executeRaw(addSessionColumn + "isTeam BOOLEAN DEFAULT 0;");
 		sDao.executeRaw(addSessionColumn + "isActive BOOLEAN DEFAULT 1;");
 		sDao.executeRaw("ALTER TABLE session RENAME TO temp;");
+		sDao.executeRaw(addSessionColumn + "ruleSetId INTEGER DEFAULT -1;");
 		TableUtils.createTable(connectionSource, Session.class);
 		sDao.executeRaw("INSERT INTO session(id, sessionName, sessionType, startDate, endDate, isTeam, isActive) "
 				+ "SELECT id, sessionName, sessionType, startDate, endDate, isTeam, isActive FROM temp;");
