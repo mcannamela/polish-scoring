@@ -1,5 +1,5 @@
 #
-# generated on 2013/11/25 08:27:26
+# generated on 2013/11/27 10:34:55
 #
 # --table-start--
 dataClass=com.ultimatepolish.scorebookdb.Player
