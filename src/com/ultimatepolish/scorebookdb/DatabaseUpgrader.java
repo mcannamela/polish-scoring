@@ -27,13 +27,12 @@ public class DatabaseUpgrader {
 		String addGameColumn = "ALTER TABLE game ADD COLUMN ";
 		gDao.executeRaw(addGameColumn + "isComplete BOOLEAN DEFAULT 1;");
 		gDao.executeRaw(addGameColumn + "isTracked BOOLEAN DEFAULT 1;");
-		gDao.executeRaw(addGameColumn + "ruleSetId INTEGER;");
+		gDao.executeRaw(addGameColumn + "ruleSetId INTEGER DEFAULT 0;");
 
 		// clean out games with non-unique players
 		GenericRawResults<String[]> rawResults = gDao
 				.queryRaw("SELECT * FROM game WHERE firstPlayerId == secondPlayerId");
 		List<String[]> results = rawResults.getResults();
-		String[] resultArray = results.get(0);
 		for (String[] gRes : results) {
 			String gId = gRes[0];
 			tDao.executeRaw("DELETE FROM throw WHERE gameId == " + gId + ";");
@@ -43,8 +42,8 @@ public class DatabaseUpgrader {
 		// continue migrating game table
 		pDao.executeRaw("ALTER TABLE game RENAME TO temp;");
 		TableUtils.createTable(connectionSource, Game.class);
-		pDao.executeRaw("INSERT INTO game(id, firstPlayer_id, secondPlayer_id, session_id, venue_id, firstPlayerOnTop, datePlayed, firstPlayerScore, secondPlayerScore, isComplete, isTracked) "
-				+ "SELECT id, firstPlayerId, secondPlayerId, sessionId, venueId, firstPlayerOnTop, datePlayed, firstPlayerScore, secondPlayerScore, isComplete, isTracked FROM temp;");
+		pDao.executeRaw("INSERT INTO game(id, firstPlayer_id, secondPlayer_id, session_id, venue_id, ruleSetId, firstPlayerOnTop, datePlayed, firstPlayerScore, secondPlayerScore, isComplete, isTracked) "
+				+ "SELECT id, firstPlayerId, secondPlayerId, sessionId, venueId, ruleSetId, firstPlayerOnTop, datePlayed, firstPlayerScore, secondPlayerScore, isComplete, isTracked FROM temp;");
 		pDao.executeRaw("DROP TABLE temp;");
 
 		// mark completed games as appropriate
@@ -71,11 +70,12 @@ public class DatabaseUpgrader {
 		sDao.executeRaw("UPDATE session SET sessionType = 0 WHERE sessionName = 'side_books';");
 		sDao.executeRaw(addSessionColumn + "isTeam BOOLEAN DEFAULT 0;");
 		sDao.executeRaw(addSessionColumn + "isActive BOOLEAN DEFAULT 1;");
-		sDao.executeRaw("ALTER TABLE session RENAME TO temp;");
 		sDao.executeRaw(addSessionColumn + "ruleSetId INTEGER DEFAULT -1;");
+		sDao.executeRaw("UPDATE session SET ruleSetId = 1 WHERE sessionName = 'league';");
+		sDao.executeRaw("ALTER TABLE session RENAME TO temp;");
 		TableUtils.createTable(connectionSource, Session.class);
-		sDao.executeRaw("INSERT INTO session(id, sessionName, sessionType, startDate, endDate, isTeam, isActive) "
-				+ "SELECT id, sessionName, sessionType, startDate, endDate, isTeam, isActive FROM temp;");
+		sDao.executeRaw("INSERT INTO session(id, sessionName, sessionType, ruleSetId, startDate, endDate, isTeam, isActive) "
+				+ "SELECT id, sessionName, sessionType, ruleSetId, startDate, endDate, isTeam, isActive FROM temp;");
 		sDao.executeRaw("DROP TABLE temp;");
 
 		// venue table
@@ -118,12 +118,14 @@ public class DatabaseUpgrader {
 					+ g.getFirstPlayer().getId() + ";");
 		}
 
-		// fireCounts will be recalculated if the game is loaded again. should
-		// find a better way to handle this
+		// since games are set to manual fire ruleset, fire is not calculated.
 		tDao.executeRaw(addColumn("throw", "offenseFireCount", "INTEGER", "0"));
 		tDao.executeRaw(replaceNulls("throw", "offenseFireCount", "0"));
+		tDao.executeRaw("UPDATE throw SET offenseFireCount=3 WHERE isOnFire=1;");
+
 		tDao.executeRaw(addColumn("throw", "defenseFireCount", "INTEGER", "0"));
 		tDao.executeRaw(replaceNulls("throw", "defenseFireCount", "0"));
+		tDao.executeRaw("UPDATE throw SET defenseFireCount=3 WHERE isFiredOn=1;");
 
 		// other columns
 		tDao.executeRaw(addColumn("throw", "deadType", "INTEGER", "0"));
@@ -171,21 +173,20 @@ public class DatabaseUpgrader {
 		// //////////////////////////////////////////////////////////////////
 		// drink drop and break errors werent tracked before so stay false.
 		tDao.executeRaw("UPDATE throw SET throwResult=" + ThrowResult.BROKEN
-				+ " WHERE isBroken=1;");// catches cases where onFire overwrote
-										// result with NA
+				+ " WHERE isBroken=1;");
 		tDao.executeRaw("UPDATE throw SET isOffensivePoleKnocked=1 WHERE ownGoalScore=2 AND isOwnGoal=1;");
 		tDao.executeRaw("UPDATE throw SET isOffensiveBottleKnocked=1 WHERE ownGoalScore=3 AND isOwnGoal=1;");
 
 		// //////////////////////////////////////////////////////////////////
 		// ////////////// MIGRATE SHORT/TRAPPED //////////////////////////
 		// //////////////////////////////////////////////////////////////////
+		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.LOW
+				+ " WHERE isShort=1;"); // Ball_low and default deadtype
 		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.HIGH
 				+ " WHERE isShort=1 AND throwType=" + ThrowType.BALL_HIGH + ";");
 		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.RIGHT
 				+ " WHERE isShort=1 AND throwType=" + ThrowType.BALL_RIGHT
 				+ ";");
-		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.LOW
-				+ " WHERE isShort=1 AND throwType=" + ThrowType.BALL_LOW + ";");
 		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.LEFT
 				+ " WHERE isShort=1 AND throwType=" + ThrowType.BALL_LEFT + ";");
 
@@ -193,6 +194,15 @@ public class DatabaseUpgrader {
 				+ " WHERE isShort=1;");
 		tDao.executeRaw("UPDATE throw SET throwResult=" + ThrowResult.NA
 				+ " WHERE isShort=1;");
+
+		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.HIGH
+				+ " WHERE isTrap=1;"); // Ball_high and default deadtype
+		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.LOW
+				+ " WHERE isTrap=1 AND throwType=" + ThrowType.BALL_LOW + ";");
+		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.RIGHT
+				+ " WHERE isTrap=1 AND throwType=" + ThrowType.BALL_RIGHT + ";");
+		tDao.executeRaw("UPDATE throw SET deadType=" + DeadType.LEFT
+				+ " WHERE isTrap=1 AND throwType=" + ThrowType.BALL_LEFT + ";");
 
 		tDao.executeRaw("UPDATE throw SET throwType=" + ThrowType.TRAP
 				+ " WHERE isTrap=1;");
@@ -248,6 +258,15 @@ public class DatabaseUpgrader {
 				+ " WHERE isError=1 AND errorScore>1 AND throwType!="
 				+ ThrowType.STRIKE + ";");
 
+		// Handle two special cases...
+		tDao.executeRaw("UPDATE throw SET throwResult=" + ThrowResult.CATCH
+				+ " WHERE throwType=" + ThrowType.BALL_HIGH
+				+ " AND throwResult=" + ThrowResult.STALWART + ";");
+
+		tDao.executeRaw("UPDATE throw SET throwType=" + ThrowType.BOTTLE
+				+ " WHERE throwResult=" + ThrowResult.BROKEN
+				+ " AND throwType=" + ThrowType.STRIKE + ";");
+
 		// rebuild the table and copy data over
 		tDao.executeRaw("ALTER TABLE throw RENAME TO temp;");
 		TableUtils.createTable(connectionSource, Throw.class);
@@ -293,7 +312,7 @@ public class DatabaseUpgrader {
 			oldScores[0] = g.getFirstPlayerScore();
 			oldScores[1] = g.getSecondPlayerScore();
 
-			ag = new ActiveGame(g.getId(), context, RuleType.rs00);
+			ag = new ActiveGame(g.getId(), context, g.ruleSetId);
 			// saveAllThrows is extremely slow. any way to speed up?
 			ag.saveAllThrows(); // this also calls updateThrowsFrom(0)
 			ag.saveGame();
@@ -322,15 +341,6 @@ public class DatabaseUpgrader {
 				Log.w("DatabaseUpgrader.checkThrows()", msg);
 				badThrows.add(t.getId());
 			}
-		}
-		if (badThrows.size() > 0) {
-			// these have to be done after firecounts are updated
-			tDao.executeRaw("UPDATE throw SET throwResult=" + ThrowResult.NA
-					+ " WHERE offenseFireCount>3 AND throwResult != "
-					+ ThrowResult.BROKEN + ";");
-			tDao.executeRaw("UPDATE throw SET throwType=" + ThrowType.FIRED_ON
-					+ ", throwResult= " + ThrowResult.NA
-					+ " WHERE defenseFireCount>=3;");
 		}
 		return badThrows;
 	}
