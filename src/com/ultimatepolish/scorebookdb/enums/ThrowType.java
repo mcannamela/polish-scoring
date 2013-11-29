@@ -17,4 +17,14 @@ public final class ThrowType {
 	
 	public static final String[] typeString = {"Bottle", "Cup", "Pole", "Strike", "High", "Right",
 		"Low", "Left", "Short", "Trap", "Redeemed Trap", "Not thrown", "Fired on"};
+	
+	public static boolean isBall(int i){
+		boolean b = (i==BALL_HIGH || i==BALL_LOW|| i==BALL_RIGHT|| i==BALL_LEFT); 
+		return b;
+	}
+	
+	public static boolean isStackHit(int i){
+		boolean b = (i==BOTTLE || i==CUP|| i==POLE); 
+		return b;
+	}
 }

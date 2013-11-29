@@ -570,7 +570,7 @@ public class RuleSet00 implements RuleSet {
 	}
 
 	public boolean isStackHit(Throw t) {
-		return (t.throwType == ThrowType.POLE || t.throwType == ThrowType.CUP || t.throwType == ThrowType.BOTTLE);
+		return t.isStackHit();
 	}
 
 	public boolean isOffensiveError(Throw t) {

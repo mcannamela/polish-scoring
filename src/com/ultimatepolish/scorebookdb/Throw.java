@@ -216,6 +216,18 @@ public class Throw implements Comparable<Throw> {
 	public boolean isP1Throw() {
 		return isP1Throw(throwIdx);
 	}
+	
+	public boolean isBall(){
+		return ThrowType.isBall(throwType);
+	}
+	
+	public boolean isStackHit(){
+		return ThrowType.isStackHit(throwType);
+	}
+	
+	public boolean isStrike(){
+		return throwType==ThrowType.STRIKE;
+	}
 
 	private void logd(String method, String msg) {
 		Log.d("Throw" + "." + method, msg);
