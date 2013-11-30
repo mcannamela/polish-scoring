@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import com.ultimatepolish.scorebookdb.enums.ThrowResult;
 import com.ultimatepolish.scorebookdb.enums.ThrowType;
@@ -72,12 +73,12 @@ public class SimpleThrowStats {
 	static class MarginalCondition implements ThrowIndicator{
 
 		@Override
-		public int indicate(Throw t) {
+		public String indicate(Throw t) {
 			return 0;
 		}
 
 		@Override
-		public ArrayList<Integer> categories() {
+		public Set<String> enumerate() {
 			return (ArrayList<Integer>) Arrays.asList(0);
 		}
 	}
@@ -92,7 +93,7 @@ public class SimpleThrowStats {
 		public static final int OTHER = 3;
 		
 		@Override
-		public int indicate(Throw t) {
+		public String indicate(Throw t) {
 			
 			if (t.isStackHit()){
 				return HIT;
@@ -107,7 +108,7 @@ public class SimpleThrowStats {
 		}
 
 		@Override
-		public ArrayList<Integer> categories() {
+		public Set<String> enumerate() {
 			return (ArrayList<Integer>) Arrays.asList(BALL, STRIKE, HIT, OTHER);
 		}
 	}
@@ -123,7 +124,7 @@ public class SimpleThrowStats {
 		public static final int OTHER = 4;
 		
 		@Override
-		public int indicate(Throw t) {
+		public String indicate(Throw t) {
 			if (t.throwType==ThrowType.BALL_HIGH){
 				return HIGH;
 			}
@@ -140,7 +141,7 @@ public class SimpleThrowStats {
 		}
 		
 		@Override
-		public ArrayList<Integer> categories() {
+		public Set<String> enumerate() {
 			return (ArrayList<Integer>) Arrays.asList(HIGH, RIGHT, LOW, LEFT, OTHER);
 		}
 	}
@@ -155,7 +156,7 @@ public class SimpleThrowStats {
 		public static final int OTHER = 3;
 		
 		@Override
-		public int indicate(Throw t) {
+		public String indicate(Throw t) {
 			if (t.throwResult==ThrowResult.DROP){
 				return DROP;
 			}
@@ -169,7 +170,7 @@ public class SimpleThrowStats {
 		}
 		
 		@Override
-		public ArrayList<Integer> categories() {
+		public Set<String> enumerate() {
 			return (ArrayList<Integer>) Arrays.asList(OTHER, DROP, CATCH, STALWART);
 		}
 	}
@@ -183,7 +184,7 @@ public class SimpleThrowStats {
 		public static final int OTHER = 3;
 		
 		@Override
-		public int indicate(Throw t) {
+		public String indicate(Throw t) {
 			if (t.throwType==ThrowType.POLE){
 				return POLE;
 			}
@@ -197,7 +198,7 @@ public class SimpleThrowStats {
 		}
 		
 		@Override
-		public ArrayList<Integer> categories() {
+		public Set<String> enumerate() {
 			return (ArrayList<Integer>) Arrays.asList(OTHER, POLE,CUP,BOTTLE);
 		}
 	}
