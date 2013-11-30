@@ -27,4 +27,8 @@ public final class ThrowType {
 		boolean b = (i==BOTTLE || i==CUP|| i==POLE); 
 		return b;
 	}
+	
+	public static String getString(int throwType){
+		return typeString[throwType];
+	}
 }
