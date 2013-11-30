@@ -8,4 +8,10 @@ public final class ThrowResult {
 	public static final int NA = 4;
 	
 	public static final String[] typeString = {"Catch", "Drop", "Stalwart", "Broken", "NA"};
+
+	public static String getString(int throwResult){
+			return typeString[throwResult];
+		}
+	
+	
 }
