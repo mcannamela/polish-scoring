@@ -10,10 +10,36 @@ import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class SimpleThrowStats {
 	private ArrayList<Throw> tArray;
+	
+	private static final HashMap<Integer, ThrowIndicator> offensiveIndicatorMap = initializeOffensiveCountingMaps();
+	private static final ThrowIndicator offensiveCondition = new BallStrikeHitCondition();
+	
+	public SimpleThrowStats(ArrayList<Throw> tArray) {
+		super();
+		this.tArray = tArray;
+	}
+	
+	public HashMap<Integer, HashMap<Integer,Integer>> getOffensiveCounts(){
+		return ConditionalThrowCounter.count(tArray, offensiveCondition, offensiveIndicatorMap);
+	}
+	
+	private static HashMap<Integer, ThrowIndicator> initializeOffensiveCountingMaps(){
+		HashMap<Integer, ThrowIndicator> m = new HashMap<Integer, ThrowIndicator>();
+		
+		MarginalCondition c = new MarginalCondition();
+		BallIndicator bi = new BallIndicator();
+		PoleCupBottleIndicator pcb = new PoleCupBottleIndicator();
+		
+		m.put(BallStrikeHitCondition.BALL, bi);
+		m.put(BallStrikeHitCondition.STRIKE, c);
+		m.put(BallStrikeHitCondition.OTHER, c);
+		m.put(BallStrikeHitCondition.HIT, pcb);
+		return m;
+	}
 	/*
-	 * Lump all throws together to get marginal hit/ball rates
+	 * Lump all throws together
 	 */
-	class MarginalCondition implements ThrowIndicator{
+	static class MarginalCondition implements ThrowIndicator{
 
 		@Override
 		public int indicate(Throw t) {
@@ -29,7 +55,7 @@ public class SimpleThrowStats {
 	/*
 	 * Separate into balls, strikes, and stack hits
 	 */
-	class BallStrikeHitCondition implements ThrowIndicator{
+	static class BallStrikeHitCondition implements ThrowIndicator{
 		public static final int BALL = 0;
 		public static final int STRIKE = 1;
 		public static final int HIT = 2;
@@ -59,7 +85,7 @@ public class SimpleThrowStats {
 	/*
 	 * Separate balls into HRLL
 	 */
-	class BallIndicator implements ThrowIndicator {
+	static class BallIndicator implements ThrowIndicator {
 		public static final int HIGH = 0;
 		public static final int RIGHT = 1;
 		public static final int LOW = 2;
@@ -92,7 +118,7 @@ public class SimpleThrowStats {
 	/*
 	 * Separate by defensive results
 	 */
-	class DropCatchStalwartIndicator implements ThrowIndicator{
+	static class DropCatchStalwartIndicator implements ThrowIndicator{
 		public static final int DROP = 0;
 		public static final int CATCH = 1;
 		public static final int STALWART = 2;
@@ -120,7 +146,7 @@ public class SimpleThrowStats {
 	/*
 	 * Separate by type of hit
 	 */
-	class PoleCupBottleIndicator implements ThrowIndicator{
+	static class PoleCupBottleIndicator implements ThrowIndicator{
 		public static final int POLE = 0;
 		public static final int CUP = 1;
 		public static final int BOTTLE= 2;

@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class ConditionalThrowCounter {
 
-	public HashMap<Integer, HashMap<Integer,Integer>> count(
+	public static HashMap<Integer, HashMap<Integer,Integer>> count(
 			ArrayList<Throw> tArray, 
 			ThrowIndicator condition, 
 			Map<Integer, ThrowIndicator> outcomeIndicators){
@@ -25,7 +25,7 @@ public class ConditionalThrowCounter {
 		return m;
 	}
 	
-	private HashMap<Integer, HashMap<Integer,Integer>> initializeCountMap(
+	private static HashMap<Integer, HashMap<Integer,Integer>> initializeCountMap(
 			ThrowIndicator condition, 
 			Map<Integer, ThrowIndicator> outcomeIndicators){
 		
