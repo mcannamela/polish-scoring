@@ -1,6 +1,8 @@
 package com.ultimatepolish.throwstats;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import com.ultimatepolish.scorebookdb.Throw;
@@ -10,6 +12,7 @@ public class IndicatorNode {
 	ThrowIndicator indicator = null;
 	IndicatorNode parent = null;
 	HashMap<String, IndicatorNode> childMap = null;
+	String key = null;
 	
 	public int count = 0;
 
@@ -23,6 +26,7 @@ public class IndicatorNode {
 		}
 		childMap.put(key, node);
 		node.parent = this;
+		node.key = key;
 		
 	}
 	
@@ -46,6 +50,15 @@ public class IndicatorNode {
 			return 1;
 		}
 		return fraction()*parent.absoluteFraction();
+	}
+	
+	public ArrayList<String> lineage(){
+		if (isRoot()){
+			return new ArrayList<String>();
+		}
+		ArrayList<String> arr = parent.lineage();
+		arr.add(key);
+		return arr;
 	}
 	
 	public boolean isLeaf(){
