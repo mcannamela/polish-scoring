@@ -3,6 +3,7 @@ package com.ultimatepolish.scorebookdb;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import com.ultimatepolish.scorebookdb.enums.ThrowResult;
 import com.ultimatepolish.scorebookdb.enums.ThrowType;
@@ -11,12 +12,40 @@ import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 public class SimpleThrowStats {
 	private ArrayList<Throw> tArray;
 	
+	public HashMap<String, Double> offensiveStats = new HashMap<String, Double>(); 
+	
 	private static final HashMap<Integer, ThrowIndicator> offensiveIndicatorMap = initializeOffensiveCountingMaps();
-	private static final ThrowIndicator offensiveCondition = new BallStrikeHitCondition();
+	private static final BallStrikeHitCondition offensiveCondition = new BallStrikeHitCondition();
+	
+	private static final String BALL_RATE = "BallRate";
+	private static final String STRIKE_RATE = "StrikeRate";
+	private static final String HIT_RATE = "HitRate";
+	
 	
 	public SimpleThrowStats(ArrayList<Throw> tArray) {
 		super();
 		this.tArray = tArray;
+	}
+	
+	public void computeOffensiveStats() {
+		HashMap<Integer, HashMap<Integer,Integer>> c = getOffensiveCounts();
+		HashMap<Integer, HashMap<Integer,Double>> f = ConditionalThrowCounter.countsToFractions(c);
+		
+		HashMap<Integer,Integer> summedCounts = ConditionalThrowCounter.collapse(c);
+		Integer totalCounts = ConditionalThrowCounter.sumMap(summedCounts);
+		HashMap<Integer,Double> marginalFractions = new HashMap<Integer,Double>();
+		
+		double x;
+		
+		for (Integer i : summedCounts.keySet()) {
+			x = ConditionalThrowCounter.divideIntegers(summedCounts.get(i), totalCounts);
+			marginalFractions.put(i, x);
+		}
+		
+		offensiveStats.put(BALL_RATE, marginalFractions.get(offensiveCondition.BALL));
+		offensiveStats.put(STRIKE_RATE, marginalFractions.get(offensiveCondition.STRIKE));
+		offensiveStats.put(HIT_RATE, marginalFractions.get(offensiveCondition.HIT));
+				
 	}
 	
 	public HashMap<Integer, HashMap<Integer,Integer>> getOffensiveCounts(){
@@ -36,6 +65,7 @@ public class SimpleThrowStats {
 		m.put(BallStrikeHitCondition.HIT, pcb);
 		return m;
 	}
+	
 	/*
 	 * Lump all throws together
 	 */
