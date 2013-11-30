@@ -69,7 +69,7 @@ public class ConditionalThrowCounter {
 			ThrowIndicator condition, 
 			Map<Integer, ThrowIndicator> outcomeIndicators){
 		
-		ArrayList<Integer> outerCategories = condition.categories();
+		ArrayList<Integer> outerCategories = condition.enumerate();
 		ArrayList<Integer> innerCategories;
 		HashMap<Integer, HashMap<Integer,Integer>> m;
 		HashMap<Integer,Integer> outcomeMap;
@@ -77,7 +77,7 @@ public class ConditionalThrowCounter {
 
 		for (Integer i : outerCategories) {
 			m.put(i,new HashMap<Integer, Integer>());
-			innerCategories = outcomeIndicators.get(i).categories();
+			innerCategories = outcomeIndicators.get(i).enumerate();
 			for (Integer j : innerCategories) {
 				m.get(i).put(j, 0);
 			}

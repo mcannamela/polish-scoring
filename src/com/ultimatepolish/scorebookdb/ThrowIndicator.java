@@ -3,7 +3,7 @@
  */
 package com.ultimatepolish.scorebookdb;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * This class provides one method, which maps a throw to an integer. 
@@ -14,8 +14,8 @@ import java.util.ArrayList;
  */
 public interface ThrowIndicator {
 	
-	public int indicate(Throw t);
+	public String indicate(Throw t);
 	
-	public ArrayList<Integer> categories();
+	public Set<String> enumerate();
 
 }
