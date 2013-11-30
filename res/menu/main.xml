@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/addButton" android:showAsAction="always" android:title="@string/menu_add" android:icon="@drawable/ic_menu_add" android:visible="false"></item>
+    <item android:id="@+id/games" android:showAsAction="always" android:title="@string/menu_games"></item>
+    <item android:id="@+id/players" android:showAsAction="always" android:title="@string/menu_players"></item>
+    <item android:id="@+id/teams" android:showAsAction="always" android:title="@string/menu_teams"></item>
+    <item android:id="@+id/sessions" android:showAsAction="always" android:title="@string/menu_sessions"></item>
+    <item android:id="@+id/venues" android:showAsAction="ifRoom" android:title="@string/menu_venues"></item>
+    <item android:id="@+id/modifyButton" android:orderInCategory="80" android:showAsAction="never" android:title="@string/menu_modify" android:visible="false"></item>
+    <item android:id="@+id/dbSettings" android:orderInCategory="90" android:showAsAction="never" android:title="@string/menu_dbSettings" />
+    <item android:id="@+id/preferences" android:orderInCategory="95" android:showAsAction="never" android:title="@string/menu_preferences" />
+    <item android:id="@+id/about" android:orderInCategory="100" android:showAsAction="never" android:title="@string/menu_about" />
+</menu>
