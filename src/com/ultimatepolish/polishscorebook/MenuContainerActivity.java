@@ -26,21 +26,6 @@ public class MenuContainerActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		case android.R.id.home:
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
-		case R.id.games:
-			openGamesActivity();
-			return true;
-		case R.id.players:
-			openPlayersActivity();
-			return true;
-		case R.id.teams:
-			openTeamsActivity();
-			return true;
-		case R.id.venues:
-			openVenuesActivity();
-			return true;
-		case R.id.sessions:
-			openSessionsActivity();
-			return true;
 		case R.id.modifyButton:
 			openModifyActivity();
 			return true;
@@ -58,39 +43,9 @@ public class MenuContainerActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		}
 	}
 
-	public void openAddActivity() {
-		// this wont do anything unless overridden in the file that extends this
-		// class
-	}
-
 	public void openModifyActivity() {
 		// this wont do anything unless overridden in the file that extends this
 		// class
-	}
-
-	public void openGamesActivity() {
-		Intent intent = new Intent(this, View_Games.class);
-		startActivity(intent);
-	}
-
-	public void openPlayersActivity() {
-		Intent intent = new Intent(this, View_Players.class);
-		startActivity(intent);
-	}
-
-	public void openTeamsActivity() {
-		Intent intent = new Intent(this, View_Teams.class);
-		startActivity(intent);
-	}
-
-	public void openVenuesActivity() {
-		Intent intent = new Intent(this, View_Venues.class);
-		startActivity(intent);
-	}
-
-	public void openSessionsActivity() {
-		Intent intent = new Intent(this, View_Sessions.class);
-		startActivity(intent);
 	}
 
 	public void openDbSettingsActivity() {
@@ -119,5 +74,4 @@ public class MenuContainerActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	public void loge(String msg, Exception e) {
 		Log.e(LOGTAG, msg + ": " + e.getMessage());
 	}
-
 }

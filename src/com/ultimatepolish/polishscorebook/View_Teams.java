@@ -4,76 +4,72 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.Toast;
 
+import com.ultimatepolish.scorebookdb.OrmLiteFragment;
 import com.ultimatepolish.scorebookdb.Player;
 
-public class View_Teams extends MenuContainerActivity {
+public class View_Teams extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Teams";
 
 	private LinkedHashMap<String, ViewHolderHeader_Team> sHash = new LinkedHashMap<String, ViewHolderHeader_Team>();
 	private List<ViewHolderHeader_Team> statusList = new ArrayList<ViewHolderHeader_Team>();
 	private ListAdapter_Team teamAdapter;
 	private ExpandableListView elv;
+	private View rootView;
+	private Context context;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_view_listing);
+		setHasOptionsMenu(true);
+	}
 
-		// Make sure we're running on Honeycomb or higher to use ActionBar APIs
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			// Show the Up button in the action bar.
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		rootView = inflater.inflate(R.layout.activity_view_listing, container,
+				false);
 
-		elv = (ExpandableListView) findViewById(R.id.dbListing);
-		teamAdapter = new ListAdapter_Team(View_Teams.this, statusList);
+		elv = (ExpandableListView) rootView.findViewById(R.id.dbListing);
+		teamAdapter = new ListAdapter_Team(context, statusList);
 		elv.setAdapter(teamAdapter);
 		expandAll();
 		elv.setOnChildClickListener(elvItemClicked);
 		elv.setOnGroupClickListener(elvGroupClicked);
-
+		return rootView;
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		menu.findItem(R.id.teams).setEnabled(false);
-		// menu.findItem(R.id.addButton).setVisible(true);
-		return true;
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		context = getActivity();
+	}
+
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		MenuItem fav = menu.add("New Team");
+		fav.setIcon(R.drawable.ic_menu_add);
+		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		fav.setIntent(new Intent(context, NewPlayer.class));
 	}
 
 	@Override
-	public void openAddActivity() {
-		Intent intent = new Intent(this, NewTeam.class);
-		startActivity(intent);
-	}
-
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-	}
-
-	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
 		refreshTeamsListing();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
 	}
 
 	private void expandAll() {
@@ -100,7 +96,6 @@ public class View_Teams extends MenuContainerActivity {
 		addStatus("Active");
 		addStatus("Retired");
 
-		Context context = getApplicationContext();
 		Player[] p = new Player[2];
 
 		// add all the teams
@@ -139,14 +134,12 @@ public class View_Teams extends MenuContainerActivity {
 			ViewHolder_Team teamInfo = statusInfo.getTeamList().get(
 					childPosition);
 			// display it or do something with it
-			Toast.makeText(getBaseContext(),
-					"Selected " + teamInfo.getTeamName(), Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(context, "Selected " + teamInfo.getTeamName(),
+					Toast.LENGTH_SHORT).show();
 
 			// load the game in progress screen
 			Long tId = Long.valueOf(teamInfo.getId());
-			Intent intent = new Intent(getApplicationContext(),
-					Detail_Team.class);
+			Intent intent = new Intent(context, Detail_Team.class);
 			intent.putExtra("TID", tId);
 			startActivity(intent);
 			return false;
@@ -159,7 +152,7 @@ public class View_Teams extends MenuContainerActivity {
 			// get the group header
 			ViewHolderHeader_Team statusInfo = statusList.get(groupPosition);
 			// display it or do something with it
-			Toast.makeText(getBaseContext(), "Tapped " + statusInfo.getName(),
+			Toast.makeText(context, "Tapped " + statusInfo.getName(),
 					Toast.LENGTH_SHORT).show();
 			return false;
 		}

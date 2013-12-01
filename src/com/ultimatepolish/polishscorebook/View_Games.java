@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ExpandableListView;
@@ -20,80 +24,65 @@ import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Game;
+import com.ultimatepolish.scorebookdb.OrmLiteFragment;
 import com.ultimatepolish.scorebookdb.Player;
 import com.ultimatepolish.scorebookdb.Session;
 
-public class View_Games extends MenuContainerActivity {
+public class View_Games extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Games";
 
 	private LinkedHashMap<String, ViewHolderHeader_Game> sHash = new LinkedHashMap<String, ViewHolderHeader_Game>();
 	private List<ViewHolderHeader_Game> sessionList = new ArrayList<ViewHolderHeader_Game>();
 	private ListAdapter_Game gameAdapter;
 	private ExpandableListView elv;
+	private View rootView;
+	private Context context;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		log("onCreate() - about to create activity");
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_view_listing);
+		setHasOptionsMenu(true);
+	}
 
-		// Make sure we're running on Honeycomb or higher to use ActionBar APIs
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			// Show the Up button in the action bar.
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		rootView = inflater.inflate(R.layout.activity_view_listing, container,
+				false);
 
-		elv = (ExpandableListView) findViewById(R.id.dbListing);
-		gameAdapter = new ListAdapter_Game(View_Games.this, sessionList);
-
-		log("onCreate() - setting adapter");
+		elv = (ExpandableListView) rootView.findViewById(R.id.dbListing);
+		gameAdapter = new ListAdapter_Game(context, sessionList);
 		elv.setAdapter(gameAdapter);
-		log("onCreate() - expanding all");
 		expandAll();
-		log("onCreate() - setting listeners");
 		elv.setOnChildClickListener(elvItemClicked);
 		elv.setOnGroupClickListener(elvGroupClicked);
 		elv.setOnItemLongClickListener(elvItemLongClicked);
-
+		return rootView;
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		menu.findItem(R.id.games).setEnabled(false);
-		// menu.findItem(R.id.addButton).setVisible(true);
-		return true;
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		context = getActivity();
+	}
+
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		MenuItem fav = menu.add("New Game");
+		fav.setIcon(R.drawable.ic_menu_add);
+		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		fav.setIntent(new Intent(context, NewPlayer.class));
 	}
 
 	@Override
-	public void openAddActivity() {
-		Intent intent = new Intent(this, NewGame.class);
-		startActivity(intent);
-	}
-
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-	}
-
-	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
-		log("onResume() - refreshing games listing");
 		refreshGamesListing();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
 	}
 
 	private void expandAll() {
 		// method to expand all groups
 		int count = gameAdapter.getGroupCount();
 		for (int i = 0; i < count; i++) {
-			log("expandAll() - expanding group " + i);
 			elv.expandGroup(i);
 		}
 	}
@@ -110,9 +99,7 @@ public class View_Games extends MenuContainerActivity {
 		sHash.clear();
 		sessionList.clear();
 		// add all the sessions to the headers
-		logd("refreshGamesListing() - adding session daos");
 
-		Context context = getApplicationContext();
 		Session s;
 		Player[] p = new Player[2];
 
@@ -121,14 +108,11 @@ public class View_Games extends MenuContainerActivity {
 			Dao<Game, Long> gameDao = Game.getDao(context);
 			Dao<Player, Long> playerDao = Player.getDao(context);
 
-			logd("refreshGamesListing() - adding sessions");
 			for (Session sess : sessionDao) {
 				addSession(sess.getSessionName());
 			}
 
-			logd("refreshGamesListing() - adding games");
 			for (Game g : gameDao) {
-				logd("refreshGamesListing() - got game " + g.getId());
 				sessionDao.refresh(g.getSession());
 				s = g.getSession();
 				p[0] = playerDao.queryForId(g.getFirstPlayer().getId());
@@ -142,11 +126,8 @@ public class View_Games extends MenuContainerActivity {
 		} catch (SQLException e) {
 			loge("Retrieval of games/sessions failed", e);
 		}
-
-		log("refreshGamesListing() - done adding games, about to expand all");
 		expandAll();
-		gameAdapter.notifyDataSetChanged(); // required in case the list has
-											// changed
+		gameAdapter.notifyDataSetChanged(); // required if list has changed
 	}
 
 	private OnChildClickListener elvItemClicked = new OnChildClickListener() {
@@ -160,14 +141,14 @@ public class View_Games extends MenuContainerActivity {
 					childPosition);
 			// display it or do something with it
 			Toast.makeText(
-					getBaseContext(),
+					context,
 					"Selected " + sessionInfo.getName() + "/"
 							+ String.valueOf(gameInfo.getId()),
 					Toast.LENGTH_SHORT).show();
 
 			// load the game in progress screen
 			Long gid = Long.valueOf(gameInfo.getId());
-			Intent intent = new Intent(getApplicationContext(),
+			Intent intent = new Intent(context.getApplicationContext(),
 					GameInProgress.class);
 			intent.putExtra("GID", gid);
 			startActivity(intent);
@@ -192,15 +173,14 @@ public class View_Games extends MenuContainerActivity {
 						childPosition);
 				// display it or do something with it
 				Toast.makeText(
-						getBaseContext(),
+						context,
 						"Selected " + sessionInfo.getName() + "/"
 								+ String.valueOf(gameInfo.getId()),
 						Toast.LENGTH_SHORT).show();
 
 				// load the game in progress screen
 				Long gid = Long.valueOf(gameInfo.getId());
-				Intent intent = new Intent(getApplicationContext(),
-						Detail_Game.class);
+				Intent intent = new Intent(context, Detail_Game.class);
 				intent.putExtra("GID", gid);
 				startActivity(intent);
 				return true;
@@ -215,7 +195,7 @@ public class View_Games extends MenuContainerActivity {
 			// get the group header
 			ViewHolderHeader_Game sessionInfo = sessionList.get(groupPosition);
 			// display it or do something with it
-			Toast.makeText(getBaseContext(), "Tapped " + sessionInfo.getName(),
+			Toast.makeText(context, "Tapped " + sessionInfo.getName(),
 					Toast.LENGTH_SHORT).show();
 			return true;
 		}
