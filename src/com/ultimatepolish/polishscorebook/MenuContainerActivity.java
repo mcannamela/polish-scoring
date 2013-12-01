@@ -26,9 +26,6 @@ public class MenuContainerActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		case android.R.id.home:
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
-		case R.id.addButton:
-			openAddActivity();
-			return true;
 		case R.id.games:
 			openGamesActivity();
 			return true;

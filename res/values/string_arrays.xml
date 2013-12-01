@@ -22,7 +22,9 @@
         <item >Teams</item>
         <item >Sessions</item>
         <item >Venues</item>
+        <item >Preferences</item>
         <item >Database</item>
+        <item >About</item>
     </string-array>
 	
 </resources>

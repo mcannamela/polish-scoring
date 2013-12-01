@@ -50,7 +50,7 @@ public class View_Teams extends MenuContainerActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		menu.findItem(R.id.teams).setEnabled(false);
-		menu.findItem(R.id.addButton).setVisible(true);
+		// menu.findItem(R.id.addButton).setVisible(true);
 		return true;
 	}
 
