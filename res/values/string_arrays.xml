@@ -16,5 +16,13 @@
         <item >Knocked bottle</item>
         <item >Break</item>
     </string-array>
+    <string-array name="menuItems">
+        <item >Games</item>
+        <item >Players</item>
+        <item >Teams</item>
+        <item >Sessions</item>
+        <item >Venues</item>
+        <item >Database</item>
+    </string-array>
 	
 </resources>
