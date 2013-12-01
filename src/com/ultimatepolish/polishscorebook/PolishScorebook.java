@@ -78,10 +78,6 @@ public class PolishScorebook extends MenuContainerActivity {
 		// hide action items when drawer is open
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		// menu.findItem(R.id.games).setVisible(!drawerOpen);
-		// menu.findItem(R.id.players).setVisible(!drawerOpen);
-		// menu.findItem(R.id.teams).setVisible(!drawerOpen);
-		// menu.findItem(R.id.sessions).setVisible(!drawerOpen);
-		// menu.findItem(R.id.venues).setVisible(!drawerOpen);
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -139,8 +135,14 @@ public class PolishScorebook extends MenuContainerActivity {
 		case 4: // venues
 			fragment = new View_Venues();
 			break;
-		case 5: // database
-			// fragment = new dbSettings();
+		case 5: // preferences
+			fragment = new DbSettings();
+			break;
+		case 6: // database
+			fragment = new DbSettings();
+			break;
+		case 7: // about
+			fragment = new AboutPage();
 			break;
 		}
 		// update the main content by replacing fragments
