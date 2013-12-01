@@ -72,23 +72,16 @@ public class PolishScorebook extends MenuContainerActivity {
 		}
 	}
 
-	// @Override
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// MenuInflater inflater = getMenuInflater();
-	// inflater.inflate(R.menu.main, menu);
-	// return super.onCreateOptionsMenu(menu);
-	// }
-
 	/* Called whenever we call invalidateOptionsMenu() */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// hide action items when drawer is open
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-		menu.findItem(R.id.games).setVisible(!drawerOpen);
-		menu.findItem(R.id.players).setVisible(!drawerOpen);
-		menu.findItem(R.id.teams).setVisible(!drawerOpen);
-		menu.findItem(R.id.sessions).setVisible(!drawerOpen);
-		menu.findItem(R.id.venues).setVisible(!drawerOpen);
+		// menu.findItem(R.id.games).setVisible(!drawerOpen);
+		// menu.findItem(R.id.players).setVisible(!drawerOpen);
+		// menu.findItem(R.id.teams).setVisible(!drawerOpen);
+		// menu.findItem(R.id.sessions).setVisible(!drawerOpen);
+		// menu.findItem(R.id.venues).setVisible(!drawerOpen);
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -129,12 +122,29 @@ public class PolishScorebook extends MenuContainerActivity {
 	}
 
 	private void selectItem(int position) {
+		Fragment fragment = new View_Players();
+		switch (position) {
+		case 0: // games
+			break;
+		case 1: // players
+			fragment = new View_Players();
+			break;
+		case 2: // teams
+			break;
+		case 3: // sessions
+			break;
+		case 4: // venues
+			break;
+		case 5: // database
+			break;
+		}
 		// update the main content by replacing fragments
-		Fragment fragment = new ContentFragment();
+		// Fragment fragment = new ContentFragment();
 		// Bundle args = new Bundle();
 		// args.putInt(ContentFragment.ARG_PLANET_NUMBER, position);
 		// fragment.setArguments(args);
 
+		//
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction()
 				.replace(R.id.content_frame, fragment).commit();
@@ -168,35 +178,5 @@ public class PolishScorebook extends MenuContainerActivity {
 		super.onConfigurationChanged(newConfig);
 		// Pass any configuration change to the drawer toggles
 		mDrawerToggle.onConfigurationChanged(newConfig);
-	}
-
-	/**
-	 * Fragment that appears in the "content_frame", shows a planet
-	 */
-	public static class ContentFragment extends Fragment {
-		public static final String ARG_PLANET_NUMBER = "planet_number";
-
-		public ContentFragment() {
-			// Empty constructor required for fragment subclasses
-		}
-
-		// @Override
-		// public View onCreateView(LayoutInflater inflater, ViewGroup
-		// container,
-		// Bundle savedInstanceState) {
-		// View rootView = inflater.inflate(R.layout.fragment_planet,
-		// container, false);
-		// int i = getArguments().getInt(ARG_PLANET_NUMBER);
-		// String planet = getResources()
-		// .getStringArray(R.array.planets_array)[i];
-		//
-		// int imageId = getResources().getIdentifier(
-		// planet.toLowerCase(Locale.getDefault()), "drawable",
-		// getActivity().getPackageName());
-		// ((ImageView) rootView.findViewById(R.id.image))
-		// .setImageResource(imageId);
-		// getActivity().setTitle(planet);
-		// return rootView;
-		// }
 	}
 }
