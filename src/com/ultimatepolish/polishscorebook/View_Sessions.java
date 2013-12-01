@@ -149,11 +149,10 @@ public class View_Sessions extends OrmLiteFragment {
 		public boolean onGroupClick(ExpandableListView parent, View v,
 				int groupPosition, long id) {
 
-			// get the group header
-			ViewHolderHeader_Session statusInfo = statusList.get(groupPosition);
-			// display it or do something with it
-			Toast.makeText(context, "Tapped " + statusInfo.getName(),
-					Toast.LENGTH_SHORT).show();
+			// ViewHolderHeader_Session statusInfo =
+			// statusList.get(groupPosition);
+			// Toast.makeText(context, "Tapped " + statusInfo.getName(),
+			// Toast.LENGTH_SHORT).show();
 			return false;
 		}
 	};

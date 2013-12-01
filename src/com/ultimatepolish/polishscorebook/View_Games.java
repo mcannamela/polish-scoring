@@ -126,7 +126,7 @@ public class View_Games extends OrmLiteFragment {
 		} catch (SQLException e) {
 			loge("Retrieval of games/sessions failed", e);
 		}
-		expandAll();
+		// expandAll();
 		gameAdapter.notifyDataSetChanged(); // required if list has changed
 	}
 
@@ -192,12 +192,11 @@ public class View_Games extends OrmLiteFragment {
 		public boolean onGroupClick(ExpandableListView parent, View v,
 				int groupPosition, long id) {
 
-			// get the group header
-			ViewHolderHeader_Game sessionInfo = sessionList.get(groupPosition);
-			// display it or do something with it
-			Toast.makeText(context, "Tapped " + sessionInfo.getName(),
-					Toast.LENGTH_SHORT).show();
-			return true;
+			// ViewHolderHeader_Game sessionInfo =
+			// sessionList.get(groupPosition);
+			// Toast.makeText(context, "Tapped " + sessionInfo.getName(),
+			// Toast.LENGTH_SHORT).show();
+			return false;
 		}
 	};
 
