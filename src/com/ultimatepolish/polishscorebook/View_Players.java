@@ -25,6 +25,8 @@ import com.ultimatepolish.scorebookdb.OrmLiteFragment;
 import com.ultimatepolish.scorebookdb.Player;
 
 public class View_Players extends OrmLiteFragment {
+	private static final String LOGTAG = "View_Players";
+
 	private LinkedHashMap<String, ViewHolderHeader_Player> sHash = new LinkedHashMap<String, ViewHolderHeader_Player>();
 	private ArrayList<ViewHolderHeader_Player> statusList = new ArrayList<ViewHolderHeader_Player>();
 	private ListAdapter_Player playerAdapter;
@@ -32,16 +34,10 @@ public class View_Players extends OrmLiteFragment {
 	private View rootView;
 	private Context context;
 
-	public View_Players() {
-		// Empty constructor required for fragment subclasses
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-
-		// getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -66,7 +62,7 @@ public class View_Players extends OrmLiteFragment {
 	}
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		MenuItem fav = menu.add("add");
+		MenuItem fav = menu.add("New Player");
 		fav.setIcon(R.drawable.ic_menu_add);
 		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		fav.setIntent(new Intent(context, NewPlayer.class));
@@ -112,7 +108,6 @@ public class View_Players extends OrmLiteFragment {
 						"(" + p.getNickName() + ")");
 			}
 		} catch (SQLException e) {
-			Context context = getActivity().getApplicationContext();
 			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
 			Log.e(View_Players.class.getName(), "Retrieval of players failed",
 					e);
@@ -133,13 +128,12 @@ public class View_Players extends OrmLiteFragment {
 			ViewHolder_Player playerInfo = statusInfo.getPlayerList().get(
 					childPosition);
 			// display it or do something with it
-			Toast.makeText(getActivity().getBaseContext(),
-					"Selected " + playerInfo.getName(), Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(context, "Selected " + playerInfo.getName(),
+					Toast.LENGTH_SHORT).show();
 
 			// load the game in progress screen
 			Long pId = Long.valueOf(playerInfo.getId());
-			Intent intent = new Intent(getActivity(), Detail_Player.class);
+			Intent intent = new Intent(context, Detail_Player.class);
 			intent.putExtra("PID", pId);
 			startActivity(intent);
 			return false;
@@ -152,9 +146,8 @@ public class View_Players extends OrmLiteFragment {
 			// get the group header
 			ViewHolderHeader_Player statusInfo = statusList.get(groupPosition);
 			// display it or do something with it
-			Toast.makeText(getActivity().getBaseContext(),
-					"Tapped " + statusInfo.getName(), Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(context, "Tapped " + statusInfo.getName(),
+					Toast.LENGTH_SHORT).show();
 			return false;
 		}
 	};

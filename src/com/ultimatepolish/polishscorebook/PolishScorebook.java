@@ -125,17 +125,22 @@ public class PolishScorebook extends MenuContainerActivity {
 		Fragment fragment = new View_Players();
 		switch (position) {
 		case 0: // games
+			fragment = new View_Games();
 			break;
 		case 1: // players
 			fragment = new View_Players();
 			break;
 		case 2: // teams
+			fragment = new View_Teams();
 			break;
 		case 3: // sessions
+			fragment = new View_Sessions();
 			break;
 		case 4: // venues
+			fragment = new View_Venues();
 			break;
 		case 5: // database
+			// fragment = new dbSettings();
 			break;
 		}
 		// update the main content by replacing fragments

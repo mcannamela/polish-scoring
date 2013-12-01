@@ -5,78 +5,74 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
+import com.ultimatepolish.scorebookdb.OrmLiteFragment;
 import com.ultimatepolish.scorebookdb.Venue;
 
-public class View_Venues extends MenuContainerActivity {
+public class View_Venues extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Venues";
 
 	private LinkedHashMap<String, ViewHolderHeader_Venue> sHash = new LinkedHashMap<String, ViewHolderHeader_Venue>();
 	private List<ViewHolderHeader_Venue> statusList = new ArrayList<ViewHolderHeader_Venue>();
 	private ListAdapter_Venue venueAdapter;
 	private ExpandableListView elv;
+	private View rootView;
+	private Context context;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_view_listing);
+		setHasOptionsMenu(true);
+	}
 
-		// Make sure we're running on Honeycomb or higher to use ActionBar APIs
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			// Show the Up button in the action bar.
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		rootView = inflater.inflate(R.layout.activity_view_listing, container,
+				false);
 
-		elv = (ExpandableListView) findViewById(R.id.dbListing);
-		venueAdapter = new ListAdapter_Venue(View_Venues.this, statusList);
+		elv = (ExpandableListView) rootView.findViewById(R.id.dbListing);
+		venueAdapter = new ListAdapter_Venue(context, statusList);
 		elv.setAdapter(venueAdapter);
 		expandAll();
 		elv.setOnChildClickListener(elvItemClicked);
 		elv.setOnGroupClickListener(elvGroupClicked);
-
+		return rootView;
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		menu.findItem(R.id.venues).setEnabled(false);
-		// menu.findItem(R.id.addButton).setVisible(true);
-		return true;
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		context = getActivity();
+	}
+
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		MenuItem fav = menu.add("New Venue");
+		fav.setIcon(R.drawable.ic_menu_add);
+		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		fav.setIntent(new Intent(context, NewPlayer.class));
 	}
 
 	@Override
-	public void openAddActivity() {
-		Intent intent = new Intent(this, NewVenue.class);
-		startActivity(intent);
-	}
-
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-	}
-
-	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
-		refreshVenueListing();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
+		refreshVenuesListing();
 	}
 
 	private void expandAll() {
@@ -95,7 +91,7 @@ public class View_Venues extends MenuContainerActivity {
 		}
 	}
 
-	protected void refreshVenueListing() {
+	protected void refreshVenuesListing() {
 		sHash.clear();
 		statusList.clear();
 
@@ -112,7 +108,6 @@ public class View_Venues extends MenuContainerActivity {
 						v.getName());
 			}
 		} catch (SQLException e) {
-			Context context = getApplicationContext();
 			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
 			Log.e(View_Games.class.getName(), "Retrieval of venues failed", e);
 		}
@@ -132,13 +127,12 @@ public class View_Venues extends MenuContainerActivity {
 			ViewHolder_Venue venueInfo = statusInfo.getVenueList().get(
 					childPosition);
 			// display it or do something with it
-			Toast.makeText(getBaseContext(), "Selected " + venueInfo.getName(),
+			Toast.makeText(context, "Selected " + venueInfo.getName(),
 					Toast.LENGTH_SHORT).show();
 
 			// load the game in progress screen
 			Long vId = Long.valueOf(venueInfo.getId());
-			Intent intent = new Intent(getApplicationContext(),
-					Detail_Venue.class);
+			Intent intent = new Intent(context, Detail_Venue.class);
 			intent.putExtra("VID", vId);
 			startActivity(intent);
 			return false;
@@ -151,7 +145,7 @@ public class View_Venues extends MenuContainerActivity {
 			// get the group header
 			ViewHolderHeader_Venue statusInfo = statusList.get(groupPosition);
 			// display it or do something with it
-			Toast.makeText(getBaseContext(), "Tapped " + statusInfo.getName(),
+			Toast.makeText(context, "Tapped " + statusInfo.getName(),
 					Toast.LENGTH_SHORT).show();
 			return false;
 		}

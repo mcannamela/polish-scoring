@@ -1,10 +1,12 @@
 package com.ultimatepolish.scorebookdb;
 
 import android.app.Fragment;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 public class OrmLiteFragment extends Fragment {
+	public static String LOGTAG = "OrmLiteFragment";
 
 	private DatabaseHelper databaseHelper = null;
 
@@ -23,5 +25,17 @@ public class OrmLiteFragment extends Fragment {
 			OpenHelperManager.releaseHelper();
 			databaseHelper = null;
 		}
+	}
+
+	public void log(String msg) {
+		Log.i(LOGTAG, msg);
+	}
+
+	public void logd(String msg) {
+		Log.d(LOGTAG, msg);
+	}
+
+	public void loge(String msg, Exception e) {
+		Log.e(LOGTAG, msg + ": " + e.getMessage());
 	}
 }
