@@ -148,8 +148,7 @@ public class View_Games extends OrmLiteFragment {
 
 			// load the game in progress screen
 			Long gid = Long.valueOf(gameInfo.getId());
-			Intent intent = new Intent(context.getApplicationContext(),
-					GameInProgress.class);
+			Intent intent = new Intent(context, GameInProgress.class);
 			intent.putExtra("GID", gid);
 			startActivity(intent);
 			return true;
