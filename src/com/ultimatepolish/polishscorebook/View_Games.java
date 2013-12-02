@@ -30,6 +30,7 @@ import com.ultimatepolish.scorebookdb.Session;
 
 public class View_Games extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Games";
+	NavigationInterface mNav;
 
 	private LinkedHashMap<String, ViewHolderHeader_Game> sHash = new LinkedHashMap<String, ViewHolderHeader_Game>();
 	private List<ViewHolderHeader_Game> sessionList = new ArrayList<ViewHolderHeader_Game>();
@@ -64,6 +65,13 @@ public class View_Games extends OrmLiteFragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = getActivity();
+
+		try {
+			mNav = (NavigationInterface) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement NavigationInterface");
+		}
 	}
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -147,10 +155,8 @@ public class View_Games extends OrmLiteFragment {
 					Toast.LENGTH_SHORT).show();
 
 			// load the game in progress screen
-			Long gid = Long.valueOf(gameInfo.getId());
-			Intent intent = new Intent(context, GameInProgress.class);
-			intent.putExtra("GID", gid);
-			startActivity(intent);
+			Long gId = Long.valueOf(gameInfo.getId());
+			mNav.loadGame(gId);
 			return true;
 		}
 	};

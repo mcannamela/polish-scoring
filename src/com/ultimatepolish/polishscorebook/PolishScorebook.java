@@ -2,6 +2,7 @@ package com.ultimatepolish.polishscorebook;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -14,7 +15,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class PolishScorebook extends MenuContainerActivity {
+public class PolishScorebook extends MenuContainerActivity implements
+		NavigationInterface {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -185,5 +187,12 @@ public class PolishScorebook extends MenuContainerActivity {
 		super.onConfigurationChanged(newConfig);
 		// Pass any configuration change to the drawer toggles
 		mDrawerToggle.onConfigurationChanged(newConfig);
+	}
+
+	public void loadGame(long gId) {
+		Intent intent = new Intent(getApplicationContext(),
+				GameInProgress.class);
+		intent.putExtra("GID", gId);
+		startActivity(intent);
 	}
 }
