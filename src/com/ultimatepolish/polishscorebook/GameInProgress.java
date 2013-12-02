@@ -775,6 +775,7 @@ public class GameInProgress extends MenuContainerActivity implements
 			frag = ThrowTableFragment
 					.newInstance(pidx, getApplicationContext());
 			fragmentArray.add(frag);
+			vpAdapter.notifyDataSetChanged();
 		}
 		if (setVpItem) {
 			vp.setCurrentItem(pidx);
