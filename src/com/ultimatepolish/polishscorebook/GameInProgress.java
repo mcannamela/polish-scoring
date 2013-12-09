@@ -762,7 +762,6 @@ public class GameInProgress extends MenuContainerActivity implements
 		} else {
 			tbFire.setChecked(false);
 		}
-
 	}
 
 	private void renderPage(int pidx) {
