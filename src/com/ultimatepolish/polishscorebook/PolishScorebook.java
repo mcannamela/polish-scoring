@@ -1,5 +1,8 @@
 package com.ultimatepolish.polishscorebook;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -12,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class PolishScorebook extends MenuContainerActivity implements
@@ -23,7 +25,7 @@ public class PolishScorebook extends MenuContainerActivity implements
 
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
-	private String[] mItemTitles;
+	private NavDrawerItem[] mDrawerItems;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,7 @@ public class PolishScorebook extends MenuContainerActivity implements
 		setContentView(R.layout.activity_polish_scorebook);
 
 		mTitle = mDrawerTitle = getTitle();
-		mItemTitles = getResources().getStringArray(R.array.menuItems);
+		mDrawerItems = makeDrawerItemArray();
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
@@ -39,8 +41,8 @@ public class PolishScorebook extends MenuContainerActivity implements
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
 		// set up the drawer's list view with items and click listener
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-				R.layout.drawer_list_item, mItemTitles));
+		mDrawerList.setAdapter(new NavDrawerAdapter(this,
+				R.layout.nav_drawer_item, mDrawerItems));
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		// enable ActionBar app icon to behave as action to toggle nav drawer
@@ -72,6 +74,17 @@ public class PolishScorebook extends MenuContainerActivity implements
 		if (savedInstanceState == null) {
 			selectItem(0);
 		}
+	}
+
+	private NavDrawerItem[] makeDrawerItemArray() {
+		List<NavDrawerItem> items = new ArrayList<NavDrawerItem>();
+		// String[] mStrings = getResources().getStringArray(R.array.menuItems);
+
+		int iconId = R.drawable.ic_action_about;
+		items.add(new NavDrawerItem("Test1", iconId, false));
+		items.add(new NavDrawerItem("Test2", iconId, false));
+
+		return items.toArray(new NavDrawerItem[2]);
 	}
 
 	/* Called whenever we call invalidateOptionsMenu() */
@@ -160,7 +173,7 @@ public class PolishScorebook extends MenuContainerActivity implements
 
 		// update selected item and title, then close the drawer
 		mDrawerList.setItemChecked(position, true);
-		setTitle(mItemTitles[position]);
+		setTitle(mDrawerItems[position].label);
 		mDrawerLayout.closeDrawer(mDrawerList);
 	}
 
