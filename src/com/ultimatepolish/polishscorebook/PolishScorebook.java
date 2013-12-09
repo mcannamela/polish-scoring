@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -78,13 +79,16 @@ public class PolishScorebook extends MenuContainerActivity implements
 
 	private NavDrawerItem[] makeDrawerItemArray() {
 		List<NavDrawerItem> items = new ArrayList<NavDrawerItem>();
-		// String[] mStrings = getResources().getStringArray(R.array.menuItems);
+		String[] mLabels = getResources().getStringArray(R.array.menuItems);
+		TypedArray mIcons = getResources().obtainTypedArray(R.array.menuIcons);
 
-		int iconId = R.drawable.ic_action_about;
-		items.add(new NavDrawerItem("Test1", iconId, false));
-		items.add(new NavDrawerItem("Test2", iconId, false));
-
-		return items.toArray(new NavDrawerItem[2]);
+		for (int ii = 0; ii < mLabels.length; ii += 1) {
+			items.add(new NavDrawerItem(mLabels[ii], mIcons.getResourceId(ii,
+					-1), false));
+		}
+		mIcons.recycle();
+		// items.get(0).counter = 3;
+		return items.toArray(new NavDrawerItem[0]);
 	}
 
 	/* Called whenever we call invalidateOptionsMenu() */
