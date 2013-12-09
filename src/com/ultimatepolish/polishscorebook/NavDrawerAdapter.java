@@ -22,7 +22,7 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerItem> {
 		this.drawerItems = drawerItems;
 	}
 
-	public static class NavViewHolder {
+	static class NavViewHolder {
 		public final TextView labelView;
 		public final ImageView iconView;
 		public final TextView counterView;
@@ -33,11 +33,6 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerItem> {
 			this.iconView = ivIcon;
 			this.counterView = tvCounter;
 		}
-	}
-
-	@Override
-	public int getViewTypeCount() {
-		return 2;
 	}
 
 	@Override
@@ -72,10 +67,9 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerItem> {
 
 			if (holder.counterView != null) {
 				if (item.counter > 0) {
-					holder.counterView.setVisibility(View.VISIBLE);
 					holder.counterView.setText("" + item.counter);
 				} else {
-					holder.counterView.setVisibility(View.GONE);
+					holder.counterView.setText("");
 				}
 			}
 
@@ -91,9 +85,4 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerItem> {
 
 		return v;
 	}
-
-	// @Override
-	// public boolean hasStableIds() {
-	// return true;
-	// }
 }
