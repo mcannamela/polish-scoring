@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -31,6 +32,7 @@ public class PolishScorebook extends MenuContainerActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_polish_scorebook);
 
 		mTitle = mDrawerTitle = getTitle();
@@ -156,7 +158,7 @@ public class PolishScorebook extends MenuContainerActivity implements
 			fragment = new View_Venues();
 			break;
 		case 6: // preferences
-			fragment = new DbSettings();
+			fragment = new Preferences();
 			break;
 		case 7: // database
 			fragment = new DbSettings();
