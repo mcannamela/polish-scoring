@@ -84,8 +84,9 @@ public class PolishScorebook extends MenuContainerActivity implements
 
 		for (int ii = 0; ii < mLabels.length; ii += 1) {
 			items.add(new NavDrawerItem(mLabels[ii], mIcons.getResourceId(ii,
-					-1), false));
+					-1)));
 		}
+		items.add(5, new NavDrawerItem());
 		mIcons.recycle();
 		// items.get(0).counter = 3;
 		return items.toArray(new NavDrawerItem[0]);
@@ -137,7 +138,7 @@ public class PolishScorebook extends MenuContainerActivity implements
 	}
 
 	private void selectItem(int position) {
-		Fragment fragment = new View_Players();
+		Fragment fragment = new View_Venues();
 		switch (position) {
 		case 0: // games
 			fragment = new View_Games();
@@ -154,13 +155,13 @@ public class PolishScorebook extends MenuContainerActivity implements
 		case 4: // venues
 			fragment = new View_Venues();
 			break;
-		case 5: // preferences
+		case 6: // preferences
 			fragment = new DbSettings();
 			break;
-		case 6: // database
+		case 7: // database
 			fragment = new DbSettings();
 			break;
-		case 7: // about
+		case 8: // about
 			fragment = new AboutPage();
 			break;
 		}
