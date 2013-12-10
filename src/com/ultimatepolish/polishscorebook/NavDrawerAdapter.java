@@ -41,45 +41,50 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerItem> {
 		NavViewHolder holder = null;
 		NavDrawerItem item = getItem(position);
 
-		if (v == null) {
-			int layout = R.layout.nav_drawer_item;
-			if (item.isHeader)
-				layout = R.layout.nav_drawer_item;
+		if (!item.isHeader) {
+			if (v == null) {
+				int layout = R.layout.nav_drawer_item;
 
-			v = LayoutInflater.from(getContext()).inflate(layout, null);
+				v = LayoutInflater.from(getContext()).inflate(layout, null);
 
-			TextView tvLabel = (TextView) v.findViewById(R.id.navLabel);
-			ImageView ivIcon = (ImageView) v.findViewById(R.id.navIcon);
-			TextView tvCounter = (TextView) v.findViewById(R.id.navCounter);
-			v.setTag(new NavViewHolder(tvLabel, ivIcon, tvCounter));
-		}
-
-		if (holder == null && v != null) {
-			Object tag = v.getTag();
-			if (tag instanceof NavViewHolder) {
-				holder = (NavViewHolder) tag;
+				TextView tvLabel = (TextView) v.findViewById(R.id.navLabel);
+				ImageView ivIcon = (ImageView) v.findViewById(R.id.navIcon);
+				TextView tvCounter = (TextView) v.findViewById(R.id.navCounter);
+				v.setTag(new NavViewHolder(tvLabel, ivIcon, tvCounter));
 			}
-		}
 
-		if (item != null && holder != null) {
-			if (holder.labelView != null)
-				holder.labelView.setText(item.label);
-
-			if (holder.counterView != null) {
-				if (item.counter > 0) {
-					holder.counterView.setText("" + item.counter);
-				} else {
-					holder.counterView.setText("");
+			if (holder == null && v != null) {
+				Object tag = v.getTag();
+				if (tag instanceof NavViewHolder) {
+					holder = (NavViewHolder) tag;
 				}
 			}
 
-			if (holder.iconView != null) {
-				if (item.iconId > 0) {
-					holder.iconView.setVisibility(View.VISIBLE);
-					holder.iconView.setImageResource(item.iconId);
-				} else {
-					holder.iconView.setVisibility(View.GONE);
+			if (item != null && holder != null) {
+				if (holder.labelView != null)
+					holder.labelView.setText(item.label);
+
+				if (holder.counterView != null) {
+					if (item.counter > 0) {
+						holder.counterView.setText("" + item.counter);
+					} else {
+						holder.counterView.setText("");
+					}
 				}
+
+				if (holder.iconView != null) {
+					if (item.iconId > 0) {
+						holder.iconView.setVisibility(View.VISIBLE);
+						holder.iconView.setImageResource(item.iconId);
+					} else {
+						holder.iconView.setVisibility(View.GONE);
+					}
+				}
+			}
+		} else {
+			if (v == null) {
+				int layout = R.layout.nav_drawer_header;
+				v = LayoutInflater.from(getContext()).inflate(layout, null);
 			}
 		}
 

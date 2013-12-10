@@ -7,12 +7,16 @@ public class NavDrawerItem {
 	public boolean isHeader;
 
 	public NavDrawerItem() {
+		this.label = "";
+		this.iconId = 0;
+		this.counter = 0;
+		this.isHeader = true;
 	}
 
-	public NavDrawerItem(String label, int iconId, boolean isHeader) {
+	public NavDrawerItem(String label, int iconId) {
 		this.label = label;
 		this.iconId = iconId;
 		this.counter = 0;
-		this.isHeader = isHeader;
+		this.isHeader = false;
 	}
 }
