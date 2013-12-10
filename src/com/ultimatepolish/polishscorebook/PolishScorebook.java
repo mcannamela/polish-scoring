@@ -138,7 +138,7 @@ public class PolishScorebook extends MenuContainerActivity implements
 	}
 
 	private void selectItem(int position) {
-		Fragment fragment = new View_Venues();
+		Fragment fragment = null;
 		switch (position) {
 		case 0: // games
 			fragment = new View_Games();
@@ -171,15 +171,16 @@ public class PolishScorebook extends MenuContainerActivity implements
 		// args.putInt(ContentFragment.ARG_PLANET_NUMBER, position);
 		// fragment.setArguments(args);
 
-		//
-		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction()
-				.replace(R.id.content_frame, fragment).commit();
+		if (fragment != null) {
+			FragmentManager fragmentManager = getFragmentManager();
+			fragmentManager.beginTransaction()
+					.replace(R.id.content_frame, fragment).commit();
 
-		// update selected item and title, then close the drawer
-		mDrawerList.setItemChecked(position, true);
-		setTitle(mDrawerItems[position].label);
-		mDrawerLayout.closeDrawer(mDrawerList);
+			// update selected item and title, then close the drawer
+			mDrawerList.setItemChecked(position, true);
+			setTitle(mDrawerItems[position].label);
+			mDrawerLayout.closeDrawer(mDrawerList);
+		}
 	}
 
 	@Override
