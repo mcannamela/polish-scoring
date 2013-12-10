@@ -66,7 +66,7 @@ public class DbSettings extends OrmLiteFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.activity_simple_settings,
+		rootView = inflater.inflate(R.layout.activity_db_settings,
 				container, false);
 
 		mDbxAcctMgr = DbxAccountManager.getInstance(
