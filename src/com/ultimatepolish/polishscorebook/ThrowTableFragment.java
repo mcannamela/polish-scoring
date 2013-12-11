@@ -115,6 +115,7 @@ public class ThrowTableFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		log("onCreate(): creating fragment");
 		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
 	}
 
 	@Override
