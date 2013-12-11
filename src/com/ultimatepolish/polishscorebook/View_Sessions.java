@@ -39,6 +39,7 @@ public class View_Sessions extends OrmLiteFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		setRetainInstance(true);
 	}
 
 	@Override

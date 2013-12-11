@@ -43,6 +43,7 @@ public class View_Games extends OrmLiteFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		setRetainInstance(true);
 	}
 
 	@Override
@@ -54,7 +55,6 @@ public class View_Games extends OrmLiteFragment {
 		elv = (ExpandableListView) rootView.findViewById(R.id.dbListing);
 		gameAdapter = new ListAdapter_Game(context, sessionList);
 		elv.setAdapter(gameAdapter);
-		expandAll();
 		elv.setOnChildClickListener(elvItemClicked);
 		elv.setOnGroupClickListener(elvGroupClicked);
 		elv.setOnItemLongClickListener(elvItemLongClicked);

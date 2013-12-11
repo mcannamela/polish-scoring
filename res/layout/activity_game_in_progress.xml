@@ -23,7 +23,7 @@
     <TextView
         android:id="@+id/textView_session"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView_players"
+        android:layout_below="@id/textView_players"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/gip_session_hint"
@@ -33,7 +33,7 @@
     <TextView
         android:id="@+id/textView_gId"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView_players"
+        android:layout_below="@id/textView_players"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/gip_gid_hint"
@@ -43,7 +43,7 @@
     <TextView
         android:id="@+id/textView_venue"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView_session"
+        android:layout_below="@id/textView_session"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/gip_venue_hint"
@@ -53,7 +53,7 @@
     <TextView
         android:id="@+id/textView_datePlayed"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView_gId"
+        android:layout_below="@id/textView_gId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/gip_date_hint"
