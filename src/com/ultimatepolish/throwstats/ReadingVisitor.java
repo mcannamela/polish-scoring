@@ -1,13 +1,16 @@
 package com.ultimatepolish.throwstats;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class ReadingVisitor extends BaseWalkingVisitor {
+public class ReadingVisitor extends BaseWalkingVisitor 
+	implements Iterator<String>, Iterable<String>{
 	ArrayList<ArrayList<String>> lineages = new ArrayList<ArrayList<String>>();
 	ArrayList<Double> conditionalFractions = new ArrayList<Double>();
 	ArrayList<Double> absoluteFractions = new ArrayList<Double>();
 	ArrayList<Integer> counts = new ArrayList<Integer>();
 	
+	int iterator_index = 0;
 	@Override
 	public void update(IndicatorNode node) {
 		lineages.add(node.lineage());
@@ -21,6 +24,51 @@ public class ReadingVisitor extends BaseWalkingVisitor {
 
 	@Override
 	public void prepare(IndicatorNode node) {}
+
+	@Override
+	public Iterator<String> iterator() {
+		//I am my own iterator.
+		iterator_index = 0;
+		return this;
+	}
+
+	@Override
+	public boolean hasNext() {
+		return iterator_index<size();
+	}
+
+	@Override
+	public String next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove() {
+		throw new RuntimeException("Removing elements isn't allowed, artard!");
+		
+	}
+
+	public int size(){
+		return counts.size();
+	}
+	
+	String render_line(int idx){
+		String s = "";
+		String lineage = "";
+		
+		for (String lineage_element : lineages.get(idx)) {
+			lineage+= lineage_element;
+			lineage+= "->";
+		}
+		
+		s = lineage+
+				" "+counts.get(idx)
+				+", p|outcome:"+conditionalFractions.get(idx)
+				+", p:"+absoluteFractions.get(idx);
+		
+		return s;
+	}
 	
 	
 
