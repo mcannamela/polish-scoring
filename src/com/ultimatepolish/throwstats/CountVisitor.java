@@ -4,6 +4,9 @@ public class CountVisitor extends IndicatorNodeVisitor {
 
 	@Override
 	public void update(IndicatorNode node) {
+		if (node==null){
+			throw new RuntimeException("got a null node!");
+		}
 		node.increment();
 	}
 
