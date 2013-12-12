@@ -78,7 +78,7 @@ public class View_Games extends OrmLiteFragment {
 		MenuItem fav = menu.add("New Game");
 		fav.setIcon(R.drawable.ic_menu_add);
 		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		fav.setIntent(new Intent(context, NewPlayer.class));
+		fav.setIntent(new Intent(context, NewGame.class));
 	}
 
 	@Override

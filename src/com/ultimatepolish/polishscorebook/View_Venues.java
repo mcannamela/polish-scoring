@@ -67,7 +67,7 @@ public class View_Venues extends OrmLiteFragment {
 		MenuItem fav = menu.add("New Venue");
 		fav.setIcon(R.drawable.ic_menu_add);
 		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		fav.setIntent(new Intent(context, NewPlayer.class));
+		fav.setIntent(new Intent(context, NewVenue.class));
 	}
 
 	@Override

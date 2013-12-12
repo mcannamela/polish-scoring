@@ -64,7 +64,7 @@ public class View_Teams extends OrmLiteFragment {
 		MenuItem fav = menu.add("New Team");
 		fav.setIcon(R.drawable.ic_menu_add);
 		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		fav.setIntent(new Intent(context, NewPlayer.class));
+		fav.setIntent(new Intent(context, NewTeam.class));
 	}
 
 	@Override
