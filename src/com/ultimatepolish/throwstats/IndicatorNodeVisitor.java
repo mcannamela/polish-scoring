@@ -19,4 +19,8 @@ public abstract class IndicatorNodeVisitor {
 	public abstract void update(IndicatorNode node);
 	public abstract void prepareLeaf(IndicatorNode leafNode);
 	public abstract void prepare(IndicatorNode node);
+	
+	public void setThrow(Throw t){
+		this.t = t;
+	}
 }
