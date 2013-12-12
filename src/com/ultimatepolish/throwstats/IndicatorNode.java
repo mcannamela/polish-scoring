@@ -2,7 +2,7 @@ package com.ultimatepolish.throwstats;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.ultimatepolish.scorebookdb.Throw;
@@ -35,6 +35,9 @@ public class IndicatorNode {
 	}
 	
 	public Set<String> childKeys(){
+		if (indicator==null){
+			return new HashSet<String>();
+		}
 		return indicator.enumerate();
 	}
 	
@@ -66,7 +69,7 @@ public class IndicatorNode {
 	}
 	
 	public boolean isLeaf(){
-		return (indicator==null && childMap==null);
+		return (childKeys().size()==0);
 	}
 	
 	public boolean isRoot(){
@@ -75,6 +78,10 @@ public class IndicatorNode {
 	
 	public boolean isComplete(){
 		return childMap.keySet().equals(indicator.enumerate());
+	}
+	
+	public Set<String> getChildMapKeySet(){
+		return childMap.keySet();
 	}
 	
 	public void increment(int inc){

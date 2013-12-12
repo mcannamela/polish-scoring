@@ -1,5 +1,6 @@
 package com.ultimatepolish.throwstats;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -84,12 +85,12 @@ public class SimpleThrowStats {
 
 		@Override
 		public String indicate(Throw t) {
-			return null;
+			return "NULL";
 		}
 
 		@Override
 		public Set<String> enumerate() {
-			return null;
+			return new HashSet<String>();
 		}
 	}
 	
