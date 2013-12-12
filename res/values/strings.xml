@@ -70,5 +70,6 @@
 	
 	<string name="button_newGame">New Game</string>
 	<string name="create">Create!</string>
+	<string name="pDet_computeStats">Get Stats</string>
 
 </resources>

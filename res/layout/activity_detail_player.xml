@@ -48,5 +48,21 @@
         android:layout_below="@+id/pDet_winRatio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    
+    <Button
+        android:id="@+id/button_ComputeStats"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="computeStats"
+        android:text="@string/pDet_computeStats" />
+    
+    <TextView
+        android:id="@+id/pDet_statsSummary"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pDet_handed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
