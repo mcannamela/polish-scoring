@@ -1,18 +1,14 @@
 package com.ultimatepolish.throwstats;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.enums.ThrowResult;
 import com.ultimatepolish.scorebookdb.enums.ThrowType;
-import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class SimpleThrowStats {
-	private ArrayList<Throw> tArray;
+	private List<Throw> tArray;
 	
 	private static ThrowIndicator leafIndicator = new LeafIndicator();
 	private static ThrowIndicator ballStrikeHitIndicator = new BallStrikeHitIndicator();
@@ -22,14 +18,17 @@ public class SimpleThrowStats {
 	
 	
 	
-	public SimpleThrowStats(ArrayList<Throw> tArray) {
+	public SimpleThrowStats(List<Throw> tArray) {
 		this.tArray = tArray;
 	}
 	
 	public IndicatorNode computeStats(){
 		CountVisitor v = new CountVisitor();
 		IndicatorNode root = buildTree();
-		v.visit(root);
+		for (Throw  t: tArray) {
+			v.setThrow(t);
+			v.visit(root);
+		}
 		return root;
 	}
 	

@@ -1,7 +1,7 @@
 package com.ultimatepolish.polishscorebook;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -61,6 +61,8 @@ public class Detail_Player extends MenuContainerActivity {
 			try{
 				pDao = Player.getDao(getApplicationContext());
 				p = pDao.queryForId(pId);
+				
+				tDao = Throw.getDao(getApplicationContext());
 			}
 			catch (SQLException e){
 				Toast.makeText(getApplicationContext(), 
@@ -103,10 +105,10 @@ public class Detail_Player extends MenuContainerActivity {
 	public void computeStats(View view){
 		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
 		pStatsSummary.setText("Summoning throws from db");
-		ArrayList<Throw> tArray = new ArrayList<Throw>();
+		List<Throw> tList;
 		
 		try{
-			tArray = (ArrayList<Throw>) tDao.queryForEq(Throw.OFFENSIVE_PLAYER, pId);
+			tList = tDao.queryForEq(Throw.OFFENSIVE_PLAYER, pId);
 		}
 		catch (SQLException e){
 			Toast.makeText(getApplicationContext(), 
@@ -117,7 +119,7 @@ public class Detail_Player extends MenuContainerActivity {
 		}
 		
 		pStatsSummary.setText("Aggregating...");
-		SimpleThrowStats sts = new SimpleThrowStats(tArray);
+		SimpleThrowStats sts = new SimpleThrowStats(tList);
 		IndicatorNode statsTree = sts.computeStats();
 		ReadingVisitor rv = new ReadingVisitor();
 		rv.visit(statsTree);
