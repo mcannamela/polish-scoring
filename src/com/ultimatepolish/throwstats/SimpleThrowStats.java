@@ -135,6 +135,14 @@ public class SimpleThrowStats {
 		public static final String LEFT = ThrowType.getString(ThrowType.BALL_LEFT);
 		public static final String OTHER = "Other";
 		
+		public BallIndicator(){
+			keys.add(HIGH);
+			keys.add(RIGHT);
+			keys.add(LOW);
+			keys.add(LEFT);
+			keys.add(OTHER);
+		}
+		
 		@Override
 		public String indicate(Throw t) {
 			if (t.throwType==ThrowType.BALL_HIGH){
@@ -163,6 +171,13 @@ public class SimpleThrowStats {
 		public static final String BOTTLE = ThrowType.getString(ThrowType.BOTTLE);
 		public static final String OTHER = "Other";
 		
+		public PoleCupBottleIndicator(){
+			keys.add(POLE);
+			keys.add(CUP);
+			keys.add(BOTTLE);
+			keys.add(OTHER);
+		}
+		
 		@Override
 		public String indicate(Throw t) {
 			if (t.throwType==ThrowType.POLE){
@@ -187,6 +202,13 @@ public class SimpleThrowStats {
 		public static final String CATCH = ThrowResult.getString(ThrowResult.CATCH);
 		public static final String STALWART = ThrowResult.getString(ThrowResult.STALWART);
 		public static final String OTHER = "Other";
+		
+		public DropCatchStalwartIndicator(){
+			keys.add(DROP);
+			keys.add(CATCH);
+			keys.add(STALWART);
+			keys.add(OTHER);
+		}
 		
 		@Override
 		public String indicate(Throw t) {

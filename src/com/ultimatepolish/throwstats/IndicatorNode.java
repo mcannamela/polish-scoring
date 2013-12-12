@@ -11,7 +11,7 @@ public class IndicatorNode {
 
 	ThrowIndicator indicator = null;
 	IndicatorNode parent = null;
-	HashMap<String, IndicatorNode> childMap = null;
+	HashMap<String, IndicatorNode> childMap = new HashMap<String, IndicatorNode>();
 	String key = null;
 	
 	public int count = 0;
@@ -22,7 +22,11 @@ public class IndicatorNode {
 	
 	public void addChild(String key, IndicatorNode node){
 		if (!indicator.enumerate().contains(key)){
-			throw new RuntimeException("key must be a member of indicator.enumerate()");
+			String msg = "key must be a member of indicator.enumerate(): "+key+" not in ";
+			for (String allowedKey : indicator.enumerate()) {
+				msg+= allowedKey+", ";
+			}
+			throw new RuntimeException(msg);
 		}
 		childMap.put(key, node);
 		node.parent = this;
