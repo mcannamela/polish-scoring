@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,18 +42,15 @@ public class Detail_Game extends MenuContainerActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		menu.findItem(R.id.modifyButton).setVisible(true);
-		return true;
-	}
+		MenuItem fav = menu.add(R.string.menu_modify);
+		fav.setIcon(R.drawable.ic_action_edit);
+		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-	@Override
-	public void openModifyActivity() {
-		Intent intent = new Intent(getApplicationContext(),
-				GameInProgress.class);
+		Intent intent = new Intent(this, GameInProgress.class);
 		intent.putExtra("GID", gId);
-		startActivity(intent);
+
+		fav.setIntent(intent);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override

@@ -31,13 +31,6 @@
 	<string name="menu_about">About</string>
 	<string name="menu_add">Add</string>
 	<string name="menu_modify">Edit</string>
-	<string name="menu_games">Games</string>
-	<string name="menu_players">Players</string>
-	<string name="menu_teams">Teams</string>
-	<string name="menu_sessions">Sessions</string>
-	<string name="menu_dbSettings">Database</string>
-	<string name="menu_preferences">Preferences</string>
-	<string name="menu_venues">Venues</string>
 	
 	<string name="gip_p2_hint">PlayerTwo</string>
 	<string name="gip_gid_hint">gid</string>
