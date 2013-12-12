@@ -90,5 +90,14 @@ public class Detail_Player extends MenuContainerActivity {
 		}
 		else {pHanded.setText("R");
 		}
+		
+		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
+		pStatsSummary.setText("Stats \n will \n go \n here");
+	}
+	
+	public void computeStats(View view){
+		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
+		pStatsSummary.setText("Stats were computed");
+		
 	}
 }
