@@ -1,22 +1,27 @@
 package com.ultimatepolish.polishscorebook;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Player;
+import com.ultimatepolish.scorebookdb.Throw;
+import com.ultimatepolish.throwstats.IndicatorNode;
+import com.ultimatepolish.throwstats.ReadingVisitor;
+import com.ultimatepolish.throwstats.SimpleThrowStats;
 
 public class Detail_Player extends MenuContainerActivity {
 	Long pId;
 	Player p;
 	Dao<Player, Long> pDao;
+	Dao<Throw, Long> tDao;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +102,32 @@ public class Detail_Player extends MenuContainerActivity {
 	
 	public void computeStats(View view){
 		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
-		pStatsSummary.setText("Stats were computed");
+		pStatsSummary.setText("Summoning throws from db");
+		ArrayList<Throw> tArray = new ArrayList<Throw>();
+		
+		try{
+			tArray = (ArrayList<Throw>) tDao.queryForEq(Throw.OFFENSIVE_PLAYER, pId);
+		}
+		catch (SQLException e){
+			Toast.makeText(getApplicationContext(), 
+					e.getMessage(), 
+					Toast.LENGTH_LONG).show();
+			pStatsSummary.setText("NO STATS FOR YOU!");
+			return;
+		}
+		
+		pStatsSummary.setText("Aggregating...");
+		SimpleThrowStats sts = new SimpleThrowStats(tArray);
+		IndicatorNode statsTree = sts.computeStats();
+		ReadingVisitor rv = new ReadingVisitor();
+		rv.visit(statsTree);
+		
+		String stats = "";
+		for (String stat : rv) {
+			stats+= stat+"\n";
+		}
+		
+		pStatsSummary.setText(stats);
 		
 	}
 }
