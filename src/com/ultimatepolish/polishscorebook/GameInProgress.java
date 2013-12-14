@@ -412,16 +412,17 @@ public class GameInProgress extends MenuContainerActivity implements
 	}
 
 	public void InfoDialog() {
-		DateFormat df = new SimpleDateFormat("EEE MMM dd, yyyy @HH:mm",
+		DateFormat df = new SimpleDateFormat("EEE MMM dd, yyyy. HH:mm",
 				Locale.US);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Game Information").setPositiveButton("Close",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-					}
-				});
+		builder.setTitle("Game #" + String.valueOf(ag.getGameId()))
+				.setPositiveButton("Close",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+							}
+						});
 		LayoutInflater inflater = getLayoutInflater();
 
 		View fView = inflater.inflate(R.layout.dialog_game_information, null);
@@ -445,11 +446,6 @@ public class GameInProgress extends MenuContainerActivity implements
 		// date
 		tv = (TextView) fView.findViewById(R.id.gInfo_date);
 		tv.setText(df.format(ag.getGameDate()));
-
-		// game ID
-		// tv = (TextView) findViewById(R.id.textView_gId);
-		// tv.setText(getString(R.string.gip_gamenum_text)
-		// + String.valueOf(ag.getGameId()));
 
 		builder.setView(fView);
 		AlertDialog dialog = builder.create();
