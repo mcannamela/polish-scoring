@@ -5,9 +5,9 @@ import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +23,9 @@ public class Detail_Player extends MenuContainerActivity {
 	Player p;
 	Dao<Player, Long> pDao;
 	Dao<Throw, Long> tDao;
-	
+
 	public static String LOGTAG = "DET_PLAYER";
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -101,71 +101,67 @@ public class Detail_Player extends MenuContainerActivity {
 		} else {
 			pHanded.setText("R");
 		}
-		
+
 		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
 		pStatsSummary.setText("Stats \n will \n go \n here");
 	}
-	
-	public void computeOffensiveStats(View view){
+
+	public void computeOffensiveStats(View view) {
 		log("Will now compute offensive stats");
 		log("Summoning throws from db");
 		List<Throw> tList;
-		
-		try{
+
+		try {
 			tList = tDao.queryForEq(Throw.OFFENSIVE_PLAYER, pId);
-		}
-		catch (SQLException e){
-			Toast.makeText(getApplicationContext(), 
-					e.getMessage(), 
+		} catch (SQLException e) {
+			Toast.makeText(getApplicationContext(), e.getMessage(),
 					Toast.LENGTH_LONG).show();
 			log("NO STATS FOR YOU!");
 			return;
 		}
-		
+
 		computeStats(tList);
 	}
-	
-	public void computeDefensiveStats(View view){
+
+	public void computeDefensiveStats(View view) {
 		log("Will now compute defensive stats");
 		log("Summoning throws from db");
 		List<Throw> tList;
-		
-		try{
+
+		try {
 			tList = tDao.queryForEq(Throw.DEFENSIVE_PLAYER, pId);
-		}
-		catch (SQLException e){
-			Toast.makeText(getApplicationContext(), 
-					e.getMessage(), 
+		} catch (SQLException e) {
+			Toast.makeText(getApplicationContext(), e.getMessage(),
 					Toast.LENGTH_LONG).show();
 			log("NO STATS FOR YOU!");
 			return;
 		}
-		
+
 		computeStats(tList);
 	}
-	
-	public void computeStats(List<Throw> tList){
+
+	public void computeStats(List<Throw> tList) {
 		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
-		
+
 		log("Aggregating...");
 		SimpleThrowStats sts = new SimpleThrowStats(tList);
 		log("Tree is built");
-		
+
 		IndicatorNode statsTree = sts.computeStats();
 		log("Stats are computed");
 		ReadingVisitor rv = new ReadingVisitor();
 		rv.visit(statsTree);
 		log("Stats are read");
-		
+
 		String stats = "";
 		int cnt = 0;
 		for (String stat : rv) {
 			log(stat);
-			stats+= stat+"\n";
+			stats += stat + "\n";
 			cnt++;
 		}
-		
+
 		pStatsSummary.setText(stats);
-		
+
 	}
 }
