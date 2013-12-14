@@ -39,8 +39,11 @@ public class ReadingVisitor extends BaseWalkingVisitor
 
 	@Override
 	public String next() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String line = render_line(iterator_index);
+		iterator_index++;
+		return line;
+		
 	}
 
 	@Override
@@ -64,8 +67,8 @@ public class ReadingVisitor extends BaseWalkingVisitor
 		
 		s = lineage+
 				" "+counts.get(idx)
-				+", p|outcome:"+conditionalFractions.get(idx)
-				+", p:"+absoluteFractions.get(idx);
+				+", p|x="+String.format("%.1f", 100*conditionalFractions.get(idx))
+				+", p="+String.format("%.2f", 100*absoluteFractions.get(idx));
 		
 		return s;
 	}
