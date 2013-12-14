@@ -67,8 +67,8 @@ public class ReadingVisitor extends BaseWalkingVisitor
 		
 		s = lineage+
 				" "+counts.get(idx)
-				+", p|x="+String.format("%.1f", 100*conditionalFractions.get(idx))
-				+", p="+String.format("%.2f", 100*absoluteFractions.get(idx));
+				+", p|x="+String.format("%.1f", 100*conditionalFractions.get(idx))+"%"
+				+", p="+String.format("%.2f", 100*absoluteFractions.get(idx))+"%";
 		
 		return s;
 	}
