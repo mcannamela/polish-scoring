@@ -4,11 +4,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.util.Log;
+
 import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.enums.ThrowResult;
 import com.ultimatepolish.scorebookdb.enums.ThrowType;
 
 public class SimpleThrowStats {
+	public static String LOGTAG = "ThrowStats";
 	private List<Throw> tArray;
 	
 	private static ThrowIndicator leafIndicator = new LeafIndicator();
@@ -26,9 +29,19 @@ public class SimpleThrowStats {
 	public IndicatorNode computeStats(){
 		CountVisitor v = new CountVisitor();
 		IndicatorNode root = buildTree();
+		log("Will now process "+tArray.size() +" throws");
+		int cnt = 0;
 		for (Throw  t: tArray) {
+			if (cnt%10==0){
+				log("Processing throw "+cnt+" of "+tArray.size());
+			}
+//			if (cnt>100){
+//				break;
+//			}
 			v.setThrow(t);
 			v.visit(root);
+			cnt++;
+			
 		}
 		return root;
 	}
@@ -47,7 +60,7 @@ public class SimpleThrowStats {
 		IndicatorNode root = new IndicatorNode(ballStrikeHitIndicator);
 		IndicatorNode ballNode, strikeNode, hitNode, poleNode, cupNode, bottleNode;
 		
-		ballNode = new IndicatorNode(dropCatchStalwartIndicator);
+		ballNode = new IndicatorNode(ballIndicator);
 		strikeNode = new IndicatorNode(dropCatchStalwartIndicator);
 		
 		hitNode = new IndicatorNode(poleCupBottleIndicator);
@@ -227,6 +240,8 @@ public class SimpleThrowStats {
 		
 	}
 	
-	
+	public void log(String msg) {
+		Log.i(LOGTAG, msg);
+	}
 	
 }

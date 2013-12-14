@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -22,6 +23,8 @@ public class Detail_Player extends MenuContainerActivity {
 	Player p;
 	Dao<Player, Long> pDao;
 	Dao<Throw, Long> tDao;
+	
+	public static String LOGTAG = "DET_PLAYER";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +107,7 @@ public class Detail_Player extends MenuContainerActivity {
 	
 	public void computeStats(View view){
 		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
-		pStatsSummary.setText("Summoning throws from db");
+		log("Summoning throws from db");
 		List<Throw> tList;
 		
 		try{
@@ -114,22 +117,32 @@ public class Detail_Player extends MenuContainerActivity {
 			Toast.makeText(getApplicationContext(), 
 					e.getMessage(), 
 					Toast.LENGTH_LONG).show();
-			pStatsSummary.setText("NO STATS FOR YOU!");
+			log("NO STATS FOR YOU!");
 			return;
 		}
 		
-		pStatsSummary.setText("Aggregating...");
+		log("Aggregating...");
 		SimpleThrowStats sts = new SimpleThrowStats(tList);
+		log("Tree is built");
+		
 		IndicatorNode statsTree = sts.computeStats();
+		log("Stats are computed");
 		ReadingVisitor rv = new ReadingVisitor();
 		rv.visit(statsTree);
+		log("Stats are read");
 		
 		String stats = "";
+		int cnt = 0;
 		for (String stat : rv) {
+			log(stat);
 			stats+= stat+"\n";
+			cnt++;
 		}
 		
 		pStatsSummary.setText(stats);
 		
+	}
+	public void log(String msg) {
+		Log.i(LOGTAG, msg);
 	}
 }
