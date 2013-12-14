@@ -105,8 +105,8 @@ public class Detail_Player extends MenuContainerActivity {
 		pStatsSummary.setText("Stats \n will \n go \n here");
 	}
 	
-	public void computeStats(View view){
-		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
+	public void computeOffensiveStats(View view){
+		log("Will now compute offensive stats");
 		log("Summoning throws from db");
 		List<Throw> tList;
 		
@@ -120,6 +120,31 @@ public class Detail_Player extends MenuContainerActivity {
 			log("NO STATS FOR YOU!");
 			return;
 		}
+		
+		computeStats(tList);
+	}
+	
+	public void computeDefensiveStats(View view){
+		log("Will now compute defensive stats");
+		log("Summoning throws from db");
+		List<Throw> tList;
+		
+		try{
+			tList = tDao.queryForEq(Throw.DEFENSIVE_PLAYER, pId);
+		}
+		catch (SQLException e){
+			Toast.makeText(getApplicationContext(), 
+					e.getMessage(), 
+					Toast.LENGTH_LONG).show();
+			log("NO STATS FOR YOU!");
+			return;
+		}
+		
+		computeStats(tList);
+	}
+	
+	public void computeStats(List<Throw> tList){
+		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
 		
 		log("Aggregating...");
 		SimpleThrowStats sts = new SimpleThrowStats(tList);
