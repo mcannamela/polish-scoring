@@ -48,5 +48,30 @@
         android:layout_below="@+id/pDet_winRatio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    
+    <Button
+        android:id="@+id/button_ComputeOffensiveStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="computeOffensiveStats"
+        android:text="@string/pDet_computeStats" />
+    
+    <Button
+        android:id="@+id/button_ComputeDefensiveStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/button_ComputeOffensiveStats"
+        android:onClick="computeDefensiveStats"
+        android:text="@string/pDet_computeDefensiveStats" />
+    
+    <TextView
+        android:id="@+id/pDet_statsSummary"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pDet_handed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
