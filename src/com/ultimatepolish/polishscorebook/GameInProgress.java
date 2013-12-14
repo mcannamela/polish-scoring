@@ -18,7 +18,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -409,13 +411,58 @@ public class GameInProgress extends MenuContainerActivity implements
 		dialog.show();
 	}
 
+	public void InfoDialog() {
+		DateFormat df = new SimpleDateFormat("EEE MMM dd, yyyy @HH:mm",
+				Locale.US);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Game Information").setPositiveButton("Close",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+					}
+				});
+		LayoutInflater inflater = getLayoutInflater();
+
+		View fView = inflater.inflate(R.layout.dialog_game_information, null);
+		TextView tv;
+
+		// players
+		tv = (TextView) fView.findViewById(R.id.gInfo_p1);
+		tv.setText(ag.getP1Name());
+
+		tv = (TextView) fView.findViewById(R.id.gInfo_p2);
+		tv.setText(ag.getP2Name());
+
+		// // session
+		tv = (TextView) fView.findViewById(R.id.gInfo_session);
+		tv.setText(ag.getSessionName());
+
+		// venue
+		tv = (TextView) fView.findViewById(R.id.gInfo_venue);
+		tv.setText(ag.getVenueName());
+
+		// date
+		tv = (TextView) fView.findViewById(R.id.gInfo_date);
+		tv.setText(df.format(ag.getGameDate()));
+
+		// game ID
+		// tv = (TextView) findViewById(R.id.textView_gId);
+		// tv.setText(getString(R.string.gip_gamenum_text)
+		// + String.valueOf(ag.getGameId()));
+
+		builder.setView(fView);
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
+
 	public static class GentlemensDialogFragment extends DialogFragment {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			// Use the Builder class for convenient dialog construction
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setMessage("Time out, Gentlemen!").setPositiveButton(
-					"resume", new DialogInterface.OnClickListener() {
+					"Resume", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 						}
 					});
@@ -449,11 +496,25 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuItem fav = menu.add("Game Information");
+		MenuItem fav = menu.add(0, 1, 0, "Game Information");
 		fav.setIcon(R.drawable.ic_action_about);
 		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		// fav.setIntent(new Intent(this, NewPlayer.class));
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
+		case 1:
+			InfoDialog();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override
@@ -482,32 +543,7 @@ public class GameInProgress extends MenuContainerActivity implements
 
 	// INITIALIZATION =========================================================
 	private void initMetadata() {
-		DateFormat df = new SimpleDateFormat("EEE MMM dd, yyyy @HH:mm",
-				Locale.US);
 		TextView tv;
-
-		// player names
-		tv = (TextView) findViewById(R.id.textView_players);
-		tv.setText(ag.getP1Name() + " " + getString(R.string.gip_vs_text) + " "
-				+ ag.getP2Name());
-
-		// session
-		tv = (TextView) findViewById(R.id.textView_session);
-		tv.setText(getString(R.string.gip_session_text) + " "
-				+ ag.getSessionName());
-
-		// venue
-		tv = (TextView) findViewById(R.id.textView_venue);
-		tv.setText(getString(R.string.gip_venue_text) + " " + ag.getVenueName());
-
-		// date
-		tv = (TextView) findViewById(R.id.textView_datePlayed);
-		tv.setText(df.format(ag.getGameDate()));
-
-		// game ID
-		tv = (TextView) findViewById(R.id.textView_gId);
-		tv.setText(getString(R.string.gip_gamenum_text)
-				+ String.valueOf(ag.getGameId()));
 
 		// table header
 		tv = (TextView) findViewById(R.id.header_p1);
