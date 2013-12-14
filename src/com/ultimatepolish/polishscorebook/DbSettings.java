@@ -17,9 +17,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,13 +37,14 @@ import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.DatabaseHelper;
 import com.ultimatepolish.scorebookdb.DatabaseUpgrader;
 import com.ultimatepolish.scorebookdb.Game;
+import com.ultimatepolish.scorebookdb.OrmLiteFragment;
 import com.ultimatepolish.scorebookdb.Player;
 import com.ultimatepolish.scorebookdb.Session;
 import com.ultimatepolish.scorebookdb.Throw;
 import com.ultimatepolish.scorebookdb.Venue;
 import com.ultimatepolish.scorebookdb.enums.RuleType;
 
-public class DbSettings extends MenuContainerActivity {
+public class DbSettings extends OrmLiteFragment {
 
 	private DbxAccountManager mDbxAcctMgr;
 	private static final String appKey = "v08dmrsen6b8pr5";
@@ -48,27 +53,38 @@ public class DbSettings extends MenuContainerActivity {
 	private Button dbxSaveButton;
 	private Button dbxLoadButton;
 	private TextView mTestOutput;
+	private View rootView;
+	private Context context;
 
 	private static final int REQUEST_LINK_TO_DBX = 0;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_simple_settings);
+	}
 
-		mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(),
-				appKey, appSecret);
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		rootView = inflater.inflate(R.layout.activity_db_settings,
+				container, false);
 
-		mLinkButton = (Button) findViewById(R.id.settings_linkToDropbox);
+		mDbxAcctMgr = DbxAccountManager.getInstance(
+				context.getApplicationContext(), appKey, appSecret);
+
+		mLinkButton = (Button) rootView
+				.findViewById(R.id.settings_linkToDropbox);
 		mLinkButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onClickLinkToDropbox();
 			}
 		});
-		dbxSaveButton = (Button) findViewById(R.id.button_saveDB_dropbox);
-		dbxLoadButton = (Button) findViewById(R.id.button_loadDB_dropbox);
-		mTestOutput = (TextView) findViewById(R.id.settings_dbxFiles);
+		dbxSaveButton = (Button) rootView
+				.findViewById(R.id.button_saveDB_dropbox);
+		dbxLoadButton = (Button) rootView
+				.findViewById(R.id.button_loadDB_dropbox);
+		mTestOutput = (TextView) rootView.findViewById(R.id.settings_dbxFiles);
 
 		dbxLoadButton.setOnClickListener(new OnClickListener() {
 
@@ -104,18 +120,24 @@ public class DbSettings extends MenuContainerActivity {
 			}
 		});
 
+		return rootView;
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		menu.findItem(R.id.dbSettings).setVisible(false);
-		return true;
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		context = getActivity();
+	}
+
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		MenuItem fav = menu.add("New Player");
+		fav.setIcon(R.drawable.ic_menu_add);
+		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		fav.setIntent(new Intent(context, NewPlayer.class));
 	}
 
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
 		if (mDbxAcctMgr.hasLinkedAccount()) {
 			showLinkedView();
@@ -137,7 +159,7 @@ public class DbSettings extends MenuContainerActivity {
 	}
 
 	private void onClickLinkToDropbox() {
-		mDbxAcctMgr.startLink((Activity) this, REQUEST_LINK_TO_DBX);
+		mDbxAcctMgr.startLink((Activity) context, REQUEST_LINK_TO_DBX);
 	}
 
 	@Override
@@ -145,13 +167,11 @@ public class DbSettings extends MenuContainerActivity {
 		if (requestCode == REQUEST_LINK_TO_DBX) {
 			if (resultCode == Activity.RESULT_OK) {
 				// ... Start using Dropbox files.
-				Context context = getApplicationContext();
 				Toast.makeText(context, "Successfully connected to dropbox!",
 						Toast.LENGTH_SHORT).show();
 				mLinkButton.setVisibility(View.GONE);
 			} else {
 				// ... Link failed or was cancelled by the user.
-				Context context = getApplicationContext();
 				Toast.makeText(context,
 						"Link failed or was cancelled by the user.",
 						Toast.LENGTH_SHORT).show();
@@ -220,7 +240,6 @@ public class DbSettings extends MenuContainerActivity {
 			venueDao.create(v2);
 			venueDao.create(v3);
 		} catch (SQLException e) {
-			Context context = getApplicationContext();
 			int duration = Toast.LENGTH_LONG;
 			Toast.makeText(context, e.getMessage(), duration).show();
 			Log.e(PolishScorebook.class.getName(),
@@ -233,7 +252,6 @@ public class DbSettings extends MenuContainerActivity {
 		List<Long> badThrows = null;
 		Dao<Game, Long> gDao;
 		Dao<Throw, Long> tDao;
-		Context context = getApplicationContext();
 		try {
 
 			gDao = Game.getDao(context);
@@ -264,7 +282,6 @@ public class DbSettings extends MenuContainerActivity {
 	}
 
 	public void saveDBdropbox(View view) {
-		Context context = getApplicationContext();
 		Toast.makeText(context, "Saved to dropbox", Toast.LENGTH_SHORT).show();
 
 		try {

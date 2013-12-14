@@ -1,0 +1,94 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:title="Not Yet Implemented">
+
+        <ListPreference
+                android:key="ruleset_preference"
+                android:title="Default Ruleset"
+                android:summary="This should say which ruleset is chosen."
+                android:entries="@array/owngoals"
+                android:entryValues="@array/owngoals"
+                android:dialogTitle="Default Ruleset" />
+        
+        <ListPreference
+                android:key="iconset_preference"
+                android:title="Default Icons"
+                android:summary="This should say which icon set is chosen."
+                android:entries="@array/owngoals"
+                android:entryValues="@array/owngoals"
+                android:dialogTitle="Default Icons" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="Examples">
+        
+        <SwitchPreference
+                android:key="switch_preference"
+                android:title="A Switch"
+                android:summary="Flip it"
+                android:defaultValue="true" />
+
+        <CheckBoxPreference
+                android:key="checkbox_preference"
+                android:title="A Checkbox"
+                android:summary="Summarize the checkbox" />
+        
+        <EditTextPreference
+                android:key="edittext_preference"
+                android:title="Edit some text"
+                android:summary="seriously, edit it"
+                android:dialogTitle="Dialog title for edit text" />
+
+        <ListPreference
+                android:key="list_preference"
+                android:title="A list of preferences"
+                android:summary="choose from the list"
+                android:entries="@array/owngoals"
+                android:entryValues="@array/owngoals"
+                android:dialogTitle="Title for the list dialog" />
+
+        <!-- This PreferenceScreen tag serves as a screen break (similar to page break
+             in word processing). Like for other preference types, we assign a key
+             here so it is able to save and restore its instance state. -->
+        <PreferenceScreen
+                android:key="screen_preference"
+                android:title="A screen break?"
+                android:summary="What is a screen break?">
+
+            <!-- You can place more preferences here that will be shown on the next screen. -->
+
+            <CheckBoxPreference
+                    android:key="next_screen_checkbox_preference"
+                    android:title="Another checkbox"
+                    android:summary="This may take you to the next screen" />
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
+                android:title="An intent preference"
+                android:summary="This will let your choose your intent">
+
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="http://www.android.com" />
+
+        </PreferenceScreen>
+
+        <CheckBoxPreference
+                android:key="parent_checkbox_preference"
+                android:title="Checkbox parent attributes"
+                android:summary="Check attributes of your preferences" />
+
+        <!-- The visual style of a child is defined by this styled theme attribute. -->
+        <CheckBoxPreference
+                android:key="child_checkbox_preference"
+                android:dependency="parent_checkbox_preference"
+                android:layout="?android:attr/preferenceLayoutChild"
+                android:title="Checkbox child"
+                android:summary="Child attribute checkbox" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

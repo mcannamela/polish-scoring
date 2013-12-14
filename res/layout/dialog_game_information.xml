@@ -1,0 +1,135 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    tools:context="GameInformation" >
+
+    
+    <ImageView
+        android:id="@+id/gInfo_p1icon"
+    	android:layout_height="32dp"
+    	android:layout_width = "32dp"
+    	android:layout_alignParentTop="true"
+    	android:layout_alignParentLeft="true"
+    	android:layout_marginLeft="24dp"
+		android:layout_marginRight="12dp"
+		android:layout_marginTop="10dp"
+    	android:src="@drawable/ic_player_lt"
+    	/>
+    
+    <TextView
+        android:id="@+id/gInfo_p1"
+        android:layout_alignBottom="@id/gInfo_p1icon"
+        android:layout_toRightOf="@id/gInfo_p1icon"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textIsSelectable="false" />
+    
+    <TextView
+        android:id="@+id/gInfo_vs"
+        android:layout_alignLeft="@id/gInfo_p1"
+        android:layout_below="@id/gInfo_p1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textIsSelectable="false"
+        android:text="vs" />
+    
+    <ImageView
+        android:id="@+id/gInfo_p2icon"
+    	android:layout_height="32dp"
+    	android:layout_width = "32dp"
+    	android:layout_below="@id/gInfo_vs"
+    	android:layout_alignParentLeft="true"
+    	android:layout_marginLeft="24dp"
+		android:layout_marginRight="12dp"
+    	android:src="@drawable/ic_player_lt"
+    	/>
+    
+    <TextView
+        android:id="@+id/gInfo_p2"
+        android:layout_alignBottom="@id/gInfo_p2icon"
+        android:layout_toRightOf="@id/gInfo_p2icon"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textIsSelectable="false" />
+    
+    <ImageView
+        android:id="@+id/gInfo_sessionIcon"
+    	android:layout_height="32dp"
+    	android:layout_width = "32dp"
+    	android:layout_below="@id/gInfo_p2icon"
+    	android:layout_alignParentLeft="true"
+    	android:layout_marginLeft="24dp"
+		android:layout_marginRight="12dp"
+		android:layout_marginTop="10dp"
+    	android:src="@drawable/ic_session_lt"
+    	/>
+    
+    <TextView
+        android:id="@+id/gInfo_session"
+        android:layout_alignBottom="@id/gInfo_sessionIcon"
+        android:layout_toRightOf="@id/gInfo_sessionIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textIsSelectable="false" />
+    
+    <ImageView
+        android:id="@+id/gInfo_venueIcon"
+    	android:layout_height="32dp"
+    	android:layout_width = "32dp"
+    	android:layout_below="@id/gInfo_sessionIcon"
+    	android:layout_alignParentLeft="true"
+    	android:layout_marginLeft="24dp"
+		android:layout_marginRight="12dp"
+    	android:src="@drawable/ic_venue_lt"
+    	/>
+    
+    <TextView
+        android:id="@+id/gInfo_venue"
+        android:layout_alignBottom="@id/gInfo_venueIcon"
+        android:layout_toRightOf="@id/gInfo_venueIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textIsSelectable="false" />
+    
+    <ImageView
+        android:id="@+id/gInfo_timeIcon"
+    	android:layout_height="32dp"
+    	android:layout_width ="32dp"
+    	android:layout_below="@id/gInfo_venueIcon"
+    	android:layout_alignParentLeft="true"
+    	android:layout_marginLeft="24dp"
+		android:layout_marginRight="12dp"
+    	android:src="@drawable/ic_action_time_lt"
+    	/>
+    
+    <TextView
+        android:id="@+id/gInfo_date"
+        android:layout_alignBottom="@id/gInfo_timeIcon"
+        android:layout_toRightOf="@id/gInfo_timeIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textIsSelectable="false" />
+    
+    <ImageView
+        android:layout_height="10dp"
+    	android:layout_width ="10dp"
+    	android:layout_below="@id/gInfo_timeIcon"
+    	android:layout_alignParentLeft="true"
+    	android:layout_marginLeft="24dp"
+		android:layout_marginRight="12dp"
+    	/>
+
+</RelativeLayout>

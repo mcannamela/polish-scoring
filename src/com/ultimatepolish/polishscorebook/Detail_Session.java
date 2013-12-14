@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,17 +57,15 @@ public class Detail_Session extends MenuContainerActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		menu.findItem(R.id.modifyButton).setVisible(true);
-		return true;
-	}
+		MenuItem fav = menu.add(R.string.menu_modify);
+		fav.setIcon(R.drawable.ic_action_edit);
+		fav.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-	@Override
-	public void openModifyActivity() {
-		Intent intent = new Intent(getApplicationContext(), NewSession.class);
+		Intent intent = new Intent(this, NewSession.class);
 		intent.putExtra("SID", sId);
-		startActivity(intent);
+
+		fav.setIntent(intent);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override

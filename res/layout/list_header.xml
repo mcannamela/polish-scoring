@@ -10,7 +10,6 @@
         android:layout_height="45dp"
         android:gravity="center_vertical"
         android:paddingLeft="35sp"
-        android:layout_marginRight="10dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold"
         android:background="@color/DkBlue"
