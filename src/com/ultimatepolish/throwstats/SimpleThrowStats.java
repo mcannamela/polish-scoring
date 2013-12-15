@@ -32,11 +32,8 @@ public class SimpleThrowStats {
 		log("Will now process "+tArray.size() +" throws");
 		int cnt = 0;
 		for (Throw  t: tArray) {
-			if (cnt%10==0){
-				log("Processing throw "+cnt+" of "+tArray.size());
-			}
-//			if (cnt>100){
-//				break;
+//			if (cnt%10==0){
+//				log("Processing throw "+cnt+" of "+tArray.size());
 //			}
 			v.setThrow(t);
 			v.visit(root);
