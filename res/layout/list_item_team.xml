@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/textView_teamId"
+        android:layout_width="80sp"
+		android:layout_height="45sp"
+		android:gravity="right|center_vertical"
+        android:paddingLeft="35sp"
+        android:paddingRight="15dp"
+        android:hint="tid"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView_name"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/textView_teamId"
+        android:layout_alignBaseline="@+id/textView_teamId"
+        android:hint="team name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <TextView
+        android:id="@+id/textView_players"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/textView_name"
+        android:layout_alignBaseline="@id/textView_teamId"
+        android:hint="players"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>

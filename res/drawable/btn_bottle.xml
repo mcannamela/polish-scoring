@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:maxLevel="0" android:drawable="@drawable/btn_bottle_off" />
+	<item android:maxLevel="1" android:drawable="@drawable/btn_bottle_on" />
+	<item android:maxLevel="2">
+		<layer-list >
+			<item android:drawable="@drawable/btn_bottle_off" />
+			<item android:drawable="@drawable/btn_broken_off" />
+		</layer-list>
+	</item>
+	<item android:maxLevel="3">
+		<layer-list >
+			<item android:drawable="@drawable/btn_bottle_on" />
+			<item android:drawable="@drawable/btn_broken_on" />
+		</layer-list>
+	</item>
+</level-list>
