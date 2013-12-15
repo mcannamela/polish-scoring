@@ -8,6 +8,8 @@ public class ReadingVisitor extends BaseWalkingVisitor
 	ArrayList<ArrayList<String>> lineages = new ArrayList<ArrayList<String>>();
 	ArrayList<Double> conditionalFractions = new ArrayList<Double>();
 	ArrayList<Double> absoluteFractions = new ArrayList<Double>();
+	ArrayList<Double> conditionalFractionStdDev = new ArrayList<Double>();
+	ArrayList<Double> absoluteFractionStdDev = new ArrayList<Double>();
 	ArrayList<Integer> counts = new ArrayList<Integer>();
 	
 	int iterator_index = 0;
@@ -16,6 +18,8 @@ public class ReadingVisitor extends BaseWalkingVisitor
 		lineages.add(node.lineage());
 		conditionalFractions.add(node.conditionalFraction());
 		absoluteFractions.add(node.absoluteFraction());
+		conditionalFractionStdDev.add(node.conditionalFractionStandardDev());
+		absoluteFractionStdDev.add(node.absoluteFractionStandardDev());
 		counts.add(node.count);
 	}
 
@@ -66,9 +70,11 @@ public class ReadingVisitor extends BaseWalkingVisitor
 		}
 		
 		s = lineage+
-				" "+counts.get(idx)
-				+", p|x="+String.format("%.1f", 100*conditionalFractions.get(idx))+"%"
-				+", p="+String.format("%.2f", 100*absoluteFractions.get(idx))+"%";
+				"  "+counts.get(idx)
+				+",   "+String.format("%.1f", 100*conditionalFractions.get(idx))
+				+"+/-"+String.format("%.1f", 100*conditionalFractionStdDev.get(idx))+"%"
+				+",   "+String.format("%.2f", 100*absoluteFractions.get(idx))
+				+"+/-"+String.format("%.2f", 100*absoluteFractionStdDev.get(idx))+"%";
 		
 		return s;
 	}

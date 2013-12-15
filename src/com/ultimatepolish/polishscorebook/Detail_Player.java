@@ -142,7 +142,7 @@ public class Detail_Player extends MenuContainerActivity {
 			return;
 		}
 
-		String stats = computeStats(tList);
+		String stats = computeStats(tList); 
 		
 		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
 		pStatsSummary.setText("DEFENSIVE STATS\n"+stats);
@@ -163,7 +163,7 @@ public class Detail_Player extends MenuContainerActivity {
 		String stats = "";
 		int cnt = 0;
 		for (String stat : rv) {
-			log(stat);
+//			log(stat);
 			stats += stat + "\n";
 			cnt++;
 		}
