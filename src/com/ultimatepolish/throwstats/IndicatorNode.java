@@ -14,6 +14,13 @@ public class IndicatorNode {
 	HashMap<String, IndicatorNode> childMap = new HashMap<String, IndicatorNode>();
 	String key = null;
 	
+	public static double proportionStandardDev(double p, int n){
+		if (n==0){
+			return 0.0;
+		}
+		return Math.sqrt(p*(1-p)/(double) n);
+	}
+	
 	public int count = 0;
 
 	public IndicatorNode(ThrowIndicator indicator) {
@@ -48,15 +55,34 @@ public class IndicatorNode {
 		return parent.count;
 	}
 	
-	public double fraction(){
+	public int rootCount(){
+		if (isRoot()){
+			return count;
+		}
+		return parent.rootCount();
+	}
+	
+	public double conditionalFraction(){
 		return divideIntegers(count, parentCount());
 	}
+	
+	/*
+	 * Estimate standard dev with normal approximation
+	 */
+	public double conditionalFractionStandardDev(){
+		return proportionStandardDev(conditionalFraction(), parentCount());
+	}
+	
 	
 	public double absoluteFraction(){
 		if (isRoot()){
 			return 1;
 		}
-		return fraction()*parent.absoluteFraction();
+		return conditionalFraction()*parent.absoluteFraction();
+	}
+	
+	public double absoluteFractionStandardDev(){
+		return proportionStandardDev(absoluteFraction(), rootCount());
 	}
 	
 	public ArrayList<String> lineage(){
