@@ -24,14 +24,14 @@ public abstract class IndicatorNodeVisitor {
 		if (node.isLeaf()){
 			prepareLeaf(node);
 			recursion_depth--;
-			log("Node '"+node.key+"' is a leaf, returning");
+//			log("Node '"+node.key+"' is a leaf, returning");
 			return;
 		}
 		else{
 			prepare(node);
 			IndicatorNode child = node.indicate(t);
 			recursion_depth++;
-			log("Entering child '"+child.key+"' at depth "+recursion_depth);
+//			log("Entering child '"+child.key+"' at depth "+recursion_depth);
 			visit(child);
 		}
 	}
