@@ -104,6 +104,8 @@ public class Detail_Player extends MenuContainerActivity {
 
 		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
 		pStatsSummary.setText("Stats \n will \n go \n here");
+		View oStatButton = findViewById(R.id.button_ComputeOffensiveStats);
+		computeOffensiveStats(oStatButton);
 	}
 
 	public void computeOffensiveStats(View view) {
@@ -120,7 +122,10 @@ public class Detail_Player extends MenuContainerActivity {
 			return;
 		}
 
-		computeStats(tList);
+		String stats = computeStats(tList);
+		
+		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
+		pStatsSummary.setText("OFFENSIVE STATS\n"+stats);
 	}
 
 	public void computeDefensiveStats(View view) {
@@ -137,11 +142,13 @@ public class Detail_Player extends MenuContainerActivity {
 			return;
 		}
 
-		computeStats(tList);
+		String stats = computeStats(tList);
+		
+		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
+		pStatsSummary.setText("DEFENSIVE STATS\n"+stats);
 	}
 
-	public void computeStats(List<Throw> tList) {
-		TextView pStatsSummary = (TextView) findViewById(R.id.pDet_statsSummary);
+	public String computeStats(List<Throw> tList) {
 
 		log("Aggregating...");
 		SimpleThrowStats sts = new SimpleThrowStats(tList);
@@ -160,8 +167,9 @@ public class Detail_Player extends MenuContainerActivity {
 			stats += stat + "\n";
 			cnt++;
 		}
+		return stats;
 
-		pStatsSummary.setText(stats);
+		
 
 	}
 }

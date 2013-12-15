@@ -14,7 +14,7 @@ public class ReadingVisitor extends BaseWalkingVisitor
 	@Override
 	public void update(IndicatorNode node) {
 		lineages.add(node.lineage());
-		conditionalFractions.add(node.fraction());
+		conditionalFractions.add(node.conditionalFraction());
 		absoluteFractions.add(node.absoluteFraction());
 		counts.add(node.count);
 	}
