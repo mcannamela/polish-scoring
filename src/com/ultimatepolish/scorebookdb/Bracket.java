@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
@@ -26,7 +25,6 @@ public class Bracket {
 	private Session s;
 	private List<SessionMember> sMembers = new ArrayList<SessionMember>();
 	private Boolean isDoubleElim;
-	private Integer svWidth;
 	public RelativeLayout rl;
 
 	// bracketMap maps a member to the appropriate view id
@@ -42,7 +40,6 @@ public class Bracket {
 	public Bracket(ScrollView sv, Session s, Boolean isDoubleElim) {
 		super();
 		this.context = sv.getContext();
-		this.svWidth = ((View) sv.getParent()).getWidth();
 		this.s = s;
 		this.isDoubleElim = isDoubleElim;
 
@@ -461,7 +458,7 @@ public class Bracket {
 	}
 
 	public Integer getTopMatchOfTier(Integer tier) {
-		return (int) (sMembers.size() * (1 - Math.pow(2, -tier + 1)));
+		return (int) (sMembers.size() * (1 - Math.pow(2, -tier)));
 	}
 
 	public Integer getTopParentMatch(Integer bracketIdx) {
