@@ -10,53 +10,49 @@
     tools:context=".DbSettings" >
 
    	<Button
-	    android:id="@+id/button_clearDB"
+	    android:id="@+id/db_clearDB"
 	    android:layout_width="200sp"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="10dp"
-	    android:text="clearDB"
-	    android:onClick="clearTables" />
+	    android:text="clearDB" />
 	
 	<Button
-	    android:id="@+id/button_popDB"
+	    android:id="@+id/db_popDB"
 	    android:layout_width="200sp"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="10dp"
-	    android:text="populateDB"
-	    android:onClick="doPopulateTest" />
+	    android:text="populateDB" />
 	
 	<Button
-	    android:id="@+id/settings_linkToDropbox"
+	    android:id="@+id/db_linkToDropbox"
 	    android:layout_width="200sp"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="10dp"
 	    android:text="Link to Dropbox" />
 	
 	<Button
-	    android:id="@+id/button_saveDB_dropbox"
+	    android:id="@+id/db_save_dropbox"
 	    android:layout_width="200sp"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="10dp"
-	    android:text="saveDB (dropbox)" 
-	    android:onClick="saveDBdropbox"/>
+	    android:text="saveDB (dropbox)" />
 
 	<Button
-	    android:id="@+id/button_loadDB_dropbox"
+	    android:id="@+id/db_load_dropbox"
 	    android:layout_width="200sp"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="10dp"
 	    android:text="loadDB (dropbox)" />
 
 	<Button
-	    android:id="@+id/button_updateScores"
+	    android:id="@+id/db_updateScores"
 	    android:layout_width="200sp"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="10dp"
-	    android:onClick="updateScores"
 	    android:text="updateScores" />
 
 	<TextView 
-		android:id="@+id/settings_dbxFiles"
+		android:id="@+id/db_dbxFiles"
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
 		 />	

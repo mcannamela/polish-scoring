@@ -66,25 +66,46 @@ public class DbSettings extends OrmLiteFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.activity_db_settings,
-				container, false);
+		rootView = inflater.inflate(R.layout.activity_db_settings, container,
+				false);
 
 		mDbxAcctMgr = DbxAccountManager.getInstance(
 				context.getApplicationContext(), appKey, appSecret);
 
-		mLinkButton = (Button) rootView
-				.findViewById(R.id.settings_linkToDropbox);
+		Button mClearButton = (Button) rootView.findViewById(R.id.db_clearDB);
+		mClearButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				clearTables();
+			}
+		});
+
+		Button mPopulateButton = (Button) rootView.findViewById(R.id.db_popDB);
+		mPopulateButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				doPopulateTest();
+			}
+		});
+
+		mLinkButton = (Button) rootView.findViewById(R.id.db_linkToDropbox);
 		mLinkButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onClickLinkToDropbox();
+				linkToDropbox();
 			}
 		});
-		dbxSaveButton = (Button) rootView
-				.findViewById(R.id.button_saveDB_dropbox);
-		dbxLoadButton = (Button) rootView
-				.findViewById(R.id.button_loadDB_dropbox);
-		mTestOutput = (TextView) rootView.findViewById(R.id.settings_dbxFiles);
+
+		dbxSaveButton = (Button) rootView.findViewById(R.id.db_save_dropbox);
+		dbxSaveButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				saveDBdropbox();
+			}
+		});
+
+		dbxLoadButton = (Button) rootView.findViewById(R.id.db_load_dropbox);
+		mTestOutput = (TextView) rootView.findViewById(R.id.db_dbxFiles);
 
 		dbxLoadButton.setOnClickListener(new OnClickListener() {
 
@@ -117,6 +138,14 @@ public class DbSettings extends OrmLiteFragment {
 
 				AlertDialog alertDialog = alertDialogBuilder.create();
 				alertDialog.show();
+			}
+		});
+
+		Button mUpdtBtn = (Button) rootView.findViewById(R.id.db_updateScores);
+		mUpdtBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				updateScores();
 			}
 		});
 
@@ -158,7 +187,7 @@ public class DbSettings extends OrmLiteFragment {
 		dbxLoadButton.setVisibility(View.GONE);
 	}
 
-	private void onClickLinkToDropbox() {
+	private void linkToDropbox() {
 		mDbxAcctMgr.startLink((Activity) context, REQUEST_LINK_TO_DBX);
 	}
 
@@ -181,13 +210,13 @@ public class DbSettings extends OrmLiteFragment {
 		}
 	}
 
-	public void clearTables(View view) {
+	public void clearTables() {
 		DatabaseHelper h = getHelper();
 		h.dropAll();
 		h.createAll();
 	}
 
-	public void doPopulateTest(View view) {
+	public void doPopulateTest() {
 		Dao<Player, Long> playerDao = null;
 		byte[] emptyImage = new byte[0];
 		Player[] players = {
@@ -247,7 +276,7 @@ public class DbSettings extends OrmLiteFragment {
 		}
 	}
 
-	public void updateScores(View view) {
+	public void updateScores() {
 		List<Long> badGames = null;
 		List<Long> badThrows = null;
 		Dao<Game, Long> gDao;
@@ -281,7 +310,7 @@ public class DbSettings extends OrmLiteFragment {
 		}
 	}
 
-	public void saveDBdropbox(View view) {
+	public void saveDBdropbox() {
 		Toast.makeText(context, "Saved to dropbox", Toast.LENGTH_SHORT).show();
 
 		try {
