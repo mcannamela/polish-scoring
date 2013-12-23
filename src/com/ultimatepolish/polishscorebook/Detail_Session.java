@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Bracket;
 import com.ultimatepolish.scorebookdb.Session;
+import com.ultimatepolish.scorebookdb.SessionMember;
 import com.ultimatepolish.scorebookdb.enums.RuleType;
 import com.ultimatepolish.scorebookdb.enums.SessionType;
 
@@ -49,7 +51,39 @@ public class Detail_Session extends MenuContainerActivity {
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-			bracket = new Bracket(sv, s, false);
+			bracket = new Bracket(sv, s, false) {
+				@Override
+				public void onClick(View v) {
+					Integer p1s;
+					Integer p2s;
+					String p1Name;
+					String p2Name;
+					SessionMember sMember;
+					Integer matchId = v.getId() % 1000;
+					log("Game " + matchId);
+
+					if (this.bracketMap.containsValue(matchId + 1000)) {
+						sMember = this.bracketMap.inverseBidiMap().get(
+								(Integer) (matchId + 1000));
+						p1s = sMember.getPlayerSeed();
+						p1Name = sMember.getPlayer().getDisplayName();
+					} else {
+						p1s = -1;
+						p1Name = "Bye";
+					}
+					if (this.bracketMap.containsValue(matchId + 2000)) {
+						sMember = this.bracketMap.inverseBidiMap().get(
+								(Integer) (matchId + 2000));
+						p2s = sMember.getPlayerSeed();
+						p2Name = sMember.getPlayer().getDisplayName();
+
+					} else {
+						p2s = -1;
+						p2Name = "Bye";
+					}
+					log(p1Name + " vs " + p2Name);
+				}
+			};
 			sv.addView(bracket.rl);
 		} else {
 			setContentView(R.layout.activity_detail_session);

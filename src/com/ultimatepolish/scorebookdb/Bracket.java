@@ -2,9 +2,10 @@ package com.ultimatepolish.scorebookdb;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.TreeBidiMap;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,7 +13,6 @@ import android.graphics.PorterDuff.Mode;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -30,9 +30,9 @@ public class Bracket implements View.OnClickListener {
 	public RelativeLayout rl;
 
 	// bracketMap maps a member to the appropriate view id
-	private HashMap<SessionMember, Integer> bracketMap = new HashMap<SessionMember, Integer>();
+	public BidiMap<SessionMember, Integer> bracketMap = new TreeBidiMap<SessionMember, Integer>();
 	// sMemberMap maps a player id to a session member
-	private HashMap<Long, SessionMember> sMemberMap = new HashMap<Long, SessionMember>();
+	public BidiMap<Long, SessionMember> sMemberMap = new TreeBidiMap<Long, SessionMember>();
 
 	Dao<Session, Long> sDao;
 	Dao<SessionMember, Long> smDao;
@@ -134,28 +134,21 @@ public class Bracket implements View.OnClickListener {
 
 			// upper half of match bracket
 			if (bracketMap.containsValue(matchIdx + 1000)) {
-				for (Map.Entry<SessionMember, Integer> entry : bracketMap
-						.entrySet()) {
-					if (matchIdx + 1000 == entry.getValue()) {
+				SessionMember sMember = bracketMap.inverseBidiMap().get(
+						matchIdx + 1000);
 
-						tv = makeHalfBracket(context, entry.getKey(), true,
-								true);
-						tv.setId(matchIdx + 1000);
-						lp = new RelativeLayout.LayoutParams(
-								RelativeLayout.LayoutParams.WRAP_CONTENT,
-								RelativeLayout.LayoutParams.WRAP_CONTENT);
-						lp.addRule(RelativeLayout.ALIGN_RIGHT,
-								getTier(matchIdx) + 1);
-						lp.addRule(RelativeLayout.ALIGN_BOTTOM,
-								getTopParentMatch(matchIdx) + 1000);
-						if (matchIdx != 0) {
-							lp.setMargins(0, -2, 0, 0);
-						}
-
-						rl.addView(tv, lp);
-						break;
-					}
+				tv = makeHalfBracket(context, sMember, true, true);
+				tv.setId(matchIdx + 1000);
+				lp = new RelativeLayout.LayoutParams(
+						RelativeLayout.LayoutParams.WRAP_CONTENT,
+						RelativeLayout.LayoutParams.WRAP_CONTENT);
+				lp.addRule(RelativeLayout.ALIGN_RIGHT, getTier(matchIdx) + 1);
+				lp.addRule(RelativeLayout.ALIGN_BOTTOM,
+						getTopParentMatch(matchIdx) + 1000);
+				if (matchIdx != 0) {
+					lp.setMargins(0, -2, 0, 0);
 				}
+				rl.addView(tv, lp);
 			} else {
 				tv = makeHalfBracket(context, dummySessionMember, true, false);
 				tv.setId(matchIdx + 1000);
@@ -164,25 +157,18 @@ public class Bracket implements View.OnClickListener {
 
 			// lower half of match bracket
 			if (bracketMap.containsValue(matchIdx + 2000)) {
-				for (Map.Entry<SessionMember, Integer> entry : bracketMap
-						.entrySet()) {
-					if (matchIdx + 2000 == entry.getValue()) {
+				SessionMember sMember = bracketMap.inverseBidiMap().get(
+						matchIdx + 2000);
+				tv = makeHalfBracket(context, sMember, false, true);
+				tv.setId(matchIdx + 2000);
+				lp = new RelativeLayout.LayoutParams(
+						RelativeLayout.LayoutParams.WRAP_CONTENT,
+						RelativeLayout.LayoutParams.WRAP_CONTENT);
+				lp.addRule(RelativeLayout.ALIGN_RIGHT, getTier(matchIdx) + 1);
+				lp.addRule(RelativeLayout.BELOW, matchIdx + 1000);
+				lp.setMargins(0, 0, 0, -2);
 
-						tv = makeHalfBracket(context, entry.getKey(), false,
-								true);
-						tv.setId(matchIdx + 2000);
-						lp = new RelativeLayout.LayoutParams(
-								RelativeLayout.LayoutParams.WRAP_CONTENT,
-								RelativeLayout.LayoutParams.WRAP_CONTENT);
-						lp.addRule(RelativeLayout.ALIGN_RIGHT,
-								getTier(matchIdx) + 1);
-						lp.addRule(RelativeLayout.BELOW, matchIdx + 1000);
-						lp.setMargins(0, 0, 0, -2);
-
-						rl.addView(tv, lp);
-						break;
-					}
-				}
+				rl.addView(tv, lp);
 			} else {
 				tv = makeHalfBracket(context, dummySessionMember, false, false);
 				tv.setId(matchIdx + 2000);
@@ -484,12 +470,4 @@ public class Bracket implements View.OnClickListener {
 	public void onClick(View v) {
 		Log.i("Bracket", "howdy, game " + v.getId());
 	}
-
-	public OnClickListener mBracketListener = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			Log.i("Bracket", "hello there, old");
-			// View vw = findViewById("sDet_test");
-		}
-	};
 }
