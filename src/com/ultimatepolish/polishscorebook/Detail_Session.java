@@ -48,7 +48,7 @@ public class Detail_Session extends MenuContainerActivity {
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-			bracket = new Bracket(sv, s, false, metrics.widthPixels);
+			bracket = new Bracket(sv, s, false);
 			sv.addView(bracket.rl);
 		} else {
 			setContentView(R.layout.activity_detail_session);

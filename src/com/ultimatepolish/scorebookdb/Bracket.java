@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
@@ -25,10 +26,12 @@ public class Bracket {
 	private Session s;
 	private List<SessionMember> sMembers = new ArrayList<SessionMember>();
 	private Boolean isDoubleElim;
-	private Integer screenWidth;
+	private Integer svWidth;
 	public RelativeLayout rl;
 
+	// bracketMap maps a member to the appropriate view id
 	private HashMap<SessionMember, Integer> bracketMap = new HashMap<SessionMember, Integer>();
+	// sMemberMap maps a player id to a session member
 	private HashMap<Long, SessionMember> sMemberMap = new HashMap<Long, SessionMember>();
 
 	Dao<Session, Long> sDao;
@@ -39,40 +42,9 @@ public class Bracket {
 	public Bracket(ScrollView sv, Session s, Boolean isDoubleElim) {
 		super();
 		this.context = sv.getContext();
+		this.svWidth = ((View) sv.getParent()).getWidth();
 		this.s = s;
 		this.isDoubleElim = isDoubleElim;
-
-		try {
-			sDao = Session.getDao(context);
-			smDao = SessionMember.getDao(context);
-			pDao = Player.getDao(context);
-			gDao = Game.getDao(context);
-
-			// get all the session members
-			QueryBuilder<Session, Long> sQue = sDao.queryBuilder();
-			sQue.where().eq("id", s.getId());
-			QueryBuilder<SessionMember, Long> smQue = smDao.queryBuilder();
-			sMembers = smQue.join(sQue)
-					.orderBy(SessionMember.PLAYER_SEED, true).query();
-
-			for (SessionMember member : sMembers) {
-				pDao.refresh(member.getPlayer());
-				sMemberMap.put(member.getPlayer().getId(), member);
-			}
-		} catch (SQLException e) {
-			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-		}
-
-		createSingleElimBracket();
-	}
-
-	public Bracket(ScrollView sv, Session s, Boolean isDoubleElim,
-			Integer screenWidth) {
-		super();
-		this.context = sv.getContext();
-		this.s = s;
-		this.isDoubleElim = isDoubleElim;
-		this.screenWidth = screenWidth;
 
 		try {
 			sDao = Session.getDao(context);
@@ -283,6 +255,8 @@ public class Bracket {
 		Integer matchIdx;
 		RelativeLayout.LayoutParams lp;
 
+		restartBracketMap();
+
 		// get all the completed games for the session, ordered by date played
 		List<Game> sGamesList = new ArrayList<Game>();
 		try {
@@ -334,6 +308,29 @@ public class Bracket {
 			}
 			tv.getBackground().setColorFilter(loser.getPlayer().color,
 					Mode.MULTIPLY);
+		}
+	}
+
+	public void restartBracketMap() {
+		bracketMap.clear();
+		Integer matchIdx;
+
+		for (Integer i = 0; i < sMembers.size() - 1; i += 2) {
+			Log.i("SessionDetails",
+					"Match idx " + String.valueOf(i / 2) + ", "
+							+ sMembers.get(i).getPlayerSeed() + " vs "
+							+ sMembers.get(i + 1).getPlayerSeed());
+			matchIdx = i / 2;
+
+			// populate the bracket map
+			bracketMap.put(sMembers.get(i), matchIdx + 1000);
+			if (sMembers.get(i + 1).getPlayerSeed() >= 0) {
+				bracketMap.put(sMembers.get(i + 1), matchIdx + 2000);
+			} else if (sMembers.get(i + 1).getPlayerSeed() == -1) {
+				sMembers.get(i).setPlayerRank(1);
+				bracketMap.remove(sMembers.get(i));
+				bracketMap.put(sMembers.get(i), getChildBracketId(matchIdx));
+			}
 		}
 	}
 
@@ -392,12 +389,11 @@ public class Bracket {
 		// headers for the remaining tiers
 		Integer nTiers = factorTwos(sMembers.size());
 
-		Integer tierWidth = 70;
-		if (screenWidth != null) {
-			// tier width = (screen width - label width - arbitrary side
-			// spacing) / number tiers
-			tierWidth = (screenWidth - 350 - 100) / nTiers;
-		}
+		Integer tierWidth = 150;
+
+		// tier width = (screen width - label width - arbitrary side spacing) /
+		// number of tiers
+		// tierWidth = (svWidth - 350 - 100) / nTiers;
 
 		for (Integer i = 0; i < nTiers; i++) {
 			tv = new TextView(context);
@@ -493,5 +489,4 @@ public class Bracket {
 		}
 		return childBracket;
 	}
-
 }
