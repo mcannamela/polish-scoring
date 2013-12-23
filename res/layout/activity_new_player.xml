@@ -1,0 +1,115 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".NewPlayer" >
+
+    <Button
+        android:id="@+id/button_createPlayer"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="createNewPlayer"
+        android:text="@string/create" />
+    
+    <EditText
+        android:id="@+id/editText_playerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:hint="First Last (required)"
+        android:inputType="textPersonName" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/editText_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/editText_playerName"
+        android:layout_below="@id/editText_playerName"
+        android:ems="10"
+        android:hint="nickname (required)" />
+
+    <EditText
+        android:id="@+id/editText_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/editText_nickname"
+        android:layout_below="@id/editText_nickname"
+        android:ems="10"
+        android:hint="Weight, kg"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/editText_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/editText_weight"
+        android:layout_below="@id/editText_weight"
+        android:ems="10"
+        android:hint="Height, cm"
+        android:inputType="number" />
+
+    <CheckBox
+        android:id="@+id/checkBox_throwsRightHanded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/editText_height"
+        android:layout_below="@id/editText_height"
+        android:text="ThrowsRightHanded?" />
+    
+    <CheckBox
+        android:id="@+id/checkBox_throwsLeftHanded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/checkBox_throwsRightHanded"
+        android:layout_below="@id/checkBox_throwsRightHanded"
+        android:text="ThrowsLeftHanded?" />
+    
+    <CheckBox
+        android:id="@+id/checkBox_prefersRightSide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/editText_height"
+        android:layout_below="@id/checkBox_throwsLeftHanded"
+        android:text="PrefersRightSide?" />
+    
+    <CheckBox
+        android:id="@+id/checkBox_prefersLeftSide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/checkBox_throwsRightHanded"
+        android:layout_below="@id/checkBox_prefersRightSide"
+        android:text="PrefersLeftSide?" />
+    
+    <Button
+    	android:id="@+id/newPlayer_colorPicker"
+    	android:layout_width="50dp"
+    	android:layout_height="50dp"
+    	android:layout_alignLeft="@id/checkBox_throwsRightHanded"
+        android:layout_below="@id/checkBox_prefersLeftSide"
+    	android:background="@color/Black"
+    	android:onClick="showColorPicker" />
+    	
+    <CheckBox 
+    	android:id="@+id/newPlayer_isActive"
+    	android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+    	android:layout_below="@id/newPlayer_colorPicker"
+    	android:layout_alignLeft="@id/checkBox_throwsRightHanded"
+    	android:layout_marginTop="20dp"
+    	android:text="Active"
+    	android:visibility="gone" />
+
+</RelativeLayout>

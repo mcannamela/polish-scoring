@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string name="app_name">PolishScorebook</string>
+	<string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="action_websearch">Web search</string>
+    <string name="app_not_available">Sorry, there\'s no web browser available</string>
+
+	<string name="title_activity_polish_scorebook">PolishScorebook</string>
+	<string name="title_activity_about_page">About</string>
+	<string name="title_activity_dbSettings">Database Settings</string>
+	<string name="title_activity_games">Games</string>
+	<string name="title_activity_players">Players</string>
+	<string name="title_activity_sessions">Sessions</string>
+	<string name="title_activity_teams">Teams</string>
+	<string name="title_activity_venues">Venues</string>
+	<string name="title_activity_new_game">New Game</string>
+	<string name="title_activity_new_player">New Player</string>
+	<string name="title_activity_new_team">New Team</string>
+	<string name="title_activity_new_session">New Session</string>
+	<string name="title_activity_new_venue">New Venue</string>
+	<string name="title_activity_game_in_progress">Game In-Progress</string>
+	<string name="title_activity_detail_game">Game Summary</string>
+	<string name="title_activity_detail_player">Player Details</string>
+	<string name="title_activity_detail_team">Team Details</string>
+	<string name="title_activity_detail_session">Session Details</string>
+	<string name="title_activity_detail_venue">Venue Details</string>
+	<string name="title_activity_menu_container">MenuContainerActivity</string>
+
+	<string name="menu_about">About</string>
+	<string name="menu_add">Add</string>
+	<string name="menu_modify">Edit</string>
+	
+	<string name="gip_p2_hint">PlayerTwo</string>
+	<string name="gip_gid_hint">gid</string>
+	<string name="gip_gamenum_text">Game #</string>
+	<string name="gip_venue_text">Venue:</string>
+	<string name="gip_session_text">Session:</string>
+	<string name="gip_vs_text">vs.</string>
+	<string name="gip_p1_hint">PlayerOne</string>
+	<string name="gip_session_hint">sessionName</string>
+	<string name="gip_date_hint">date</string>
+	<string name="gip_venue_hint">venue</string>
+	<string name="gip_ballHigh_button">^</string>
+	<string name="gip_ballLeft_button">&lt;</string>
+	<string name="gip_bottle_button">bottle</string>
+	<string name="gip_pole_button">pole</string>
+	<string name="gip_cup_button">cup</string>
+	<string name="gip_strike_button">strike</string>
+	<string name="gip_confirm_button">confirm</string>
+	<string name="gip_drop">drop</string>
+	<string name="gip_catch">catch</string>
+	<string name="gip_stalwart">stalwart</string>
+	<string name="gip_ballRight_button">&gt;</string>
+	<string name="gip_ballLow_button">v</string>
+	<string name="gip_error_check">er</string>
+	<string name="gip_owngoal_check">og</string>
+	<string name="gip_goaltend_check">gt</string>
+	<string name="gip_short_check">dead</string>
+	<string name="gip_trap_check">trap</string>
+	<string name="gip_broken_check">broken</string>
+	<string name="gip_onfire_check">onFire</string>
+	<string name="gip_firedon_check">firedOn</string>
+	<string name="gip_drinkhit_check">drinkHit</string>
+	<string name="gip_drinkdrop_check">drinkDrop</string>
+	
+	<string name="button_newGame">New Game</string>
+	<string name="create">Create!</string>
+	<string name="pDet_computeStats">Get Offensive Stats</string>
+	<string name="pDet_computeDefensiveStats">Get Defensive Stats</string>
+
+</resources>

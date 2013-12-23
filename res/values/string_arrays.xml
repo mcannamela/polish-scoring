@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="owngoals">
+        <item >Line fault</item>
+        <item >Drink drop</item>
+        <item >Knocked pole</item>
+        <item >Knocked bottle</item>
+        <item >Break</item>
+    </string-array>
+    <string-array name="defErrors">
+        <item >Goaltend</item>
+        <item >Grabbed</item>
+        <item >Drink hit</item>
+        <item >Drink drop</item>
+        <item >Knocked pole</item>
+        <item >Knocked bottle</item>
+        <item >Break</item>
+    </string-array>
+    <string-array name="menuItems">
+        <item >Games</item>
+        <item >Players</item>
+        <item >Teams</item>
+        <item >Sessions</item>
+        <item >Venues</item>
+        <item >Preferences</item>
+        <item >Database</item>
+        <item >About</item>
+    </string-array>
+    <string-array name="menuIcons">
+        <item >@drawable/ic_action_edit</item>
+        <item >@drawable/ic_player</item>
+        <item >@drawable/ic_team</item>
+        <item >@drawable/ic_session</item>
+        <item >@drawable/ic_venue</item>
+        <item >@drawable/ic_action_settings</item>
+        <item >@drawable/ic_database</item>
+        <item >@drawable/ic_action_about</item>
+    </string-array>
+	
+</resources>

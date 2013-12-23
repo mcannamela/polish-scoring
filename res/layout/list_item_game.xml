@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/textView_gameId"
+        android:layout_width="120sp"
+        android:layout_height="45sp"
+        android:gravity="right|center_vertical"
+		android:paddingLeft="35sp"
+		android:paddingRight="15dp"
+        android:hint="id"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	<TextView
+        android:id="@+id/textView_playerOne"
+        android:layout_width="110sp"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:layout_alignBaseline="@+id/textView_gameId"
+        android:layout_toRightOf="@+id/textView_gameId"
+        android:hint="playerOne"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+	<TextView
+        android:id="@+id/textView_pageIndex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_toRightOf="@+id/textView_playerOne"
+        android:layout_alignBaseline="@+id/textView_gameId"
+        android:text="-vs-"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+    <TextView
+        android:id="@+id/textView_playerTwo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/textView_pageIndex"
+        android:layout_alignBaseline="@+id/textView_gameId"
+        android:hint="playerTwo"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <TextView
+        android:id="@+id/textView_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/textView_gameId"
+        android:gravity="right"
+        android:layout_marginRight="24dp"
+        android:hint="score"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>
