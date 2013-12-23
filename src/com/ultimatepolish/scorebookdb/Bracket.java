@@ -213,8 +213,8 @@ public class Bracket implements View.OnClickListener {
 			loser = sMemberMap.get(g.getLoser().getId());
 			Log.i("bracket", "winner id is " + g.getWinner().getId()
 					+ ", loser id is " + g.getLoser().getId());
-
 			newWinnerBracket = getChildBracketId(bracketMap.get(winner));
+
 			Log.i("bracket", "winner bracket id is " + newWinnerBracket);
 			tv = (TextView) rl.findViewById(newWinnerBracket);
 			tv.getBackground().setColorFilter(winner.getPlayer().color,
