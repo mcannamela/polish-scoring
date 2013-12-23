@@ -18,6 +18,7 @@ import com.ultimatepolish.scorebookdb.enums.RuleType;
 import com.ultimatepolish.scorebookdb.enums.SessionType;
 
 public class Detail_Session extends MenuContainerActivity {
+	public static String LOGTAG = "Detail_Session";
 	Long sId;
 	Session s;
 	Dao<Session, Long> sDao;
@@ -137,4 +138,5 @@ public class Detail_Session extends MenuContainerActivity {
 			sIsActive.setText("This session is no longer active");
 		}
 	}
+
 }

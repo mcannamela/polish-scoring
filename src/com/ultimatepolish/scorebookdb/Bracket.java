@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
@@ -20,7 +22,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.ultimatepolish.polishscorebook.R;
 
-public class Bracket {
+public class Bracket implements View.OnClickListener {
 	private Context context;
 	private Session s;
 	private List<SessionMember> sMembers = new ArrayList<SessionMember>();
@@ -68,6 +70,7 @@ public class Bracket {
 	}
 
 	private void createSingleElimBracket() {
+		// matches and tiers are 0 based.
 		// matches are numbered top to bottom starting at tier 0 and continuing
 		// in higher tiers
 		// the upper bracket of a match is given the id = 1000 + matchId
@@ -100,32 +103,12 @@ public class Bracket {
 			// upper half of match bracket
 			tv = makeHalfBracket(context, sMembers.get(i), true, true);
 			tv.setId(matchIdx + 1000);
-
-			if (i != 0) {
-				lp = new RelativeLayout.LayoutParams(
-						RelativeLayout.LayoutParams.WRAP_CONTENT,
-						RelativeLayout.LayoutParams.WRAP_CONTENT);
-				lp.addRule(RelativeLayout.BELOW, matchIdx - 1 + 2000);
-				lp.addRule(RelativeLayout.ALIGN_RIGHT, 1);
-				lp.setMargins(0, 8, 0, 0);
-				rl.addView(tv, lp);
-			} else {
-				rl.addView(tv);
-			}
+			addViewToLayout(tv, true);
 
 			// lower half of match bracket
 			tv = makeHalfBracket(context, sMembers.get(i + 1), false, true);
-			tv.setId(matchIdx + 2000); // (bottom id same as top but offset by
-										// 1000)
-
-			lp = new RelativeLayout.LayoutParams(
-					RelativeLayout.LayoutParams.WRAP_CONTENT,
-					RelativeLayout.LayoutParams.WRAP_CONTENT);
-			lp.addRule(RelativeLayout.BELOW, matchIdx + 1000);
-			lp.addRule(RelativeLayout.ALIGN_RIGHT, 1);
-			lp.setMargins(0, 0, 0, 8);
-			rl.addView(tv, lp);
-
+			tv.setId(matchIdx + 2000);
+			addViewToLayout(tv, false);
 		}
 
 		// create higher tiers
@@ -134,55 +117,25 @@ public class Bracket {
 		dummySessionMember.setPlayerRank(-1000);
 		for (Integer i = sMembers.size() / 2; i < sMembers.size() - 1; i++) {
 			matchIdx = i;
-			Integer topParentMatch = getTopParentMatch(matchIdx);
-			Integer bottomParentMatch = getTopParentMatch(matchIdx) + 1;
 
 			// upper half of match bracket
 			tv = makeHalfBracket(context, dummySessionMember, true, false);
 			tv.setId(matchIdx + 1000);
-
-			lp = new RelativeLayout.LayoutParams(
-					RelativeLayout.LayoutParams.WRAP_CONTENT,
-					RelativeLayout.LayoutParams.WRAP_CONTENT);
-			lp.addRule(RelativeLayout.ALIGN_LEFT, getTier(matchIdx) + 1);
-			lp.addRule(RelativeLayout.ALIGN_RIGHT, getTier(matchIdx) + 1);
-			lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch + 2000);
-			lp.addRule(RelativeLayout.BELOW, topParentMatch + 1000);
-			lp.setMargins(0, -2, 0, 0);
-			rl.addView(tv, lp);
+			addViewToLayout(tv, true);
 
 			// lower half of match bracket
 			tv = makeHalfBracket(context, dummySessionMember, false, false);
-			tv.setId(i + 2000);
-
-			lp = new RelativeLayout.LayoutParams(
-					RelativeLayout.LayoutParams.WRAP_CONTENT,
-					RelativeLayout.LayoutParams.WRAP_CONTENT);
-			lp.addRule(RelativeLayout.ALIGN_LEFT, getTier(matchIdx) + 1);
-			lp.addRule(RelativeLayout.ALIGN_RIGHT, getTier(matchIdx) + 1);
-			lp.addRule(RelativeLayout.ABOVE, bottomParentMatch + 2000);
-			lp.addRule(RelativeLayout.BELOW, matchIdx + 1000);
-			lp.setMargins(0, 0, 0, -2);
-			rl.addView(tv, lp);
-
-			Log.i("bracket", "Game " + i + ", topParent = " + topParentMatch
-					+ ", bottomParent = " + bottomParentMatch);
+			tv.setId(matchIdx + 2000);
+			addViewToLayout(tv, false);
 		}
 
 		// create winner view
-		Integer topParent = getTopParentMatch(sMembers.size() - 1);
+
 		tv = new TextView(context);
 		tv.setId(sMembers.size() - 1 + 1000);
 		tv.setBackgroundResource(R.drawable.bracket_endpoint);
 		tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-		lp = new RelativeLayout.LayoutParams(
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.ALIGN_LEFT, getTier(sMembers.size() - 1) + 1);
-		lp.addRule(RelativeLayout.ALIGN_RIGHT, getTier(sMembers.size() - 1) + 1);
-		lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParent + 1000);
-		lp.setMargins(0, 0, 0, -19);
-		rl.addView(tv, lp);
+		addViewToLayout(tv, true);
 
 		// for players with byes, move their labeled view up to the next tier
 		for (Integer i = 0; i < sMembers.size() - 1; i += 2) {
@@ -416,7 +369,6 @@ public class Bracket {
 		Boolean isUnset = member.getPlayerSeed() == -2;
 
 		if (addLabels) {
-			tv.setWidth(350);
 			if (isBye) {
 				tv.setHeight(10);
 			} else {
@@ -445,6 +397,8 @@ public class Bracket {
 			tv.getBackground().setColorFilter(member.getPlayer().getColor(),
 					Mode.MULTIPLY);
 		}
+
+		tv.setOnClickListener(this);
 
 		return tv;
 	}
@@ -486,4 +440,57 @@ public class Bracket {
 		}
 		return childBracket;
 	}
+
+	private void addViewToLayout(TextView tv, boolean onTop) {
+		Integer matchIdx = tv.getId() % 1000;
+		Integer tier = getTier(matchIdx);
+		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 1);
+		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 1);
+
+		if (tier == 0) {
+			// lp.addRule(RelativeLayout.ALIGN_RIGHT, 1);
+			if (onTop) {
+				if (matchIdx != 0) {
+					lp.addRule(RelativeLayout.BELOW, matchIdx - 1 + 2000);
+				}
+				lp.setMargins(0, 8, 0, 0);
+			} else {
+				lp.addRule(RelativeLayout.BELOW, matchIdx + 1000);
+				lp.setMargins(0, 0, 0, 8);
+			}
+		} else if (tier == getTier(sMembers.size() - 1)) {
+			Integer topParent = getTopParentMatch(matchIdx);
+			lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParent + 1000);
+			lp.setMargins(0, 0, 0, -19);
+		} else {
+			if (onTop) {
+				Integer topParentMatch = getTopParentMatch(matchIdx);
+				lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch + 2000);
+				lp.addRule(RelativeLayout.BELOW, topParentMatch + 1000);
+				lp.setMargins(0, -2, 0, 0);
+			} else {
+				Integer bottomParentMatch = getTopParentMatch(matchIdx) + 1;
+				lp.addRule(RelativeLayout.ABOVE, bottomParentMatch + 2000);
+				lp.addRule(RelativeLayout.BELOW, matchIdx + 1000);
+				lp.setMargins(0, 0, 0, -2);
+			}
+		}
+		rl.addView(tv, lp);
+	}
+
+	@Override
+	public void onClick(View v) {
+		Log.i("Bracket", "howdy, game " + v.getId());
+	}
+
+	public OnClickListener mBracketListener = new OnClickListener() {
+		@Override
+		public void onClick(View view) {
+			Log.i("Bracket", "hello there, old");
+			// View vw = findViewById("sDet_test");
+		}
+	};
 }
