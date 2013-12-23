@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -13,7 +14,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,9 +81,11 @@ public class Bracket implements View.OnClickListener {
 		RelativeLayout.LayoutParams lp;
 		TextView tv;
 		Integer matchIdx;
+		SessionMember dummySessionMember = new SessionMember();
+		dummySessionMember.setPlayerSeed(-1);
+		dummySessionMember.setPlayerRank(-1000);
 
 		foldRoster();
-
 		makeInvisibleHeaders(rl);
 
 		// create the lowest tier
@@ -95,109 +97,105 @@ public class Bracket implements View.OnClickListener {
 			matchIdx = i / 2;
 
 			// populate the bracket map
-			bracketMap.put(sMembers.get(i), matchIdx + 1000);
-			if (sMembers.get(i + 1).getPlayerSeed() >= 0) {
+
+			if (sMembers.get(i + 1).getPlayerSeed() == -1) {
+				sMembers.get(i).setPlayerRank(1);
+				bracketMap.put(sMembers.get(i), getChildBracketId(matchIdx));
+				tv = makeHalfBracket(context, dummySessionMember, true, false);
+				tv.setBackgroundResource(0);
+				tv.setText(null);
+				tv.setId(matchIdx + 1000);
+				addViewToLayout(tv);
+				tv = makeHalfBracket(context, dummySessionMember, true, true);
+				tv.setBackgroundResource(0);
+				tv.setText(null);
+				tv.setId(matchIdx + 2000);
+				addViewToLayout(tv);
+			} else {
+				bracketMap.put(sMembers.get(i), matchIdx + 1000);
 				bracketMap.put(sMembers.get(i + 1), matchIdx + 2000);
+
+				// upper half of match bracket
+				tv = makeHalfBracket(context, sMembers.get(i), true, true);
+				tv.setId(matchIdx + 1000);
+				addViewToLayout(tv);
+
+				// lower half of match bracket
+				tv = makeHalfBracket(context, sMembers.get(i + 1), false, true);
+				tv.setId(matchIdx + 2000);
+				addViewToLayout(tv);
 			}
-
-			// upper half of match bracket
-			tv = makeHalfBracket(context, sMembers.get(i), true, true);
-			tv.setId(matchIdx + 1000);
-			addViewToLayout(tv, true);
-
-			// lower half of match bracket
-			tv = makeHalfBracket(context, sMembers.get(i + 1), false, true);
-			tv.setId(matchIdx + 2000);
-			addViewToLayout(tv, false);
 		}
 
 		// create higher tiers
-		SessionMember dummySessionMember = new SessionMember();
 		dummySessionMember.setPlayerSeed(-2);
-		dummySessionMember.setPlayerRank(-1000);
 		for (Integer i = sMembers.size() / 2; i < sMembers.size() - 1; i++) {
 			matchIdx = i;
 
 			// upper half of match bracket
-			tv = makeHalfBracket(context, dummySessionMember, true, false);
-			tv.setId(matchIdx + 1000);
-			addViewToLayout(tv, true);
+			if (bracketMap.containsValue(matchIdx + 1000)) {
+				for (Map.Entry<SessionMember, Integer> entry : bracketMap
+						.entrySet()) {
+					if (matchIdx + 1000 == entry.getValue()) {
+
+						tv = makeHalfBracket(context, entry.getKey(), true,
+								true);
+						tv.setId(matchIdx + 1000);
+						lp = new RelativeLayout.LayoutParams(
+								RelativeLayout.LayoutParams.WRAP_CONTENT,
+								RelativeLayout.LayoutParams.WRAP_CONTENT);
+						lp.addRule(RelativeLayout.ALIGN_RIGHT,
+								getTier(matchIdx) + 1);
+						lp.addRule(RelativeLayout.ALIGN_BOTTOM,
+								getTopParentMatch(matchIdx) + 1000);
+						if (matchIdx != 0) {
+							lp.setMargins(0, -2, 0, 0);
+						}
+
+						rl.addView(tv, lp);
+						break;
+					}
+				}
+			} else {
+				tv = makeHalfBracket(context, dummySessionMember, true, false);
+				tv.setId(matchIdx + 1000);
+				addViewToLayout(tv);
+			}
 
 			// lower half of match bracket
-			tv = makeHalfBracket(context, dummySessionMember, false, false);
-			tv.setId(matchIdx + 2000);
-			addViewToLayout(tv, false);
+			if (bracketMap.containsValue(matchIdx + 2000)) {
+				for (Map.Entry<SessionMember, Integer> entry : bracketMap
+						.entrySet()) {
+					if (matchIdx + 2000 == entry.getValue()) {
+
+						tv = makeHalfBracket(context, entry.getKey(), false,
+								true);
+						tv.setId(matchIdx + 2000);
+						lp = new RelativeLayout.LayoutParams(
+								RelativeLayout.LayoutParams.WRAP_CONTENT,
+								RelativeLayout.LayoutParams.WRAP_CONTENT);
+						lp.addRule(RelativeLayout.ALIGN_RIGHT,
+								getTier(matchIdx) + 1);
+						lp.addRule(RelativeLayout.BELOW, matchIdx + 1000);
+						lp.setMargins(0, 0, 0, -2);
+
+						rl.addView(tv, lp);
+						break;
+					}
+				}
+			} else {
+				tv = makeHalfBracket(context, dummySessionMember, false, false);
+				tv.setId(matchIdx + 2000);
+				addViewToLayout(tv);
+			}
 		}
 
 		// create winner view
-
 		tv = new TextView(context);
 		tv.setId(sMembers.size() - 1 + 1000);
 		tv.setBackgroundResource(R.drawable.bracket_endpoint);
 		tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-		addViewToLayout(tv, true);
-
-		// for players with byes, move their labeled view up to the next tier
-		for (Integer i = 0; i < sMembers.size() - 1; i += 2) {
-			matchIdx = i / 2;
-			if (sMembers.get(i + 1).getPlayerSeed() == -1) {
-				sMembers.get(i).setPlayerRank(1);
-				bracketMap.remove(sMembers.get(i));
-				bracketMap.put(sMembers.get(i), getChildBracketId(matchIdx));
-
-				tv = (TextView) rl.findViewById(matchIdx + 1000);
-				tv.setText(null);
-				tv.setBackgroundResource(0);
-
-				tv = (TextView) rl.findViewById(matchIdx + 2000);
-				tv.setText(null);
-				tv.setBackgroundResource(0);
-
-				Integer childId = getChildBracketId(matchIdx);
-				tv = (TextView) rl.findViewById(childId);
-				lp = (LayoutParams) tv.getLayoutParams();
-				rl.removeView(tv);
-
-				Boolean onTop = true;
-				if (childId >= 2000) {
-					onTop = false;
-				}
-				Log.i("bracket", "matchIdx: " + matchIdx + ", childId: "
-						+ childId);
-
-				tv = makeHalfBracket(context, sMembers.get(i), onTop, true);
-				tv.setId(childId);
-
-				lp = new RelativeLayout.LayoutParams(
-						RelativeLayout.LayoutParams.WRAP_CONTENT,
-						RelativeLayout.LayoutParams.WRAP_CONTENT);
-				lp.addRule(RelativeLayout.ALIGN_RIGHT, getTier(matchIdx) + 2);
-
-				if (onTop) {
-					lp.addRule(RelativeLayout.ALIGN_TOP, matchIdx + 1000);
-					if (matchIdx != 0) {
-						lp.setMargins(0, -2, 0, 0);
-					}
-				} else {
-					lp.addRule(RelativeLayout.BELOW, childId - 1000);
-					lp.setMargins(0, 0, 0, -2);
-				}
-
-				rl.addView(tv, lp);
-			}
-		}
-
-		// remove and re-add views in order so that they are drawn above lower
-		// tiers
-		for (Integer i = 0; i < sMembers.size() - 1; i++) {
-			tv = (TextView) rl.findViewById(i + 1000);
-			rl.removeView(tv);
-			rl.addView(tv);
-
-			tv = (TextView) rl.findViewById(i + 2000);
-			rl.removeView(tv);
-			rl.addView(tv);
-		}
+		addViewToLayout(tv);
 	}
 
 	public void refreshSingleElimBracket() {
@@ -441,8 +439,9 @@ public class Bracket implements View.OnClickListener {
 		return childBracket;
 	}
 
-	private void addViewToLayout(TextView tv, boolean onTop) {
+	private void addViewToLayout(TextView tv) {
 		Integer matchIdx = tv.getId() % 1000;
+		Boolean onTop = tv.getId() < 2000;
 		Integer tier = getTier(matchIdx);
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
