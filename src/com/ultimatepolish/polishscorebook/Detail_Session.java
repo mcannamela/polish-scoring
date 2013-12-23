@@ -8,6 +8,7 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +26,8 @@ public class Detail_Session extends MenuContainerActivity {
 	Session s;
 	Dao<Session, Long> sDao;
 	Bracket bracket;
+	TextView matchText;
+	Button loadMatch;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,9 @@ public class Detail_Session extends MenuContainerActivity {
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
+			matchText = (TextView) findViewById(R.id.sDet_match);
+			loadMatch = (Button) findViewById(R.id.sDet_loadMatch);
+
 			bracket = new Bracket(sv, s, false) {
 				@Override
 				public void onClick(View v) {
@@ -58,7 +64,6 @@ public class Detail_Session extends MenuContainerActivity {
 					String p2Name;
 					SessionMember sMember;
 					Integer matchId = v.getId() % 1000;
-					log("Game " + matchId);
 
 					if (this.bracketMap.containsValue(matchId + 1000)) {
 						sMember = this.bracketMap.inverseBidiMap().get(
@@ -75,7 +80,14 @@ public class Detail_Session extends MenuContainerActivity {
 					} else {
 						p2Name = "Bye";
 					}
-					log(p1Name + " vs " + p2Name);
+
+					long gId = -1;
+					if (this.gameIdMap.containsKey(matchId)) {
+						gId = gameIdMap.get(matchId);
+					}
+
+					matchText.setText(p1Name + " vs " + p2Name + ". Game "
+							+ gId);
 				}
 			};
 			sv.addView(bracket.rl);
