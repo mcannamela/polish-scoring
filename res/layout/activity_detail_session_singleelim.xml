@@ -63,21 +63,29 @@
         android:layout_below="@+id/sDet_isTeam"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    
-    <TextView
-        android:id="@+id/sDet_test"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/sDet_isActive"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="bracket click tester" />
 
     <ScrollView
     	android:id="@+id/scrollView1"
     	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:layout_alignParentBottom="true"
-    	android:layout_below="@id/sDet_test"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@id/sDet_isActive"
     	android:layout_marginTop="20dp" />
+    
+    <TextView
+        android:id="@+id/sDet_match"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <Button
+        android:id="@+id/sDet_loadMatch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@id/sDet_match"
+        android:text="Fight!" />
 
 </RelativeLayout>

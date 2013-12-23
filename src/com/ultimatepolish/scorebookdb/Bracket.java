@@ -31,6 +31,8 @@ public class Bracket implements View.OnClickListener {
 
 	// bracketMap maps a member to the appropriate view id
 	public BidiMap<SessionMember, Integer> bracketMap = new TreeBidiMap<SessionMember, Integer>();
+	// gameIdMap maps remembers which gameId in the db corresponds to a match
+	public BidiMap<Integer, Long> gameIdMap = new TreeBidiMap<Integer, Long>();
 	// sMemberMap maps a player id to a session member
 	public BidiMap<Long, SessionMember> sMemberMap = new TreeBidiMap<Long, SessionMember>();
 
@@ -184,10 +186,8 @@ public class Bracket implements View.OnClickListener {
 
 	public void refreshSingleElimBracket() {
 		TextView tv;
-		Integer matchIdx;
-		RelativeLayout.LayoutParams lp;
-
 		restartBracketMap();
+		gameIdMap.clear();
 
 		// get all the completed games for the session, ordered by date played
 		List<Game> sGamesList = new ArrayList<Game>();
@@ -219,6 +219,7 @@ public class Bracket implements View.OnClickListener {
 			tv = (TextView) rl.findViewById(newWinnerBracket);
 			tv.getBackground().setColorFilter(winner.getPlayer().color,
 					Mode.MULTIPLY);
+			gameIdMap.put(bracketMap.get(winner) % 1000, g.getId());
 			bracketMap.remove(winner);
 			bracketMap.put(winner, newWinnerBracket);
 			sMembers.get(sMembers.indexOf(winner)).setPlayerRank(
