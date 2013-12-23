@@ -54,8 +54,6 @@ public class Detail_Session extends MenuContainerActivity {
 			bracket = new Bracket(sv, s, false) {
 				@Override
 				public void onClick(View v) {
-					Integer p1s;
-					Integer p2s;
 					String p1Name;
 					String p2Name;
 					SessionMember sMember;
@@ -65,20 +63,16 @@ public class Detail_Session extends MenuContainerActivity {
 					if (this.bracketMap.containsValue(matchId + 1000)) {
 						sMember = this.bracketMap.inverseBidiMap().get(
 								(Integer) (matchId + 1000));
-						p1s = sMember.getPlayerSeed();
 						p1Name = sMember.getPlayer().getDisplayName();
 					} else {
-						p1s = -1;
 						p1Name = "Bye";
 					}
 					if (this.bracketMap.containsValue(matchId + 2000)) {
 						sMember = this.bracketMap.inverseBidiMap().get(
 								(Integer) (matchId + 2000));
-						p2s = sMember.getPlayerSeed();
 						p2Name = sMember.getPlayer().getDisplayName();
 
 					} else {
-						p2s = -1;
 						p2Name = "Bye";
 					}
 					log(p1Name + " vs " + p2Name);
