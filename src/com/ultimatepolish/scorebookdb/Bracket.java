@@ -644,6 +644,8 @@ public class Bracket implements View.OnClickListener {
 
 	public class MatchInfo {
 		public long gameId = -1;
+		public long p1Id = -1;
+		public long p2Id = -1;
 		public boolean allowCreate = false;
 		public boolean allowView = false;
 		public String marquee = "";
@@ -655,9 +657,21 @@ public class Bracket implements View.OnClickListener {
 			gameId = bd.gameIds.get(idx);
 			int sm1Type = bd.sm1Types.get(idx);
 			int sm2Type = bd.sm2Types.get(idx);
+
+			if (sm1Type == SMType.TIP || sm1Type == SMType.WIN
+					|| sm1Type == SMType.LOSS) {
+				p1Id = sMembers.get(bd.sm1Idcs.get(idx)).getPlayer().getId();
+			}
+
+			if (sm2Type == SMType.TIP || sm2Type == SMType.WIN
+					|| sm2Type == SMType.LOSS) {
+				p2Id = sMembers.get(bd.sm2Idcs.get(idx)).getPlayer().getId();
+			}
+
 			if (sm1Type == SMType.TIP && sm2Type == SMType.TIP) {
 				allowCreate = true;
 			}
+
 			if (sm1Type == SMType.WIN || sm1Type == SMType.LOSS) {
 				assert sm2Type == SMType.WIN || sm2Type == SMType.LOSS;
 				allowView = true;

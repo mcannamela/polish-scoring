@@ -174,6 +174,7 @@ public class Detail_Session extends MenuContainerActivity {
 		public void onClick(View v) {
 			Intent intent = new Intent(v.getContext(), Detail_Game.class);
 			intent.putExtra("GID", mInfo.gameId);
+			finish();
 			startActivity(intent);
 		}
 	};
@@ -184,6 +185,7 @@ public class Detail_Session extends MenuContainerActivity {
 			Intent intent = new Intent(v.getContext(), GameInProgress.class);
 			intent.putExtra("GID", mInfo.gameId);
 			startActivity(intent);
+			finish();
 			return true;
 		}
 	};
@@ -192,7 +194,9 @@ public class Detail_Session extends MenuContainerActivity {
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent(v.getContext(), NewGame.class);
-			intent.putExtra("SID", sId);
+			intent.putExtra("p1", mInfo.p1Id);
+			intent.putExtra("p2", mInfo.p2Id);
+			intent.putExtra("sId", sId);
 			startActivity(intent);
 		}
 	};
