@@ -8,6 +8,8 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Bracket;
+import com.ultimatepolish.scorebookdb.Bracket.MatchInfo;
 import com.ultimatepolish.scorebookdb.Session;
 import com.ultimatepolish.scorebookdb.enums.RuleType;
 import com.ultimatepolish.scorebookdb.enums.SessionType;
@@ -27,6 +30,7 @@ public class Detail_Session extends MenuContainerActivity {
 	Bracket bracket;
 	TextView matchText;
 	Button loadMatch;
+	MatchInfo mInfo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +63,18 @@ public class Detail_Session extends MenuContainerActivity {
 			bracket = new Bracket(sv, s, false) {
 				@Override
 				public void onClick(View v) {
-					MatchInfo mInfo = bracket.getMatchInfo(v.getId());
+					mInfo = bracket.getMatchInfo(v.getId());
 					matchText.setText(mInfo.marquee);
 					if (mInfo.allowCreate) {
 						loadMatch.setVisibility(View.VISIBLE);
+						loadMatch.setText("Create");
+						loadMatch.setOnClickListener(mCreateMatchListener);
+						loadMatch.setOnLongClickListener(null);
+					} else if (mInfo.allowView) {
+						loadMatch.setVisibility(View.VISIBLE);
+						loadMatch.setText("View Match");
+						loadMatch.setOnClickListener(mViewMatchListener);
+						loadMatch.setOnLongClickListener(mMatchGIPListener);
 					} else {
 						loadMatch.setVisibility(View.GONE);
 					}
@@ -157,4 +169,31 @@ public class Detail_Session extends MenuContainerActivity {
 		}
 	}
 
+	private OnClickListener mViewMatchListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent(v.getContext(), Detail_Game.class);
+			intent.putExtra("GID", mInfo.gameId);
+			startActivity(intent);
+		}
+	};
+
+	private OnLongClickListener mMatchGIPListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
+			Intent intent = new Intent(v.getContext(), GameInProgress.class);
+			intent.putExtra("GID", mInfo.gameId);
+			startActivity(intent);
+			return true;
+		}
+	};
+
+	private OnClickListener mCreateMatchListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent(v.getContext(), NewGame.class);
+			intent.putExtra("SID", sId);
+			startActivity(intent);
+		}
+	};
 }

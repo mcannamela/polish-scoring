@@ -283,6 +283,7 @@ public class Game {
 	}
 
 	public Player getWinner() {
+		// TODO: should raise an error if game is not complete
 		Player winner = firstPlayer;
 		if (getSecondPlayerScore() > getFirstPlayerScore()) {
 			winner = secondPlayer;
