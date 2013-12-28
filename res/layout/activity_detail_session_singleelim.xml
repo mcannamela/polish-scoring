@@ -86,6 +86,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignBaseline="@id/sDet_match"
+        android:visibility="gone"
         android:text="Fight!" />
 
 </RelativeLayout>

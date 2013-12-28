@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Bracket;
 import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.SessionMember;
 import com.ultimatepolish.scorebookdb.enums.RuleType;
 import com.ultimatepolish.scorebookdb.enums.SessionType;
 
@@ -60,34 +59,13 @@ public class Detail_Session extends MenuContainerActivity {
 			bracket = new Bracket(sv, s, false) {
 				@Override
 				public void onClick(View v) {
-					String p1Name;
-					String p2Name;
-					SessionMember sMember;
-					Integer matchId = v.getId() % 1000;
-
-					if (this.bracketMap.containsValue(matchId + 1000)) {
-						sMember = this.bracketMap.inverseBidiMap().get(
-								(Integer) (matchId + 1000));
-						p1Name = sMember.getPlayer().getDisplayName();
+					MatchInfo mInfo = bracket.getMatchInfo(v.getId());
+					matchText.setText(mInfo.marquee);
+					if (mInfo.allowCreate) {
+						loadMatch.setVisibility(View.VISIBLE);
 					} else {
-						p1Name = "Bye";
+						loadMatch.setVisibility(View.GONE);
 					}
-					if (this.bracketMap.containsValue(matchId + 2000)) {
-						sMember = this.bracketMap.inverseBidiMap().get(
-								(Integer) (matchId + 2000));
-						p2Name = sMember.getPlayer().getDisplayName();
-
-					} else {
-						p2Name = "Bye";
-					}
-
-					long gId = -1;
-					if (this.gameIdMap.containsKey(matchId)) {
-						gId = gameIdMap.get(matchId);
-					}
-
-					matchText.setText(p1Name + " vs " + p2Name + ". Game "
-							+ gId);
 				}
 			};
 			sv.addView(bracket.rl);
