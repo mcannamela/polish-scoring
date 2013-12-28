@@ -22,7 +22,7 @@ import com.ultimatepolish.polishscorebook.R;
 
 public class Bracket implements View.OnClickListener {
 	public static String LOGTAG = "Bracket";
-	private Context context;
+	public Context context;
 	private Session s;
 	public RelativeLayout rl;
 	private List<SessionMember> sMembers = new ArrayList<SessionMember>();
@@ -136,8 +136,7 @@ public class Bracket implements View.OnClickListener {
 		try {
 			Log.i(LOGTAG, "session id is " + s.getId());
 			sGamesList = gDao.queryBuilder().orderBy(Game.DATE_PLAYED, true)
-					.where().eq(Game.SESSION, s.getId()).and()
-					.eq(Game.IS_COMPLETE, true).query();
+					.where().eq(Game.SESSION, s.getId()).query();
 			for (Game g : sGamesList) {
 				gDao.refresh(g);
 			}
@@ -147,20 +146,21 @@ public class Bracket implements View.OnClickListener {
 
 		// step through the games for this session and associate each with a
 		// match in the bracket
-		SessionMember winner;
-		SessionMember loser;
+		int smIdxA;
+		int smIdxB;
 
 		for (Game g : sGamesList) {
-			winner = sMemberMap.get(g.getWinner().getId());
-			loser = sMemberMap.get(g.getLoser().getId());
-			Log.i(LOGTAG, "Game " + g.getId() + ". (W) "
-					+ winner.getPlayer().getNickName() + ", (L) "
-					+ loser.getPlayer().getNickName());
+			smIdxA = sMembers.indexOf(sMemberMap
+					.get(g.getFirstPlayer().getId()));
+			smIdxB = sMembers.indexOf(sMemberMap.get(g.getSecondPlayer()
+					.getId()));
+			wBr.matchMatch(g.getId(), smIdxA, smIdxB);
 
-			int wIdx = sMembers.indexOf(winner);
-			int lIdx = sMembers.indexOf(loser);
-
-			wBr.matchMatch(g.getId(), wIdx, lIdx);
+			if (g.getIsComplete()) {
+				smIdxA = sMembers
+						.indexOf(sMemberMap.get(g.getWinner().getId()));
+				wBr.promoteWinner(wBr.gameIds.indexOf(g.getId()), smIdxA);
+			}
 		}
 
 		// now refresh the views
@@ -574,43 +574,53 @@ public class Bracket implements View.OnClickListener {
 			}
 		}
 
-		public void matchMatch(long gId, int wIdx, int lIdx) {
+		public void matchMatch(long gId, int smIdxA, int smIdxB) {
 			if (gameIds.contains(gId)) {
 				int idx = gameIds.indexOf(gId);
-				assert hasSm(idx, wIdx) && hasSm(idx, lIdx);
+				assert hasSm(idx, smIdxA) && hasSm(idx, smIdxB);
 			} else {
 				int nMatches = length();
 				for (int idx = 0; idx < nMatches; idx++) {
-					if (hasSm(idx, wIdx) && hasSm(idx, lIdx)
+					if (hasSm(idx, smIdxA) && hasSm(idx, smIdxB)
 							&& gameIds.get(idx) == -1) {
 						Log.i(LOGTAG, "Matching game " + gId + " to match "
 								+ matchIds.get(idx));
 						gameIds.set(idx, gId);
-						if (sm1Idcs.get(idx) == wIdx) {
-							Log.i(LOGTAG, "Upper won");
-							sm1Types.set(idx, SMType.WIN);
-							sm2Types.set(idx, SMType.LOSS);
-						} else {
-							Log.i(LOGTAG, "Lower won");
-							sm1Types.set(idx, SMType.LOSS);
-							sm2Types.set(idx, SMType.WIN);
-						}
-
-						int childViewId = getChildBracketId(matchIds.get(idx));
-						int childIdx = matchIds.indexOf(childViewId
-								% SMType.MOD);
-
-						if (isUpperView(childViewId)) {
-							sm1Idcs.set(childIdx, wIdx);
-							sm1Types.set(childIdx, SMType.TIP);
-						} else {
-							sm2Idcs.set(childIdx, wIdx);
-							sm2Types.set(childIdx, SMType.TIP);
-						}
-
 						break;
 					}
 				}
+			}
+		}
+
+		public void promoteWinner(int idx, int wIdx) {
+			assert gameIds.get(idx) != -1;
+			boolean sm1Wins = true;
+
+			if (wIdx == sm2Idcs.get(idx)) {
+				sm1Wins = false;
+			} else {
+				assert wIdx == sm1Idcs.get(idx);
+			}
+
+			if (sm1Wins) {
+				sm1Types.set(idx, SMType.WIN);
+				sm2Types.set(idx, SMType.LOSS);
+				wIdx = sm1Idcs.get(idx);
+			} else {
+				sm1Types.set(idx, SMType.LOSS);
+				sm2Types.set(idx, SMType.WIN);
+				wIdx = sm2Idcs.get(idx);
+			}
+
+			int childViewId = getChildBracketId(matchIds.get(idx));
+			int childIdx = matchIds.indexOf(childViewId % SMType.MOD);
+
+			if (isUpperView(childViewId)) {
+				sm1Idcs.set(childIdx, wIdx);
+				sm1Types.set(childIdx, SMType.TIP);
+			} else {
+				sm2Idcs.set(childIdx, wIdx);
+				sm2Types.set(childIdx, SMType.TIP);
 			}
 		}
 
@@ -647,6 +657,10 @@ public class Bracket implements View.OnClickListener {
 			int sm2Type = bd.sm2Types.get(idx);
 			if (sm1Type == SMType.TIP && sm2Type == SMType.TIP) {
 				allowCreate = true;
+			}
+			if (sm1Type == SMType.WIN || sm1Type == SMType.LOSS) {
+				assert sm2Type == SMType.WIN || sm2Type == SMType.LOSS;
+				allowView = true;
 			}
 
 			marquee += "[ " + bd.matchIds.get(idx) + " / " + gameId + " ] ";
