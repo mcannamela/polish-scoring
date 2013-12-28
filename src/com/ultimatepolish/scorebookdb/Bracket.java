@@ -168,6 +168,7 @@ public class Bracket implements View.OnClickListener {
 		int viewId;
 		int smColor;
 		int smType;
+		boolean isLabeled;
 		for (int idx = 0; idx < wBr.length(); idx++) {
 			matchId = wBr.matchIds.get(idx);
 
@@ -175,20 +176,37 @@ public class Bracket implements View.OnClickListener {
 			viewId = matchId + SMType.UPPER;
 			smType = wBr.sm1Types.get(idx);
 			tv = (TextView) rl.findViewById(viewId);
+			isLabeled = tv.getText() != "";
 			switch (smType) {
 			case SMType.BYE:
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
 			case SMType.LOSS:
 				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_top_eliminated_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_top_eliminated);
+				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case SMType.WIN:
 				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_top);
+				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case SMType.TIP:
 				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
+				if (wBr.sm2Types.get(idx) == SMType.NA) {
+				} else if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_top);
+				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			}
@@ -197,20 +215,38 @@ public class Bracket implements View.OnClickListener {
 			viewId = matchId + SMType.LOWER;
 			smType = wBr.sm2Types.get(idx);
 			tv = (TextView) rl.findViewById(viewId);
+			if (smType != SMType.NA) {
+				isLabeled = tv.getText() != "";
+			}
 			switch (smType) {
 			case SMType.BYE:
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
 			case SMType.LOSS:
 				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated);
+				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case SMType.WIN:
 				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_bottom);
+				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case SMType.TIP:
 				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_bottom);
+				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			}

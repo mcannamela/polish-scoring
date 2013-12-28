@@ -174,7 +174,6 @@ public class Detail_Session extends MenuContainerActivity {
 		public void onClick(View v) {
 			Intent intent = new Intent(v.getContext(), Detail_Game.class);
 			intent.putExtra("GID", mInfo.gameId);
-			finish();
 			startActivity(intent);
 		}
 	};
