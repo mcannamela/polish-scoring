@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.util.Log;
 import android.view.Gravity;
@@ -95,9 +96,9 @@ public class Bracket implements View.OnClickListener {
 		wBr = new BracketData(sMembers.size());
 		for (Integer ii = 0; ii < sMembers.size(); ii += 2) {
 			if (sMembers.get(ii + 1).getSeed() == SMType.BYE) {
-				wBr.modSm12(ii / 2, ii, SMType.TIP, ii + 1, SMType.BYE);
+				wBr.modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.BYE);
 			} else {
-				wBr.modSm12(ii / 2, ii, SMType.TIP, ii + 1, SMType.TIP);
+				wBr.modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.TIP);
 			}
 		}
 		wBr.byeBye();
@@ -177,6 +178,10 @@ public class Bracket implements View.OnClickListener {
 			smType = wBr.sm1Types.get(idx);
 			tv = (TextView) rl.findViewById(viewId);
 			isLabeled = tv.getText() != "";
+			if (isLabeled && wBr.smLost(wBr.sm1Idcs.get(idx))) {
+				tv.setPaintFlags(tv.getPaintFlags()
+						| Paint.STRIKE_THRU_TEXT_FLAG);
+			}
 			switch (smType) {
 			case SMType.BYE:
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
@@ -217,6 +222,10 @@ public class Bracket implements View.OnClickListener {
 			tv = (TextView) rl.findViewById(viewId);
 			if (smType != SMType.NA) {
 				isLabeled = tv.getText() != "";
+				if (isLabeled && wBr.smLost(wBr.sm2Idcs.get(idx))) {
+					tv.setPaintFlags(tv.getPaintFlags()
+							| Paint.STRIKE_THRU_TEXT_FLAG);
+				}
 			}
 			switch (smType) {
 			case SMType.BYE:
@@ -559,7 +568,7 @@ public class Bracket implements View.OnClickListener {
 			gameIds.remove(pos);
 		}
 
-		public void modSm12(int matchId, int sm1Idx, int sm1Type, int sm2Idx,
+		public void modSMs(int matchId, int sm1Idx, int sm1Type, int sm2Idx,
 				int sm2Type) {
 			Integer idx = matchIds.indexOf(matchId);
 			if (idx != -1) {
@@ -568,6 +577,22 @@ public class Bracket implements View.OnClickListener {
 				sm2Idcs.set(idx, sm2Idx);
 				sm2Types.set(idx, sm2Type);
 			}
+		}
+
+		public boolean smLost(int smIdx) {
+			boolean hasLost = false;
+			int idx1 = sm1Idcs.lastIndexOf(smIdx);
+			int idx2 = sm2Idcs.lastIndexOf(smIdx);
+			if (idx1 > idx2) {
+				if (sm1Types.get(idx1) == SMType.LOSS) {
+					hasLost = true;
+				}
+			} else {
+				if (sm2Types.get(idx2) == SMType.LOSS) {
+					hasLost = true;
+				}
+			}
+			return hasLost;
 		}
 
 		public void byeBye() {
