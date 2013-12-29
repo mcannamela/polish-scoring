@@ -32,6 +32,7 @@ public class NewGame extends MenuContainerActivity {
 	Spinner spinner_venue;
 	Spinner spinner_ruleSet;
 	ListView lv_players;
+	Intent intent;
 
 	int p1_pos = 0;
 	int p2_pos = 1;
@@ -58,6 +59,7 @@ public class NewGame extends MenuContainerActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_new_game);
+		intent = getIntent();
 		spinner_p1 = (Spinner) findViewById(R.id.spinner_player1);
 		spinner_p2 = (Spinner) findViewById(R.id.spinner_player2);
 		spinner_session = (Spinner) findViewById(R.id.spinner_session);
@@ -71,6 +73,8 @@ public class NewGame extends MenuContainerActivity {
 		spinner_session.setOnItemSelectedListener(mSessionSelectedHandler);
 		spinner_venue.setOnItemSelectedListener(mVenueSelectedHandler);
 		spinner_ruleSet.setOnItemSelectedListener(mRuleSetSelectedHandler);
+
+		spinner_p2.setSelection(1);
 	}
 
 	private OnItemSelectedListener mPlayerOneSelectedHandler = new OnItemSelectedListener() {
@@ -135,10 +139,28 @@ public class NewGame extends MenuContainerActivity {
 			pDao = Player.getDao(context);
 			sDao = Session.getDao(context);
 			vDao = Venue.getDao(context);
-			players = pDao.queryBuilder().where().eq(Player.IS_ACTIVE, true)
-					.query();
-			sessions = sDao.queryBuilder().where().eq(Session.IS_ACTIVE, true)
-					.query();
+
+			if (intent.hasExtra("p1") && intent.hasExtra("p2")) {
+				spinner_p1.setEnabled(false);
+				spinner_p2.setEnabled(false);
+				long p1Id = intent.getLongExtra("p1", -1);
+				long p2Id = intent.getLongExtra("p2", -1);
+				players = pDao.queryBuilder().where().idEq(p1Id).or()
+						.idEq(p2Id).query();
+			} else {
+				players = pDao.queryBuilder().where()
+						.eq(Player.IS_ACTIVE, true).query();
+			}
+
+			if (intent.hasExtra("sId")) {
+				spinner_session.setEnabled(false);
+				long sId = intent.getLongExtra("sId", -1);
+				sessions = sDao.queryBuilder().where().idEq(sId).query();
+			} else {
+				sessions = sDao.queryBuilder().where()
+						.eq(Session.IS_ACTIVE, true).query();
+			}
+
 			venues = vDao.queryBuilder().where().eq(Venue.IS_ACTIVE, true)
 					.query();
 		} catch (SQLException e) {
