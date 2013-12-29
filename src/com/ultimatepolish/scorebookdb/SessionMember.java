@@ -30,7 +30,7 @@ public class SessionMember implements Comparable<SessionMember> {
 	private int playerSeed;
 
 	@DatabaseField(canBeNull = false)
-	private int playerRank;
+	public int playerRank;
 
 	// would be nice to force both seed and rank to be unique for a given
 	// session
@@ -38,6 +38,13 @@ public class SessionMember implements Comparable<SessionMember> {
 	// will just have to handle carefully elsewhere?
 
 	public SessionMember() {
+	}
+
+	public SessionMember(int playerSeed, int playerRank) {
+		// for dummy member creation
+		super();
+		this.playerSeed = playerSeed;
+		this.playerRank = playerRank;
 	}
 
 	public SessionMember(Session session, Player player, int playerSeed) {
@@ -90,20 +97,8 @@ public class SessionMember implements Comparable<SessionMember> {
 	// this.player = player;
 	// }
 
-	public int getPlayerSeed() {
+	public int getSeed() {
 		return playerSeed;
-	}
-
-	public void setPlayerSeed(int playerSeed) {
-		this.playerSeed = playerSeed;
-	}
-
-	public int getPlayerRank() {
-		return playerRank;
-	}
-
-	public void setPlayerRank(int playerRank) {
-		this.playerRank = playerRank;
 	}
 
 	public int compareTo(SessionMember another) {

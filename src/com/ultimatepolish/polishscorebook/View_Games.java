@@ -14,12 +14,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
+import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
@@ -27,6 +30,7 @@ import com.ultimatepolish.scorebookdb.Game;
 import com.ultimatepolish.scorebookdb.OrmLiteFragment;
 import com.ultimatepolish.scorebookdb.Player;
 import com.ultimatepolish.scorebookdb.Session;
+import com.ultimatepolish.scorebookdb.enums.SessionType;
 
 public class View_Games extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Games";
@@ -36,6 +40,7 @@ public class View_Games extends OrmLiteFragment {
 	private List<ViewHolderHeader_Game> sessionList = new ArrayList<ViewHolderHeader_Game>();
 	private ListAdapter_Game gameAdapter;
 	private ExpandableListView elv;
+	private Switch viewAllGames;
 	private View rootView;
 	private Context context;
 
@@ -58,6 +63,27 @@ public class View_Games extends OrmLiteFragment {
 		elv.setOnChildClickListener(elvItemClicked);
 		elv.setOnGroupClickListener(elvGroupClicked);
 		elv.setOnItemLongClickListener(elvItemLongClicked);
+
+		viewAllGames = new Switch(context);
+		viewAllGames.setTextOff("Unfinished");
+		viewAllGames.setTextOn("All");
+		viewAllGames.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				refreshGamesListing();
+			}
+		});
+
+		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		lp.setMargins(0, 20, 0, 20);
+		// lp.addRule(RelativeLayout.BELOW, R.id.dbListing);
+		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+		((RelativeLayout) rootView).addView(viewAllGames, lp);
+		rootView.requestLayout();
 		return rootView;
 	}
 
@@ -117,24 +143,46 @@ public class View_Games extends OrmLiteFragment {
 			Dao<Player, Long> playerDao = Player.getDao(context);
 
 			for (Session sess : sessionDao) {
-				addSession(sess.getSessionName());
+				if (sess.sessionType != SessionType.SNGL_ELIM
+						&& sess.sessionType != SessionType.DBL_ELIM) {
+					addSession(sess.getSessionName());
+				}
 			}
 
-			for (Game g : gameDao) {
+			// get all games or just incomplete based on switch
+			List<Game> gamesList = new ArrayList<Game>();
+			if (viewAllGames.isChecked()) {
+				gamesList = gameDao.queryForAll();
+			} else {
+				try {
+					gamesList = gameDao.queryBuilder()
+							.orderBy(Game.DATE_PLAYED, true).where()
+							.eq(Game.IS_COMPLETE, false).query();
+				} catch (SQLException e) {
+					Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG)
+							.show();
+				}
+			}
+
+			for (Game g : gamesList) {
 				sessionDao.refresh(g.getSession());
 				s = g.getSession();
-				p[0] = playerDao.queryForId(g.getFirstPlayer().getId());
-				p[1] = playerDao.queryForId(g.getSecondPlayer().getId());
 
-				addGame(s.getSessionName(), String.valueOf(g.getId()),
-						p[0].getNickName(), p[1].getNickName(),
-						String.valueOf(g.getFirstPlayerScore()) + " / "
-								+ String.valueOf(g.getSecondPlayerScore()));
+				if (s.sessionType != SessionType.SNGL_ELIM
+						&& s.sessionType != SessionType.DBL_ELIM) {
+					p[0] = playerDao.queryForId(g.getFirstPlayer().getId());
+					p[1] = playerDao.queryForId(g.getSecondPlayer().getId());
+
+					addGame(s.getSessionName(), String.valueOf(g.getId()),
+							p[0].getNickName(), p[1].getNickName(),
+							String.valueOf(g.getFirstPlayerScore()) + " / "
+									+ String.valueOf(g.getSecondPlayerScore()));
+				}
 			}
 		} catch (SQLException e) {
 			loge("Retrieval of games/sessions failed", e);
 		}
-		// expandAll();
+		expandAll();
 		gameAdapter.notifyDataSetChanged(); // required if list has changed
 	}
 
@@ -228,5 +276,4 @@ public class View_Games extends OrmLiteFragment {
 		gameList.add(gameInfo);
 		sessionInfo.setGameList(gameList);
 	}
-
 }
