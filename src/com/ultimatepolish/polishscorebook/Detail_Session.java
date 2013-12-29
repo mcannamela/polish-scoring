@@ -8,14 +8,17 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.Bracket;
+import com.ultimatepolish.scorebookdb.Bracket.MatchInfo;
 import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.SessionMember;
 import com.ultimatepolish.scorebookdb.enums.RuleType;
 import com.ultimatepolish.scorebookdb.enums.SessionType;
 
@@ -25,6 +28,9 @@ public class Detail_Session extends MenuContainerActivity {
 	Session s;
 	Dao<Session, Long> sDao;
 	Bracket bracket;
+	TextView matchText;
+	Button loadMatch;
+	MatchInfo mInfo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,31 +57,27 @@ public class Detail_Session extends MenuContainerActivity {
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
+			matchText = (TextView) findViewById(R.id.sDet_match);
+			loadMatch = (Button) findViewById(R.id.sDet_loadMatch);
+
 			bracket = new Bracket(sv, s, false) {
 				@Override
 				public void onClick(View v) {
-					String p1Name;
-					String p2Name;
-					SessionMember sMember;
-					Integer matchId = v.getId() % 1000;
-					log("Game " + matchId);
-
-					if (this.bracketMap.containsValue(matchId + 1000)) {
-						sMember = this.bracketMap.inverseBidiMap().get(
-								(Integer) (matchId + 1000));
-						p1Name = sMember.getPlayer().getDisplayName();
+					mInfo = bracket.getMatchInfo(v.getId());
+					matchText.setText(mInfo.marquee);
+					if (mInfo.allowCreate) {
+						loadMatch.setVisibility(View.VISIBLE);
+						loadMatch.setText("Create");
+						loadMatch.setOnClickListener(mCreateMatchListener);
+						loadMatch.setOnLongClickListener(null);
+					} else if (mInfo.allowView) {
+						loadMatch.setVisibility(View.VISIBLE);
+						loadMatch.setText("View Match");
+						loadMatch.setOnClickListener(mViewMatchListener);
+						loadMatch.setOnLongClickListener(mMatchGIPListener);
 					} else {
-						p1Name = "Bye";
+						loadMatch.setVisibility(View.GONE);
 					}
-					if (this.bracketMap.containsValue(matchId + 2000)) {
-						sMember = this.bracketMap.inverseBidiMap().get(
-								(Integer) (matchId + 2000));
-						p2Name = sMember.getPlayer().getDisplayName();
-
-					} else {
-						p2Name = "Bye";
-					}
-					log(p1Name + " vs " + p2Name);
 				}
 			};
 			sv.addView(bracket.rl);
@@ -167,4 +169,34 @@ public class Detail_Session extends MenuContainerActivity {
 		}
 	}
 
+	private OnClickListener mViewMatchListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent(v.getContext(), Detail_Game.class);
+			intent.putExtra("GID", mInfo.gameId);
+			startActivity(intent);
+		}
+	};
+
+	private OnLongClickListener mMatchGIPListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
+			Intent intent = new Intent(v.getContext(), GameInProgress.class);
+			intent.putExtra("GID", mInfo.gameId);
+			startActivity(intent);
+			finish();
+			return true;
+		}
+	};
+
+	private OnClickListener mCreateMatchListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent(v.getContext(), NewGame.class);
+			intent.putExtra("p1", mInfo.p1Id);
+			intent.putExtra("p2", mInfo.p2Id);
+			intent.putExtra("sId", sId);
+			startActivity(intent);
+		}
+	};
 }
