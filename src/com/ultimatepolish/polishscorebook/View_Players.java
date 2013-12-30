@@ -21,8 +21,11 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.OrmLiteFragment;
-import com.ultimatepolish.scorebookdb.Player;
+import com.ultimatepolish.db.OrmLiteFragment;
+import com.ultimatepolish.db.Player;
+import com.ultimatepolish.polishscorebook.backend.ListAdapter_Player;
+import com.ultimatepolish.polishscorebook.backend.ViewHolderHeader_Player;
+import com.ultimatepolish.polishscorebook.backend.ViewHolder_Player;
 
 public class View_Players extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Players";

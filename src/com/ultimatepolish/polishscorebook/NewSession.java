@@ -27,12 +27,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.Player;
-import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.SessionMember;
-import com.ultimatepolish.scorebookdb.enums.RuleType;
-import com.ultimatepolish.scorebookdb.enums.SessionType;
-import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
+import com.ultimatepolish.db.Player;
+import com.ultimatepolish.db.Session;
+import com.ultimatepolish.db.SessionMember;
+import com.ultimatepolish.enums.RuleType;
+import com.ultimatepolish.enums.SessionType;
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
+import com.ultimatepolish.rulesets.RuleSet;
 
 public class NewSession extends MenuContainerActivity {
 	Long sId;

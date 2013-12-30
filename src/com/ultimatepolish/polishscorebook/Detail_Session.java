@@ -16,11 +16,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.Bracket;
-import com.ultimatepolish.scorebookdb.Bracket.MatchInfo;
-import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.enums.RuleType;
-import com.ultimatepolish.scorebookdb.enums.SessionType;
+import com.ultimatepolish.db.Session;
+import com.ultimatepolish.enums.RuleType;
+import com.ultimatepolish.enums.SessionType;
+import com.ultimatepolish.polishscorebook.backend.Bracket;
+import com.ultimatepolish.polishscorebook.backend.Bracket.MatchInfo;
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
 
 public class Detail_Session extends MenuContainerActivity {
 	public static String LOGTAG = "Detail_Session";

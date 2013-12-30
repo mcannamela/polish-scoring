@@ -11,8 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.Player;
-import com.ultimatepolish.scorebookdb.Team;
+import com.ultimatepolish.db.Player;
+import com.ultimatepolish.db.Team;
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
 
 public class Detail_Team extends MenuContainerActivity {
 	Long tId;

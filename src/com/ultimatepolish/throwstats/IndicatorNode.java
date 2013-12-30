@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ultimatepolish.scorebookdb.Throw;
+import com.ultimatepolish.db.Throw;
 
 public class IndicatorNode {
 

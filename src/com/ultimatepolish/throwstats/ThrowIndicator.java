@@ -5,7 +5,7 @@ package com.ultimatepolish.throwstats;
 
 import java.util.Set;
 
-import com.ultimatepolish.scorebookdb.Throw;
+import com.ultimatepolish.db.Throw;
 
 /**
  * This class provides one method, which maps a throw to an string. 

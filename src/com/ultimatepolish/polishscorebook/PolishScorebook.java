@@ -19,6 +19,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
+import com.ultimatepolish.polishscorebook.backend.NavDrawerAdapter;
+import com.ultimatepolish.polishscorebook.backend.NavDrawerItem;
+import com.ultimatepolish.polishscorebook.backend.NavigationInterface;
+
 public class PolishScorebook extends MenuContainerActivity implements
 		NavigationInterface {
 	private DrawerLayout mDrawerLayout;

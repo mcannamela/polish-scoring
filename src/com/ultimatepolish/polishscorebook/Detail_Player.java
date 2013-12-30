@@ -12,8 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.Player;
-import com.ultimatepolish.scorebookdb.Throw;
+import com.ultimatepolish.db.Player;
+import com.ultimatepolish.db.Throw;
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
 import com.ultimatepolish.throwstats.IndicatorNode;
 import com.ultimatepolish.throwstats.ReadingVisitor;
 import com.ultimatepolish.throwstats.SimpleThrowStats;

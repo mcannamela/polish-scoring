@@ -2,7 +2,7 @@ package com.ultimatepolish.throwstats;
 
 import android.util.Log;
 
-import com.ultimatepolish.scorebookdb.Throw;
+import com.ultimatepolish.db.Throw;
 
 public abstract class IndicatorNodeVisitor {
 	public static String LOGTAG = "NODE_VISITOR";
