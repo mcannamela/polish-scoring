@@ -23,18 +23,19 @@ import com.ultimatepolish.db.Game;
 import com.ultimatepolish.db.Player;
 import com.ultimatepolish.db.Session;
 import com.ultimatepolish.db.SessionMember;
+import com.ultimatepolish.enums.BrNodeType;
 import com.ultimatepolish.polishscorebook.R;
 
-public class Bracket implements View.OnClickListener {
-	public static String LOGTAG = "Bracket";
+public class BracketHolder implements View.OnClickListener {
+	public static String LOGTAG = "BracketHolder";
 	public Context context;
 	private Session s;
 	public RelativeLayout rl;
 	private List<SessionMember> sMembers = new ArrayList<SessionMember>();
 	private Boolean isDoubleElim;
-	private BracketData wBr; // winners bracket
-	private BracketData lBr; // losers bracket
-	private BracketData fBr; // finals bracket
+	private Bracket wBr; // winners bracket
+	private Bracket lBr; // losers bracket
+	private Bracket fBr; // finals bracket
 
 	// sMemberMap maps a player id to a session member
 	public HashMap<Long, SessionMember> sMemberMap = new HashMap<Long, SessionMember>();
@@ -44,7 +45,7 @@ public class Bracket implements View.OnClickListener {
 	Dao<Player, Long> pDao;
 	Dao<Game, Long> gDao;
 
-	public Bracket(ScrollView sv, Session s, Boolean isDoubleElim) {
+	public BracketHolder(ScrollView sv, Session s, Boolean isDoubleElim) {
 		super();
 		this.context = sv.getContext();
 		this.s = s;
@@ -107,16 +108,16 @@ public class Bracket implements View.OnClickListener {
 
 			// upper half of match
 			tv = makeHalfBracket(wBr, matchIdx, true);
-			if (wBr.sm1Types.get(mPos) == SMType.TIP) {
+			if (wBr.sm1Types.get(mPos) == BrNodeType.TIP) {
 				addViewToLayout(wBr, tv, true);
 			} else {
 				addViewToLayout(wBr, tv, false);
 			}
 
 			// lower half of match
-			if (wBr.sm2Types.get(mPos) != SMType.NA) {
+			if (wBr.sm2Types.get(mPos) != BrNodeType.NA) {
 				tv = makeHalfBracket(wBr, matchIdx, false);
-				if (wBr.sm2Types.get(mPos) == SMType.TIP) {
+				if (wBr.sm2Types.get(mPos) == BrNodeType.TIP) {
 					addViewToLayout(wBr, tv, true);
 				} else {
 					addViewToLayout(wBr, tv, false);
@@ -139,10 +140,10 @@ public class Bracket implements View.OnClickListener {
 		// lay out the bracket
 		int wBrLowest;
 		if (wBr.matchIds.contains(sMembers.size() / 2)) {
-			wBrLowest = sMembers.size() / 2 - 1 + SMType.LOWER;
+			wBrLowest = sMembers.size() / 2 - 1 + BrNodeType.LOWER;
 		} else {
 			wBrLowest = wBr.findViewAbove(sMembers.size() / 2 - 1
-					+ SMType.LOWER);
+					+ BrNodeType.LOWER);
 		}
 		makeInvisibleHeaders(350, 150, 1, wBrLowest, lBr.headerIdOffset);
 
@@ -152,16 +153,16 @@ public class Bracket implements View.OnClickListener {
 
 			// upper half of match
 			tv = makeHalfBracket(lBr, matchIdx, true);
-			if (lBr.sm1Types.get(mPos) == SMType.TIP) {
+			if (lBr.sm1Types.get(mPos) == BrNodeType.TIP) {
 				addViewToLayout(lBr, tv, true);
 			} else {
 				addViewToLayout(lBr, tv, false);
 			}
 
 			// lower half of match
-			if (lBr.sm2Types.get(mPos) != SMType.NA) {
+			if (lBr.sm2Types.get(mPos) != BrNodeType.NA) {
 				tv = makeHalfBracket(lBr, matchIdx, false);
-				if (lBr.sm2Types.get(mPos) == SMType.TIP) {
+				if (lBr.sm2Types.get(mPos) == BrNodeType.TIP) {
 					addViewToLayout(lBr, tv, true);
 				} else {
 					addViewToLayout(lBr, tv, false);
@@ -215,7 +216,7 @@ public class Bracket implements View.OnClickListener {
 			matchId = wBr.matchIds.get(idx);
 
 			// match upper view
-			viewId = matchId + SMType.UPPER;
+			viewId = matchId + BrNodeType.UPPER;
 			smType = wBr.sm1Types.get(idx);
 			tv = (TextView) rl.findViewById(viewId);
 			isLabeled = tv.getText() != "";
@@ -224,10 +225,10 @@ public class Bracket implements View.OnClickListener {
 						| Paint.STRIKE_THRU_TEXT_FLAG);
 			}
 			switch (smType) {
-			case SMType.BYE:
+			case BrNodeType.BYE:
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
-			case SMType.LOSS:
+			case BrNodeType.LOSS:
 				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_top_eliminated_labeled);
@@ -236,7 +237,7 @@ public class Bracket implements View.OnClickListener {
 				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
-			case SMType.WIN:
+			case BrNodeType.WIN:
 				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
@@ -245,9 +246,9 @@ public class Bracket implements View.OnClickListener {
 				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
-			case SMType.TIP:
+			case BrNodeType.TIP:
 				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
-				if (wBr.sm2Types.get(idx) == SMType.NA) {
+				if (wBr.sm2Types.get(idx) == BrNodeType.NA) {
 				} else if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
 				} else {
@@ -258,10 +259,10 @@ public class Bracket implements View.OnClickListener {
 			}
 
 			// match lower view
-			viewId = matchId + SMType.LOWER;
+			viewId = matchId + BrNodeType.LOWER;
 			smType = wBr.sm2Types.get(idx);
 			tv = (TextView) rl.findViewById(viewId);
-			if (smType != SMType.NA) {
+			if (smType != BrNodeType.NA) {
 				isLabeled = tv.getText() != "";
 				if (isLabeled && wBr.smLost(wBr.sm2Idcs.get(idx))) {
 					tv.setPaintFlags(tv.getPaintFlags()
@@ -269,10 +270,10 @@ public class Bracket implements View.OnClickListener {
 				}
 			}
 			switch (smType) {
-			case SMType.BYE:
+			case BrNodeType.BYE:
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
-			case SMType.LOSS:
+			case BrNodeType.LOSS:
 				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated_labeled);
@@ -281,7 +282,7 @@ public class Bracket implements View.OnClickListener {
 				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
-			case SMType.WIN:
+			case BrNodeType.WIN:
 				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
@@ -290,7 +291,7 @@ public class Bracket implements View.OnClickListener {
 				}
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
-			case SMType.TIP:
+			case BrNodeType.TIP:
 				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
@@ -353,19 +354,18 @@ public class Bracket implements View.OnClickListener {
 		}
 	}
 
-	public TextView makeHalfBracket(BracketData bd, Integer matchId,
-			Boolean upper) {
+	public TextView makeHalfBracket(Bracket bd, Integer matchId, Boolean upper) {
 		TextView tv = new TextView(context);
 
 		int idx = bd.matchIds.indexOf(matchId);
-		int smType = SMType.TIP;
+		int smType = BrNodeType.TIP;
 		SessionMember sm = null;
 
 		if (upper) {
-			tv.setId(matchId + bd.matchIdOffset + SMType.UPPER);
+			tv.setId(matchId + bd.matchIdOffset + BrNodeType.UPPER);
 			smType = bd.sm1Types.get(idx);
 			switch (smType) {
-			case SMType.TIP:
+			case BrNodeType.TIP:
 				sm = sMembers.get(bd.sm1Idcs.get(idx));
 				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
 						+ sm.getPlayer().getNickName());
@@ -373,20 +373,20 @@ public class Bracket implements View.OnClickListener {
 				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
 						Mode.MULTIPLY);
 				break;
-			case SMType.UNSET:
+			case BrNodeType.UNSET:
 				tv.setBackgroundResource(R.drawable.bracket_top);
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
 			}
-			if (bd.sm2Types.get(idx) == SMType.NA) {
+			if (bd.sm2Types.get(idx) == BrNodeType.NA) {
 				tv.setBackgroundResource(R.drawable.bracket_endpoint);
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 			}
 		} else {
-			tv.setId(matchId + bd.matchIdOffset + SMType.LOWER);
+			tv.setId(matchId + bd.matchIdOffset + BrNodeType.LOWER);
 			smType = bd.sm2Types.get(idx);
 			switch (smType) {
-			case SMType.TIP:
+			case BrNodeType.TIP:
 				sm = sMembers.get(bd.sm2Idcs.get(idx));
 				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
 						+ sm.getPlayer().getNickName());
@@ -394,7 +394,7 @@ public class Bracket implements View.OnClickListener {
 				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
 						Mode.MULTIPLY);
 				break;
-			case SMType.UNSET:
+			case BrNodeType.UNSET:
 				tv.setBackgroundResource(R.drawable.bracket_bottom);
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
@@ -408,8 +408,8 @@ public class Bracket implements View.OnClickListener {
 		return tv;
 	}
 
-	private void addViewToLayout(BracketData bd, TextView tv, Boolean isLabeled) {
-		Integer matchId = tv.getId() % SMType.MOD;
+	private void addViewToLayout(Bracket bd, TextView tv, Boolean isLabeled) {
+		Integer matchId = tv.getId() % BrNodeType.MOD;
 		Boolean upper = isUpperView(tv.getId());
 		Integer tier = bd.getTier(matchId);
 
@@ -423,12 +423,12 @@ public class Bracket implements View.OnClickListener {
 			} else if (upper) {
 				Integer topParentMatch = bd.getTopParentMatch(matchId);
 				lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch
-						+ SMType.LOWER);
+						+ BrNodeType.LOWER);
 				lp.setMargins(0, -2, 0, 0);
 			} else {
 				Integer bottomParentMatch = bd.getTopParentMatch(matchId) + 1;
 				lp.addRule(RelativeLayout.ABOVE, bottomParentMatch
-						+ SMType.LOWER);
+						+ BrNodeType.LOWER);
 				lp.setMargins(0, 0, 0, -2);
 			}
 
@@ -450,7 +450,8 @@ public class Bracket implements View.OnClickListener {
 		// expand the list size to the next power of two
 		Integer n = factorTwos(sMembers.size());
 
-		SessionMember dummySessionMember = new SessionMember(SMType.BYE, -1000);
+		SessionMember dummySessionMember = new SessionMember(BrNodeType.BYE,
+				-1000);
 
 		while (sMembers.size() < Math.pow(2, n)) {
 			sMembers.add(dummySessionMember);
@@ -470,24 +471,6 @@ public class Bracket implements View.OnClickListener {
 		}
 	}
 
-	/** find n such that 2**n >= p */
-	public Integer factorTwos(int p) {
-		Integer n = 1;
-		while (Math.pow(2, n) < p) {
-			n++;
-		}
-		return n;
-	}
-
-	public boolean isUpperView(int viewId) {
-		assert viewId >= 1000;
-		if (viewId < 2000) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	@Override
 	public void onClick(View v) {
 		Log.i(LOGTAG, "View " + v.getId() + " was clicked");
@@ -495,273 +478,12 @@ public class Bracket implements View.OnClickListener {
 
 	public MatchInfo getMatchInfo(int viewId) {
 		MatchInfo mInfo = new MatchInfo();
-		int matchId = viewId % SMType.MOD;
+		int matchId = viewId % BrNodeType.MOD;
 		if (wBr.matchIds.contains(matchId)) {
 			int idx = wBr.matchIds.indexOf(matchId);
 			mInfo = new MatchInfo(wBr, idx);
 		}
 		return mInfo;
-	}
-
-	private class BracketData {
-		public boolean isDoubleElim;
-		private int headerIdOffset = 0;
-		private int matchIdOffset = 0;
-		private int nLeafs;
-		private List<Integer> matchIds = new ArrayList<Integer>();
-		private List<Integer> sm1Idcs = new ArrayList<Integer>();
-		private List<Integer> sm1Types = new ArrayList<Integer>();
-		private List<Integer> sm2Idcs = new ArrayList<Integer>();
-		private List<Integer> sm2Types = new ArrayList<Integer>();
-		private List<Long> gameIds = new ArrayList<Long>();
-
-		public BracketData(int nLeafs) {
-			this.nLeafs = (int) Math.pow(2, factorTwos(nLeafs));
-			addMatches();
-		}
-
-		private void addMatches() {
-			for (int ii = 0; ii < nLeafs; ii++) {
-				matchIds.add(ii);
-				sm1Idcs.add(-1);
-				sm1Types.add(SMType.UNSET);
-				sm2Idcs.add(-1);
-				sm2Types.add(SMType.UNSET);
-				gameIds.add((long) -1);
-			}
-			sm2Types.set(nLeafs - 1, SMType.NA);
-		}
-
-		private void removeMatch(int pos) {
-			matchIds.remove(pos);
-			sm1Idcs.remove(pos);
-			sm1Types.remove(pos);
-			sm2Idcs.remove(pos);
-			sm2Types.remove(pos);
-			gameIds.remove(pos);
-		}
-
-		public void changeOffsets(int headerIdOffset, int matchIdOffset) {
-			assert matchIdOffset - this.matchIdOffset >= 0;
-			this.headerIdOffset = headerIdOffset;
-			this.matchIdOffset = matchIdOffset;
-		}
-
-		private int getTier(int viewId) {
-			// can take bracket idx or match idx
-			int matchId = viewId % SMType.MOD;
-			return ((Double) Math.floor(-Math.log(1 - ((double) matchId)
-					/ nLeafs)
-					/ Math.log(2))).intValue();
-		}
-
-		public int getTopMatchOfTier(int tier) {
-			return (int) (nLeafs * (1 - Math.pow(2, -tier)));
-		}
-
-		public int getTopParentMatch(int bracketIdx) {
-			// can take bracket idx or match idx
-			Integer matchIdx = bracketIdx % SMType.MOD;
-			Integer tier = getTier(matchIdx);
-			Integer topOfTier = getTopMatchOfTier(tier);
-			Integer topOfPrevTier = getTopMatchOfTier(tier - 1);
-
-			Integer topParentMatch = topOfPrevTier + 2 * (matchIdx - topOfTier);
-			return topParentMatch;
-		}
-
-		public int getChildBracketId(int bracketIdx) {
-			// this can take in a bracket or match idx
-			Integer matchIdx = bracketIdx % SMType.MOD;
-			Integer tier = getTier(matchIdx);
-			Integer topOfTier = getTopMatchOfTier(tier);
-			Integer topOfNextTier = getTopMatchOfTier(tier + 1);
-
-			Integer childBracket = topOfNextTier + (matchIdx - topOfTier) / 2
-					+ SMType.UPPER;
-			if (matchIdx % 2 != 0) {
-				childBracket += 1000;
-			}
-			return childBracket;
-		}
-
-		public int findViewAbove(int viewId) {
-			Integer matchId = viewId % SMType.MOD - matchIdOffset;
-
-			Integer viewAboveId = headerIdOffset + 1;
-			Log.i(LOGTAG, "findviewabove, headerOffset is " + headerIdOffset);
-
-			if (!isUpperView(viewId)) {
-				viewAboveId = matchId + matchIdOffset + SMType.UPPER;
-			} else {
-				Integer baseId = matchId;
-				if (getTier(matchId) > 0) {
-					baseId = getTopParentMatch(matchId);
-				}
-				if (matchIds.contains(baseId) && baseId != matchId) {
-					viewAboveId = baseId + matchIdOffset + SMType.UPPER;
-				} else {
-					if (baseId > getTopMatchOfTier(getTier(baseId))) {
-						// have to keep track of upper/lower now
-						baseId += SMType.LOWER - 1; // lower arm of the match
-													// above
-						while (!matchIds.contains(baseId % SMType.MOD)) {
-							baseId = getChildBracketId(baseId);
-						}
-						viewAboveId = baseId + matchIdOffset;
-					}
-				}
-			}
-
-			Log.i(LOGTAG, "viewId: " + viewId + " placed below " + viewAboveId);
-			return viewAboveId;
-		}
-
-		private void modSMs(int matchId, int sm1Idx, int sm1Type, int sm2Idx,
-				int sm2Type) {
-			Integer idx = matchIds.indexOf(matchId);
-			if (idx != -1) {
-				sm1Idcs.set(idx, sm1Idx);
-				sm1Types.set(idx, sm1Type);
-				sm2Idcs.set(idx, sm2Idx);
-				sm2Types.set(idx, sm2Type);
-			}
-		}
-
-		public boolean smLost(int smIdx) {
-			boolean hasLost = false;
-			int idx1 = sm1Idcs.lastIndexOf(smIdx);
-			int idx2 = sm2Idcs.lastIndexOf(smIdx);
-			if (idx1 > idx2) {
-				if (sm1Types.get(idx1) == SMType.LOSS) {
-					hasLost = true;
-				}
-			} else {
-				if (sm2Types.get(idx2) == SMType.LOSS) {
-					hasLost = true;
-				}
-			}
-			return hasLost;
-		}
-
-		public void seed(List<SessionMember> sMembers) {
-			// seed the winners bracket
-			for (Integer ii = 0; ii < sMembers.size(); ii += 2) {
-				if (sMembers.get(ii + 1).getSeed() == SMType.BYE) {
-					modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.BYE);
-				} else {
-					modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.TIP);
-				}
-			}
-			byeByes();
-		}
-
-		private void byeByes() {
-			// get rid of bye matches
-			int childViewId;
-			int childMatchId;
-
-			// promote players with a bye
-			for (int ii = 0; ii < matchIds.size(); ii++) {
-				if (sm2Types.get(ii) == SMType.BYE) {
-					childViewId = getChildBracketId(matchIds.get(ii));
-					childMatchId = childViewId % SMType.MOD;
-					assert matchIds.indexOf(childMatchId) == childMatchId;
-
-					if (isUpperView(childViewId)) {
-						sm1Idcs.set(childMatchId, sm1Idcs.get(ii));
-						sm1Types.set(childMatchId, sm1Types.get(ii));
-					} else {
-						sm2Idcs.set(childMatchId, sm1Idcs.get(ii));
-						sm2Types.set(childMatchId, sm1Types.get(ii));
-					}
-					sm1Types.set(ii, SMType.BYE);
-				}
-			}
-
-			// now go back through and remove all matches with two bye players
-			for (int ii = matchIds.size() - 1; ii >= 0; ii--) {
-				if (sm1Types.get(ii) == SMType.BYE
-						&& sm2Types.get(ii) == SMType.BYE) {
-					removeMatch(ii);
-				}
-			}
-
-			Log.i("Crunch", "Final list:");
-			for (int ii = 0; ii < matchIds.size(); ii++) {
-				Log.i("Crunch", "mIdx: " + matchIds.get(ii) + ", sm1id: "
-						+ sm1Idcs.get(ii) + ", sm1type: " + sm1Types.get(ii)
-						+ ", sm2id: " + sm2Idcs.get(ii) + ", sm2type: "
-						+ sm1Types.get(ii) + ", gId: " + gameIds.get(ii));
-			}
-		}
-
-		public void matchMatches(long gId, int smIdxA, int smIdxB) {
-			if (gameIds.contains(gId)) {
-				int idx = gameIds.indexOf(gId);
-				assert hasSm(idx, smIdxA) && hasSm(idx, smIdxB);
-			} else {
-				int nMatches = length();
-				for (int idx = 0; idx < nMatches; idx++) {
-					if (hasSm(idx, smIdxA) && hasSm(idx, smIdxB)
-							&& gameIds.get(idx) == -1) {
-						Log.i(LOGTAG, "Matching game " + gId + " to match "
-								+ matchIds.get(idx));
-						gameIds.set(idx, gId);
-						break;
-					}
-				}
-			}
-		}
-
-		public void promoteWinner(int idx, int wIdx) {
-			assert gameIds.get(idx) != -1;
-			boolean sm1Wins = true;
-
-			if (wIdx == sm2Idcs.get(idx)) {
-				sm1Wins = false;
-			} else {
-				assert wIdx == sm1Idcs.get(idx);
-			}
-
-			if (sm1Wins) {
-				sm1Types.set(idx, SMType.WIN);
-				sm2Types.set(idx, SMType.LOSS);
-				wIdx = sm1Idcs.get(idx);
-			} else {
-				sm1Types.set(idx, SMType.LOSS);
-				sm2Types.set(idx, SMType.WIN);
-				wIdx = sm2Idcs.get(idx);
-			}
-
-			int childViewId = getChildBracketId(matchIds.get(idx));
-			int childIdx = matchIds.indexOf(childViewId % SMType.MOD);
-
-			if (isUpperView(childViewId)) {
-				sm1Idcs.set(childIdx, wIdx);
-				sm1Types.set(childIdx, SMType.TIP);
-			} else {
-				sm2Idcs.set(childIdx, wIdx);
-				sm2Types.set(childIdx, SMType.TIP);
-			}
-		}
-
-		private Boolean hasSm(int idx, int smIdx) {
-			if (sm1Idcs.get(idx) == smIdx || sm2Idcs.get(idx) == smIdx) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		public int length() {
-			assert matchIds.size() == sm1Idcs.size();
-			assert matchIds.size() == sm1Types.size();
-			assert matchIds.size() == sm2Idcs.size();
-			assert matchIds.size() == sm2Types.size();
-			assert matchIds.size() == gameIds.size();
-			return matchIds.size();
-		}
 	}
 
 	public class MatchInfo {
@@ -775,73 +497,60 @@ public class Bracket implements View.OnClickListener {
 		MatchInfo() {
 		}
 
-		MatchInfo(BracketData bd, int idx) {
+		MatchInfo(Bracket bd, int idx) {
 			gameId = bd.gameIds.get(idx);
 			int sm1Type = bd.sm1Types.get(idx);
 			int sm2Type = bd.sm2Types.get(idx);
 
-			if (sm1Type == SMType.TIP || sm1Type == SMType.WIN
-					|| sm1Type == SMType.LOSS) {
+			if (sm1Type == BrNodeType.TIP || sm1Type == BrNodeType.WIN
+					|| sm1Type == BrNodeType.LOSS) {
 				p1Id = sMembers.get(bd.sm1Idcs.get(idx)).getPlayer().getId();
 			}
 
-			if (sm2Type == SMType.TIP || sm2Type == SMType.WIN
-					|| sm2Type == SMType.LOSS) {
+			if (sm2Type == BrNodeType.TIP || sm2Type == BrNodeType.WIN
+					|| sm2Type == BrNodeType.LOSS) {
 				p2Id = sMembers.get(bd.sm2Idcs.get(idx)).getPlayer().getId();
 			}
 
-			if (sm1Type == SMType.TIP && sm2Type == SMType.TIP) {
+			if (sm1Type == BrNodeType.TIP && sm2Type == BrNodeType.TIP) {
 				allowCreate = true;
 			}
 
-			if (sm1Type == SMType.WIN || sm1Type == SMType.LOSS) {
-				assert sm2Type == SMType.WIN || sm2Type == SMType.LOSS;
+			if (sm1Type == BrNodeType.WIN || sm1Type == BrNodeType.LOSS) {
+				assert sm2Type == BrNodeType.WIN || sm2Type == BrNodeType.LOSS;
 				allowView = true;
 			}
 
 			marquee += "[ " + bd.matchIds.get(idx) + " / " + gameId + " ] ";
 
 			// upper player
-			if (sm1Type == SMType.UNSET) {
+			if (sm1Type == BrNodeType.UNSET) {
 				marquee += "Unknown";
 			} else {
 				marquee += sMembers.get(bd.sm1Idcs.get(idx)).getPlayer()
 						.getNickName();
-				if (sm1Type == SMType.WIN) {
+				if (sm1Type == BrNodeType.WIN) {
 					marquee += " (W)";
-				} else if (sm1Type == SMType.LOSS) {
+				} else if (sm1Type == BrNodeType.LOSS) {
 					marquee += " (L)";
 				}
 			}
 
 			// lower player
-			if (sm2Type == SMType.UNSET) {
+			if (sm2Type == BrNodeType.UNSET) {
 				marquee += " -vs- Unknown";
-			} else if (sm2Type == SMType.NA) {
+			} else if (sm2Type == BrNodeType.NA) {
 				marquee += ", tournament winner.";
 			} else {
 				marquee += " -vs- "
 						+ sMembers.get(bd.sm2Idcs.get(idx)).getPlayer()
 								.getNickName();
-				if (sm2Type == SMType.WIN) {
+				if (sm2Type == BrNodeType.WIN) {
 					marquee += " (W)";
-				} else if (sm2Type == SMType.LOSS) {
+				} else if (sm2Type == BrNodeType.LOSS) {
 					marquee += " (L)";
 				}
 			}
 		}
-	}
-
-	private final class SMType {
-		public static final int TIP = 0;
-		public static final int WIN = 1;
-		public static final int LOSS = 2;
-		public static final int BYE = 3;
-		public static final int UNSET = 4;
-		public static final int RESPAWN = 5;
-		public static final int NA = 7;
-		public static final int UPPER = 1000;
-		public static final int LOWER = 2000;
-		public static final int MOD = 1000;
 	}
 }
