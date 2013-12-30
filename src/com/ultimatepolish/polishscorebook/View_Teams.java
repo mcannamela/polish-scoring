@@ -19,8 +19,11 @@ import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.Toast;
 
-import com.ultimatepolish.scorebookdb.OrmLiteFragment;
-import com.ultimatepolish.scorebookdb.Player;
+import com.ultimatepolish.db.OrmLiteFragment;
+import com.ultimatepolish.db.Player;
+import com.ultimatepolish.polishscorebook.backend.ListAdapter_Team;
+import com.ultimatepolish.polishscorebook.backend.ViewHolderHeader_Team;
+import com.ultimatepolish.polishscorebook.backend.ViewHolder_Team;
 
 public class View_Teams extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Teams";

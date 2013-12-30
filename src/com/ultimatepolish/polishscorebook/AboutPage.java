@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ultimatepolish.scorebookdb.OrmLiteFragment;
+import com.ultimatepolish.db.OrmLiteFragment;
 
 public class AboutPage extends OrmLiteFragment {
 	private View rootView;

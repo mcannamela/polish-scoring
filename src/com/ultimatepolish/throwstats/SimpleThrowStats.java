@@ -6,9 +6,9 @@ import java.util.Set;
 
 import android.util.Log;
 
-import com.ultimatepolish.scorebookdb.Throw;
-import com.ultimatepolish.scorebookdb.enums.ThrowResult;
-import com.ultimatepolish.scorebookdb.enums.ThrowType;
+import com.ultimatepolish.db.Throw;
+import com.ultimatepolish.enums.ThrowResult;
+import com.ultimatepolish.enums.ThrowType;
 
 public class SimpleThrowStats {
 	public static String LOGTAG = "ThrowStats";

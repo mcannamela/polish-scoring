@@ -22,8 +22,11 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.OrmLiteFragment;
-import com.ultimatepolish.scorebookdb.Venue;
+import com.ultimatepolish.db.OrmLiteFragment;
+import com.ultimatepolish.db.Venue;
+import com.ultimatepolish.polishscorebook.backend.ListAdapter_Venue;
+import com.ultimatepolish.polishscorebook.backend.ViewHolderHeader_Venue;
+import com.ultimatepolish.polishscorebook.backend.ViewHolder_Venue;
 
 public class View_Venues extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Venues";

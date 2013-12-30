@@ -1,8 +1,8 @@
 #
-# generated on 2013/11/27 11:56:48
+# generated on 2013/12/30 01:59:06
 #
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.Player
+dataClass=com.ultimatepolish.db.Player
 tableName=player
 # --table-fields-start--
 # --field-start--
@@ -59,7 +59,7 @@ fieldName=isActive
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.PlayerStats
+dataClass=com.ultimatepolish.db.PlayerStats
 tableName=playerstats
 # --table-fields-start--
 # --field-start--
@@ -77,7 +77,7 @@ fieldName=nLosses
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.Game
+dataClass=com.ultimatepolish.db.Game
 tableName=game
 # --table-fields-start--
 # --field-start--
@@ -130,7 +130,7 @@ fieldName=isTracked
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.Throw
+dataClass=com.ultimatepolish.db.Throw
 tableName=throw
 # --table-fields-start--
 # --field-start--
@@ -228,7 +228,7 @@ fieldName=initialDefensivePlayerScore
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.SessionMember
+dataClass=com.ultimatepolish.db.SessionMember
 tableName=sessionmember
 # --table-fields-start--
 # --field-start--
@@ -258,7 +258,7 @@ canBeNull=false
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.Badge
+dataClass=com.ultimatepolish.db.Badge
 tableName=badge
 # --table-fields-start--
 # --field-start--
@@ -281,7 +281,7 @@ canBeNull=false
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.Session
+dataClass=com.ultimatepolish.db.Session
 tableName=session
 # --table-fields-start--
 # --field-start--
@@ -320,7 +320,7 @@ foreignCollection=true
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.ultimatepolish.scorebookdb.Venue
+dataClass=com.ultimatepolish.db.Venue
 tableName=venue
 # --table-fields-start--
 # --field-start--
