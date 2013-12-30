@@ -26,11 +26,15 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.Game;
-import com.ultimatepolish.scorebookdb.OrmLiteFragment;
-import com.ultimatepolish.scorebookdb.Player;
-import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.enums.SessionType;
+import com.ultimatepolish.db.Game;
+import com.ultimatepolish.db.OrmLiteFragment;
+import com.ultimatepolish.db.Player;
+import com.ultimatepolish.db.Session;
+import com.ultimatepolish.enums.SessionType;
+import com.ultimatepolish.polishscorebook.backend.ListAdapter_Game;
+import com.ultimatepolish.polishscorebook.backend.NavigationInterface;
+import com.ultimatepolish.polishscorebook.backend.ViewHolderHeader_Game;
+import com.ultimatepolish.polishscorebook.backend.ViewHolder_Game;
 
 public class View_Games extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Games";

@@ -55,7 +55,7 @@
 			android:parentActivityName="com.ultimatepolish.polishscorebook.View_Games" >
 		</activity>
 		<activity
-			android:name="com.ultimatepolish.polishscorebook.MenuContainerActivity"
+			android:name="com.ultimatepolish.polishscorebook.backend.MenuContainerActivity"
 			android:label="@string/title_activity_menu_container"
 			android:parentActivityName="com.ultimatepolish.polishscorebook.PolishScorebook" >
 		</activity>

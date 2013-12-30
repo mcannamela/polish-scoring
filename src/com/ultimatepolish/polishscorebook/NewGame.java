@@ -18,12 +18,13 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.Game;
-import com.ultimatepolish.scorebookdb.Player;
-import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.Venue;
-import com.ultimatepolish.scorebookdb.enums.RuleType;
-import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
+import com.ultimatepolish.db.Game;
+import com.ultimatepolish.db.Player;
+import com.ultimatepolish.db.Session;
+import com.ultimatepolish.db.Venue;
+import com.ultimatepolish.enums.RuleType;
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
+import com.ultimatepolish.rulesets.RuleSet;
 
 public class NewGame extends MenuContainerActivity {
 	Spinner spinner_p1;

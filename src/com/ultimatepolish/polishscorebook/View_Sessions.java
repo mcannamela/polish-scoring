@@ -21,9 +21,12 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.OrmLiteFragment;
-import com.ultimatepolish.scorebookdb.Session;
-import com.ultimatepolish.scorebookdb.enums.SessionType;
+import com.ultimatepolish.db.OrmLiteFragment;
+import com.ultimatepolish.db.Session;
+import com.ultimatepolish.enums.SessionType;
+import com.ultimatepolish.polishscorebook.backend.ListAdapter_Session;
+import com.ultimatepolish.polishscorebook.backend.ViewHolderHeader_Session;
+import com.ultimatepolish.polishscorebook.backend.ViewHolder_Session;
 
 public class View_Sessions extends OrmLiteFragment {
 	private static final String LOGTAG = "View_Sessions";
