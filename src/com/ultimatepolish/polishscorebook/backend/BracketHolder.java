@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -75,15 +74,13 @@ public class BracketHolder implements View.OnClickListener {
 		this.context = rl.getContext();
 
 		foldRoster();
-		wBr = new BracketData(sMembers.size());
-		wBr.seed(sMembers);
+		wBr = new Bracket(sMembers);
 		buildWinnersBracket();
 
 		if (isDoubleElim) {
 
-			lBr = new BracketData(sMembers.size());
+			lBr = new Bracket(sMembers);
 			lBr.changeOffsets(factorTwos(sMembers.size()) + 1, sMembers.size());
-			lBr.seed(sMembers);
 			buildLosersBracket();
 		}
 	}
@@ -97,17 +94,14 @@ public class BracketHolder implements View.OnClickListener {
 		// Id for lower half of match = matchId + SMType.LOWER
 
 		TextView tv;
-		Integer matchIdx;
 
 		// lay out the bracket
 		makeInvisibleHeaders(350, 150, 0, 0, 0);
 
 		for (Integer mPos = 0; mPos < wBr.length(); mPos++) {
-			// populate the bracket map
-			matchIdx = wBr.matchIds.get(mPos);
-
 			// upper half of match
-			tv = makeHalfBracket(wBr, matchIdx, true);
+			tv = wBr.makeHalfMatchView(context, mPos, true);
+			tv.setOnClickListener(this);
 			if (wBr.sm1Types.get(mPos) == BrNodeType.TIP) {
 				addViewToLayout(wBr, tv, true);
 			} else {
@@ -116,7 +110,7 @@ public class BracketHolder implements View.OnClickListener {
 
 			// lower half of match
 			if (wBr.sm2Types.get(mPos) != BrNodeType.NA) {
-				tv = makeHalfBracket(wBr, matchIdx, false);
+				tv = wBr.makeHalfMatchView(context, mPos, false);
 				if (wBr.sm2Types.get(mPos) == BrNodeType.TIP) {
 					addViewToLayout(wBr, tv, true);
 				} else {
@@ -135,7 +129,6 @@ public class BracketHolder implements View.OnClickListener {
 		// Id for lower half of match = matchId + SMType.LOWER
 
 		TextView tv;
-		Integer matchIdx;
 
 		// lay out the bracket
 		int wBrLowest;
@@ -145,14 +138,14 @@ public class BracketHolder implements View.OnClickListener {
 			wBrLowest = wBr.findViewAbove(sMembers.size() / 2 - 1
 					+ BrNodeType.LOWER);
 		}
-		makeInvisibleHeaders(350, 150, 1, wBrLowest, lBr.headerIdOffset);
+		makeInvisibleHeaders(350, 150, 1, wBrLowest, 10);
 
 		for (Integer mPos = 0; mPos < lBr.length(); mPos++) {
 			// populate the bracket map
-			matchIdx = lBr.matchIds.get(mPos);
 
 			// upper half of match
-			tv = makeHalfBracket(lBr, matchIdx, true);
+			tv = lBr.makeHalfMatchView(context, mPos, true);
+			tv.setOnClickListener(this);
 			if (lBr.sm1Types.get(mPos) == BrNodeType.TIP) {
 				addViewToLayout(lBr, tv, true);
 			} else {
@@ -161,7 +154,8 @@ public class BracketHolder implements View.OnClickListener {
 
 			// lower half of match
 			if (lBr.sm2Types.get(mPos) != BrNodeType.NA) {
-				tv = makeHalfBracket(lBr, matchIdx, false);
+				tv = lBr.makeHalfMatchView(context, mPos, false);
+				tv.setOnClickListener(this);
 				if (lBr.sm2Types.get(mPos) == BrNodeType.TIP) {
 					addViewToLayout(lBr, tv, true);
 				} else {
@@ -193,15 +187,12 @@ public class BracketHolder implements View.OnClickListener {
 		int smIdxB;
 
 		for (Game g : sGamesList) {
-			smIdxA = sMembers.indexOf(sMemberMap
-					.get(g.getFirstPlayer().getId()));
-			smIdxB = sMembers.indexOf(sMemberMap.get(g.getSecondPlayer()
-					.getId()));
+			smIdxA = sMemberMap.get(g.getFirstPlayer().getId()).getSeed();
+			smIdxB = sMemberMap.get(g.getSecondPlayer().getId()).getSeed();
 			wBr.matchMatches(g.getId(), smIdxA, smIdxB);
 
 			if (g.getIsComplete()) {
-				smIdxA = sMembers
-						.indexOf(sMemberMap.get(g.getWinner().getId()));
+				smIdxA = sMemberMap.get(g.getWinner().getId()).getSeed();
 				wBr.promoteWinner(wBr.gameIds.indexOf(g.getId()), smIdxA);
 			}
 		}
@@ -224,12 +215,14 @@ public class BracketHolder implements View.OnClickListener {
 				tv.setPaintFlags(tv.getPaintFlags()
 						| Paint.STRIKE_THRU_TEXT_FLAG);
 			}
+
+			// smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
+			smColor = Color.RED;
 			switch (smType) {
 			case BrNodeType.BYE:
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
 			case BrNodeType.LOSS:
-				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_top_eliminated_labeled);
 				} else {
@@ -238,7 +231,6 @@ public class BracketHolder implements View.OnClickListener {
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case BrNodeType.WIN:
-				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
 				} else {
@@ -247,7 +239,6 @@ public class BracketHolder implements View.OnClickListener {
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case BrNodeType.TIP:
-				smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
 				if (wBr.sm2Types.get(idx) == BrNodeType.NA) {
 				} else if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
@@ -269,12 +260,14 @@ public class BracketHolder implements View.OnClickListener {
 							| Paint.STRIKE_THRU_TEXT_FLAG);
 				}
 			}
+
+			// smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
 			switch (smType) {
 			case BrNodeType.BYE:
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 				break;
 			case BrNodeType.LOSS:
-				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
+
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated_labeled);
 				} else {
@@ -283,7 +276,6 @@ public class BracketHolder implements View.OnClickListener {
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case BrNodeType.WIN:
-				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
 				} else {
@@ -292,7 +284,6 @@ public class BracketHolder implements View.OnClickListener {
 				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
 				break;
 			case BrNodeType.TIP:
-				smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
 				if (isLabeled) {
 					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
 				} else {
@@ -354,63 +345,9 @@ public class BracketHolder implements View.OnClickListener {
 		}
 	}
 
-	public TextView makeHalfBracket(Bracket bd, Integer matchId, Boolean upper) {
-		TextView tv = new TextView(context);
-
-		int idx = bd.matchIds.indexOf(matchId);
-		int smType = BrNodeType.TIP;
-		SessionMember sm = null;
-
-		if (upper) {
-			tv.setId(matchId + bd.matchIdOffset + BrNodeType.UPPER);
-			smType = bd.sm1Types.get(idx);
-			switch (smType) {
-			case BrNodeType.TIP:
-				sm = sMembers.get(bd.sm1Idcs.get(idx));
-				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
-						+ sm.getPlayer().getNickName());
-				tv.setBackgroundResource(R.drawable.bracket_top_labeled);
-				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
-						Mode.MULTIPLY);
-				break;
-			case BrNodeType.UNSET:
-				tv.setBackgroundResource(R.drawable.bracket_top);
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
-			}
-			if (bd.sm2Types.get(idx) == BrNodeType.NA) {
-				tv.setBackgroundResource(R.drawable.bracket_endpoint);
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-			}
-		} else {
-			tv.setId(matchId + bd.matchIdOffset + BrNodeType.LOWER);
-			smType = bd.sm2Types.get(idx);
-			switch (smType) {
-			case BrNodeType.TIP:
-				sm = sMembers.get(bd.sm2Idcs.get(idx));
-				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
-						+ sm.getPlayer().getNickName());
-				tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
-				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
-						Mode.MULTIPLY);
-				break;
-			case BrNodeType.UNSET:
-				tv.setBackgroundResource(R.drawable.bracket_bottom);
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
-			}
-		}
-		tv.setGravity(Gravity.RIGHT);
-		tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
-
-		tv.setOnClickListener(this);
-
-		return tv;
-	}
-
 	private void addViewToLayout(Bracket bd, TextView tv, Boolean isLabeled) {
 		Integer matchId = tv.getId() % BrNodeType.MOD;
-		Boolean upper = isUpperView(tv.getId());
+		Boolean upper = bd.isUpperView(tv.getId());
 		Integer tier = bd.getTier(matchId);
 
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
@@ -552,5 +489,14 @@ public class BracketHolder implements View.OnClickListener {
 				}
 			}
 		}
+	}
+
+	/** find n such that 2**n >= p */
+	public Integer factorTwos(int p) {
+		Integer n = 1;
+		while (Math.pow(2, n) < p) {
+			n++;
+		}
+		return n;
 	}
 }

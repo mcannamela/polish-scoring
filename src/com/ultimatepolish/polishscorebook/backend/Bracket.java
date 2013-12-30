@@ -1,12 +1,19 @@
 package com.ultimatepolish.polishscorebook.backend;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.TextView;
 
 import com.ultimatepolish.db.SessionMember;
 import com.ultimatepolish.enums.BrNodeType;
+import com.ultimatepolish.polishscorebook.R;
 
 public class Bracket {
 	public static String LOGTAG = "Bracket";
@@ -15,28 +22,27 @@ public class Bracket {
 	private int headerIdOffset = 0;
 	private int matchIdOffset = 0;
 	private int nLeafs;
-	private List<Integer> matchIds = new ArrayList<Integer>();
-	private List<Integer> sm1Idcs = new ArrayList<Integer>();
-	private List<Integer> sm1Types = new ArrayList<Integer>();
-	private List<Integer> sm2Idcs = new ArrayList<Integer>();
-	private List<Integer> sm2Types = new ArrayList<Integer>();
-	private List<Long> gameIds = new ArrayList<Long>();
+	private HashMap<Integer, SessionMember> smMap = new HashMap<Integer, SessionMember>();
+	public List<Integer> matchIds = new ArrayList<Integer>();
+	public List<Integer> sm1Idcs = new ArrayList<Integer>();
+	public List<Integer> sm1Types = new ArrayList<Integer>();
+	public List<Integer> sm2Idcs = new ArrayList<Integer>();
+	public List<Integer> sm2Types = new ArrayList<Integer>();
+	public List<Long> gameIds = new ArrayList<Long>();
 
-	public Bracket(int nLeafs) {
-		this.nLeafs = (int) Math.pow(2, factorTwos(nLeafs));
-		addMatches();
-	}
+	public Bracket(List<SessionMember> sMembers) {
+		// fast check that nLeafs is a power of two
+		this.nLeafs = sMembers.size();
+		assert (nLeafs & (nLeafs - 1)) == 0;
+		seed(sMembers);
 
-	private void addMatches() {
-		for (int ii = 0; ii < nLeafs; ii++) {
-			matchIds.add(ii);
-			sm1Idcs.add(-1);
-			sm1Types.add(BrNodeType.UNSET);
-			sm2Idcs.add(-1);
-			sm2Types.add(BrNodeType.UNSET);
-			gameIds.add((long) -1);
+		int seed;
+		for (SessionMember sm : sMembers) {
+			seed = sm.getSeed();
+			if (seed >= 0 && !smMap.containsKey(seed)) {
+				smMap.put(seed, sm);
+			}
 		}
-		sm2Types.set(nLeafs - 1, BrNodeType.NA);
 	}
 
 	private void removeMatch(int pos) {
@@ -54,7 +60,59 @@ public class Bracket {
 		this.matchIdOffset = matchIdOffset;
 	}
 
-	private int getTier(int viewId) {
+	public TextView makeHalfMatchView(Context context, int idx, Boolean upper) {
+		TextView tv = new TextView(context);
+
+		int matchId = matchIds.get(idx);
+		int smType = BrNodeType.TIP;
+		SessionMember sm = null;
+
+		if (upper) {
+			tv.setId(matchId + matchIdOffset + BrNodeType.UPPER);
+			smType = sm1Types.get(idx);
+			switch (smType) {
+			case BrNodeType.TIP:
+				sm = smMap.get(sm1Idcs.get(idx));
+				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
+						+ sm.getPlayer().getNickName());
+				tv.setBackgroundResource(R.drawable.bracket_top_labeled);
+				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
+						Mode.MULTIPLY);
+				break;
+			case BrNodeType.UNSET:
+				tv.setBackgroundResource(R.drawable.bracket_top);
+				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
+				break;
+			}
+			if (sm2Types.get(idx) == BrNodeType.NA) {
+				tv.setBackgroundResource(R.drawable.bracket_endpoint);
+				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
+			}
+		} else {
+			tv.setId(matchId + matchIdOffset + BrNodeType.LOWER);
+			smType = sm2Types.get(idx);
+			switch (smType) {
+			case BrNodeType.TIP:
+				sm = smMap.get(sm2Idcs.get(idx));
+				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
+						+ sm.getPlayer().getNickName());
+				tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
+				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
+						Mode.MULTIPLY);
+				break;
+			case BrNodeType.UNSET:
+				tv.setBackgroundResource(R.drawable.bracket_bottom);
+				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
+				break;
+			}
+		}
+		tv.setGravity(Gravity.RIGHT);
+		tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
+
+		return tv;
+	}
+
+	public int getTier(int viewId) {
 		// can take bracket idx or match idx
 		int matchId = viewId % BrNodeType.MOD;
 		return ((Double) Math.floor(-Math.log(1 - ((double) matchId) / nLeafs)
@@ -159,15 +217,40 @@ public class Bracket {
 		return hasLost;
 	}
 
-	public void seed(List<SessionMember> sMembers) {
-		// seed the winners bracket
-		for (Integer ii = 0; ii < sMembers.size(); ii += 2) {
-			if (sMembers.get(ii + 1).getSeed() == BrNodeType.BYE) {
-				modSMs(ii / 2, ii, BrNodeType.TIP, ii + 1, BrNodeType.BYE);
+	private void seed(List<SessionMember> sMembers) {
+		int sm1Seed;
+		int sm2Seed;
+
+		// seed the lowest tier
+		for (Integer ii = 0; ii < nLeafs; ii += 2) {
+			sm1Seed = sMembers.get(ii).getSeed();
+			sm2Seed = sMembers.get(ii + 1).getSeed();
+
+			matchIds.add(ii / 2);
+			sm1Idcs.add(sm1Seed);
+			sm1Types.add(BrNodeType.TIP);
+			sm2Idcs.add(sm2Seed);
+			if (sm2Seed == BrNodeType.BYE) {
+				sm2Types.add(BrNodeType.BYE);
 			} else {
-				modSMs(ii / 2, ii, BrNodeType.TIP, ii + 1, BrNodeType.TIP);
+				sm2Types.add(BrNodeType.TIP);
 			}
+			gameIds.add((long) -1);
 		}
+
+		// add the rest of the matches
+		for (int ii = nLeafs / 2; ii < nLeafs; ii++) {
+			matchIds.add(ii);
+			sm1Idcs.add(-1);
+			sm1Types.add(BrNodeType.UNSET);
+			sm2Idcs.add(-1);
+			sm2Types.add(BrNodeType.UNSET);
+			gameIds.add((long) -1);
+		}
+
+		// last match is actually just the winner
+		sm2Types.set(nLeafs - 1, BrNodeType.NA);
+
 		byeByes();
 	}
 
@@ -289,15 +372,6 @@ public class Bracket {
 		return matchIds.size();
 	}
 
-	/** find n such that 2**n >= p */
-	public Integer factorTwos(int p) {
-		Integer n = 1;
-		while (Math.pow(2, n) < p) {
-			n++;
-		}
-		return n;
-	}
-
 	public class MatchInfo {
 		public long gameId = -1;
 		public long p1Id = -1;
@@ -316,12 +390,12 @@ public class Bracket {
 
 			if (sm1Type == BrNodeType.TIP || sm1Type == BrNodeType.WIN
 					|| sm1Type == BrNodeType.LOSS) {
-				p1Id = sMembers.get(bd.sm1Idcs.get(idx)).getPlayer().getId();
+				p1Id = smMap.get(bd.sm1Idcs.get(idx)).getPlayer().getId();
 			}
 
 			if (sm2Type == BrNodeType.TIP || sm2Type == BrNodeType.WIN
 					|| sm2Type == BrNodeType.LOSS) {
-				p2Id = sMembers.get(bd.sm2Idcs.get(idx)).getPlayer().getId();
+				p2Id = smMap.get(bd.sm2Idcs.get(idx)).getPlayer().getId();
 			}
 
 			if (sm1Type == BrNodeType.TIP && sm2Type == BrNodeType.TIP) {
@@ -339,7 +413,7 @@ public class Bracket {
 			if (sm1Type == BrNodeType.UNSET) {
 				marquee += "Unknown";
 			} else {
-				marquee += sMembers.get(bd.sm1Idcs.get(idx)).getPlayer()
+				marquee += smMap.get(bd.sm1Idcs.get(idx)).getPlayer()
 						.getNickName();
 				if (sm1Type == BrNodeType.WIN) {
 					marquee += " (W)";
@@ -355,7 +429,7 @@ public class Bracket {
 				marquee += ", tournament winner.";
 			} else {
 				marquee += " -vs- "
-						+ sMembers.get(bd.sm2Idcs.get(idx)).getPlayer()
+						+ smMap.get(bd.sm2Idcs.get(idx)).getPlayer()
 								.getNickName();
 				if (sm2Type == BrNodeType.WIN) {
 					marquee += " (W)";
