@@ -35,7 +35,7 @@ public class Bracket {
 	public List<Integer> sm2Idcs = new ArrayList<Integer>();
 	public List<Integer> sm2Types = new ArrayList<Integer>();
 	public List<Long> gameIds = new ArrayList<Long>();
-	public RelativeLayout rl;
+	private RelativeLayout rl;
 
 	public Bracket(List<SessionMember> sMembers, RelativeLayout rl) {
 		// fast check that nLeafs is a power of two
@@ -67,6 +67,92 @@ public class Bracket {
 		assert matchIdOffset - this.matchIdOffset >= 0;
 		this.headerIdOffset = headerIdOffset;
 		this.matchIdOffset = matchIdOffset;
+	}
+
+	public void buildBracket(Context context) {
+		buildBracket(context, -1, -1);
+	}
+
+	public void buildBracket(Context context, int aboveViewId, int columnViewId) {
+		TextView tv;
+
+		// lay out the bracket
+		makeInvisibleHeaders(350, 150, aboveViewId, columnViewId);
+
+		for (Integer mPos = 0; mPos < length(); mPos++) {
+			// upper half of match
+			tv = makeHalfMatchView(context, mPos, true);
+			// tv.setOnClickListener(this);
+			if (sm1Types.get(mPos) == BrNodeType.TIP) {
+				addViewToLayout(tv, true);
+			} else {
+				addViewToLayout(tv, false);
+			}
+
+			// lower half of match
+			if (sm2Types.get(mPos) != BrNodeType.NA) {
+				tv = makeHalfMatchView(context, mPos, false);
+				if (sm2Types.get(mPos) == BrNodeType.TIP) {
+					addViewToLayout(tv, true);
+				} else {
+					addViewToLayout(tv, false);
+				}
+			}
+		}
+	}
+
+	private void makeInvisibleHeaders(int baseWidth, int tierWidth,
+			int aboveViewId, int columnViewId) {
+		// invisible headers are for spacing the bracket.
+		TextView tv;
+		RelativeLayout.LayoutParams lp;
+		Context context = rl.getContext();
+
+		int vwHeight = 10;
+		Log.i(LOGTAG, "baseWidth: " + baseWidth + ", tierWidth: " + tierWidth
+				+ ", belowId: " + aboveViewId + ", offset: " + columnViewId);
+
+		// header for the labeled brackets on tier 0
+		tv = new TextView(context);
+		tv.setWidth(baseWidth);
+		tv.setHeight(vwHeight);
+		tv.setId(1 + headerIdOffset);
+		tv.setBackgroundColor(Color.BLACK);
+		lp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		if (columnViewId > 0) {
+			lp.addRule(RelativeLayout.ALIGN_RIGHT, columnViewId);
+		} else {
+			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 1);
+		}
+		if (aboveViewId > 0) {
+			lp.addRule(RelativeLayout.BELOW, aboveViewId);
+		}
+		rl.addView(tv, lp);
+
+		// headers for the remaining tiers
+		Integer nTiers = factorTwos(nLeafs);
+
+		// tier width = (screen width - label width - arbitrary side spacing) /
+		// number of tiers
+		// tierWidth = (svWidth - 350 - 100) / nTiers;
+
+		int[] vwColor = { Color.RED, Color.BLUE, Color.GREEN };
+		for (Integer i = 0; i < nTiers; i++) {
+			tv = new TextView(context);
+			tv.setWidth(tierWidth);
+			tv.setHeight(vwHeight);
+			tv.setId(i + 2 + headerIdOffset);
+			tv.setBackgroundColor(vwColor[i % 3]);
+			lp = new RelativeLayout.LayoutParams(
+					RelativeLayout.LayoutParams.WRAP_CONTENT,
+					RelativeLayout.LayoutParams.WRAP_CONTENT);
+			lp.addRule(RelativeLayout.ALIGN_BASELINE, 1 + headerIdOffset);
+			lp.addRule(RelativeLayout.RIGHT_OF, i + 1 + headerIdOffset);
+			lp.setMargins(-14, 0, 0, 0);
+			rl.addView(tv, lp);
+		}
 	}
 
 	public TextView makeHalfMatchView(Context context, int idx, Boolean upper) {
@@ -104,7 +190,6 @@ public class Bracket {
 				drwColor = sm.getPlayer().getColor();
 			}
 		}
-		Log.i(LOGTAG, "drwStr is " + drwStr);
 		tv.setBackgroundResource(BrDrawable.map.get(drwStr));
 		tv.getBackground().setColorFilter(drwColor, Mode.MULTIPLY);
 		tv.setGravity(Gravity.RIGHT);
@@ -114,26 +199,26 @@ public class Bracket {
 	}
 
 	public void addViewToLayout(TextView tv, Boolean isLabeled) {
-		Integer matchId = tv.getId() % BrNodeType.MOD;
-		Boolean upper = isUpperView(tv.getId());
+		Integer matchId = tv.getId() % BrNodeType.MOD - matchIdOffset;
+		Boolean upper = isUpperView(tv.getId() - matchIdOffset);
 		Integer tier = getTier(matchId);
 
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 		if (!isLabeled) {
-			lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 1);
+			lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 1 + headerIdOffset);
 			if (tier == getTier(nLeafs - 1)) {
 				lp.setMargins(0, -25, 0, 0);
 			} else if (upper) {
 				Integer topParentMatch = getUpperMatchParent(matchId);
 				lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch
-						+ BrNodeType.LOWER);
+						+ matchIdOffset + BrNodeType.LOWER);
 				lp.setMargins(0, -2, 0, 0);
 			} else {
 				Integer bottomParentMatch = getUpperMatchParent(matchId) + 1;
 				lp.addRule(RelativeLayout.ABOVE, bottomParentMatch
-						+ BrNodeType.LOWER);
+						+ matchIdOffset + BrNodeType.LOWER);
 				lp.setMargins(0, 0, 0, -2);
 			}
 
@@ -145,7 +230,7 @@ public class Bracket {
 			}
 		}
 
-		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 1);
+		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 1 + headerIdOffset);
 		lp.addRule(RelativeLayout.BELOW, findViewAbove(tv.getId()));
 
 		rl.addView(tv, lp);
@@ -260,7 +345,6 @@ public class Bracket {
 		Integer matchId = viewId % BrNodeType.MOD - matchIdOffset;
 
 		Integer viewAboveId = headerIdOffset + 1;
-		Log.i(LOGTAG, "findviewabove, headerOffset is " + headerIdOffset);
 
 		if (!isUpperView(viewId)) {
 			viewAboveId = matchId + matchIdOffset + BrNodeType.UPPER;
@@ -395,10 +479,7 @@ public class Bracket {
 		long gId;
 		int smASeed;
 		int smBSeed;
-		List<Integer> matchedIdx = new ArrayList<Integer>();
 
-		Log.i(LOGTAG, "sGames has " + sGames.size() + " items ");
-		Log.i(LOGTAG, "nMatches has " + length() + " items ");
 		Iterator<Game> gIt = sGames.iterator();
 		while (gIt.hasNext()) {
 			Game g = gIt.next();
@@ -406,8 +487,6 @@ public class Bracket {
 			smASeed = smIdMap.get(g.getFirstPlayer().getId());
 			smBSeed = smIdMap.get(g.getSecondPlayer().getId());
 
-			Log.i(LOGTAG, "Matching game " + gId + " (" + smASeed + "/"
-					+ smBSeed + ")");
 			if (gameIds.contains(gId)) {
 				int idx = gameIds.indexOf(gId);
 				assert hasSm(idx, smASeed) && hasSm(idx, smBSeed);
@@ -561,4 +640,12 @@ public class Bracket {
 		}
 	}
 
+	/** find n such that 2**n >= p */
+	public static Integer factorTwos(int p) {
+		Integer n = 1;
+		while (Math.pow(2, n) < p) {
+			n++;
+		}
+		return n;
+	}
 }

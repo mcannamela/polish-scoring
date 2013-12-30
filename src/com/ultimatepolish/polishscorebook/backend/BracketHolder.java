@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
@@ -67,93 +65,21 @@ public class BracketHolder implements View.OnClickListener {
 
 		foldRoster();
 		wBr = new Bracket(sMembers, rl);
-		buildWinnersBracket();
+		wBr.buildBracket(context);
 
 		if (isDoubleElim) {
+			int wBrLowest;
+			if (wBr.matchIds.contains(sMembers.size() / 2)) {
+				wBrLowest = sMembers.size() / 2 - 1 + BrNodeType.LOWER;
+			} else {
+				wBrLowest = wBr.findViewAbove(sMembers.size() / 2 - 1
+						+ BrNodeType.LOWER);
+			}
 
 			lBr = new Bracket(sMembers, rl);
-			lBr.changeOffsets(factorTwos(sMembers.size()) + 1, sMembers.size());
-			buildLosersBracket();
-		}
-	}
-
-	private void buildWinnersBracket() {
-		// matches and tiers are 0 based.
-		// matches are numbered top to bottom starting at tier 0 and continuing
-		// in higher tiers of winners bracket followed by losers bracket.
-
-		// Id for upper half of match = matchId + SMType.UPPER
-		// Id for lower half of match = matchId + SMType.LOWER
-
-		TextView tv;
-
-		// lay out the bracket
-		makeInvisibleHeaders(350, 150, 0, 0, 0);
-
-		for (Integer mPos = 0; mPos < wBr.length(); mPos++) {
-			// upper half of match
-			tv = wBr.makeHalfMatchView(context, mPos, true);
-			tv.setOnClickListener(this);
-			if (wBr.sm1Types.get(mPos) == BrNodeType.TIP) {
-				wBr.addViewToLayout(tv, true);
-			} else {
-				wBr.addViewToLayout(tv, false);
-			}
-
-			// lower half of match
-			if (wBr.sm2Types.get(mPos) != BrNodeType.NA) {
-				tv = wBr.makeHalfMatchView(context, mPos, false);
-				if (wBr.sm2Types.get(mPos) == BrNodeType.TIP) {
-					wBr.addViewToLayout(tv, true);
-				} else {
-					wBr.addViewToLayout(tv, false);
-				}
-			}
-		}
-	}
-
-	private void buildLosersBracket() {
-		// matches and tiers are 0 based.
-		// matches are numbered top to bottom starting at tier 0 and continuing
-		// in higher tiers of winners bracket followed by losers bracket.
-
-		// Id for upper half of match = matchId + SMType.UPPER
-		// Id for lower half of match = matchId + SMType.LOWER
-
-		TextView tv;
-
-		// lay out the bracket
-		int wBrLowest;
-		if (wBr.matchIds.contains(sMembers.size() / 2)) {
-			wBrLowest = sMembers.size() / 2 - 1 + BrNodeType.LOWER;
-		} else {
-			wBrLowest = wBr.findViewAbove(sMembers.size() / 2 - 1
-					+ BrNodeType.LOWER);
-		}
-		makeInvisibleHeaders(350, 150, 1, wBrLowest, 10);
-
-		for (Integer mPos = 0; mPos < lBr.length(); mPos++) {
-			// populate the bracket map
-
-			// upper half of match
-			tv = lBr.makeHalfMatchView(context, mPos, true);
-			tv.setOnClickListener(this);
-			if (lBr.sm1Types.get(mPos) == BrNodeType.TIP) {
-				lBr.addViewToLayout(tv, true);
-			} else {
-				lBr.addViewToLayout(tv, false);
-			}
-
-			// lower half of match
-			if (lBr.sm2Types.get(mPos) != BrNodeType.NA) {
-				tv = lBr.makeHalfMatchView(context, mPos, false);
-				tv.setOnClickListener(this);
-				if (lBr.sm2Types.get(mPos) == BrNodeType.TIP) {
-					lBr.addViewToLayout(tv, true);
-				} else {
-					lBr.addViewToLayout(tv, false);
-				}
-			}
+			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 1,
+					sMembers.size());
+			lBr.buildBracket(context, wBrLowest, 2);
 		}
 	}
 
@@ -183,59 +109,9 @@ public class BracketHolder implements View.OnClickListener {
 		assert sGamesList.isEmpty();
 	}
 
-	public void makeInvisibleHeaders(int baseWidth, int tierWidth,
-			int rightOfId, int belowId, int offset) {
-		// invisible headers are for spacing the bracket.
-		TextView tv;
-		RelativeLayout.LayoutParams lp;
-		int vwHeight = 10;
-		Log.i(LOGTAG, "baseWidth: " + baseWidth + ", tierWidth: " + tierWidth
-				+ ", rightOfId: " + rightOfId + ", belowId: " + belowId
-				+ ", offset: " + offset);
-
-		// header for the labeled brackets on tier 0
-		tv = new TextView(context);
-		tv.setWidth(baseWidth);
-		tv.setHeight(vwHeight);
-		tv.setId(1 + offset);
-		tv.setBackgroundColor(Color.BLACK);
-		lp = new RelativeLayout.LayoutParams(
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 1);
-		if (belowId > 0) {
-			Log.i(LOGTAG, "Header is below " + belowId);
-			lp.addRule(RelativeLayout.BELOW, belowId);
-		}
-		rl.addView(tv, lp);
-
-		// headers for the remaining tiers
-		Integer nTiers = factorTwos(sMembers.size());
-
-		// tier width = (screen width - label width - arbitrary side spacing) /
-		// number of tiers
-		// tierWidth = (svWidth - 350 - 100) / nTiers;
-
-		int[] vwColor = { Color.RED, Color.BLUE, Color.GREEN };
-		for (Integer i = 0; i < nTiers; i++) {
-			tv = new TextView(context);
-			tv.setWidth(tierWidth);
-			tv.setHeight(vwHeight);
-			tv.setId(i + 2 + offset);
-			tv.setBackgroundColor(vwColor[i % 3]);
-			lp = new RelativeLayout.LayoutParams(
-					RelativeLayout.LayoutParams.WRAP_CONTENT,
-					RelativeLayout.LayoutParams.WRAP_CONTENT);
-			lp.addRule(RelativeLayout.ALIGN_BASELINE, 1 + offset);
-			lp.addRule(RelativeLayout.RIGHT_OF, i + 1 + offset);
-			lp.setMargins(-14, 0, 0, 0);
-			rl.addView(tv, lp);
-		}
-	}
-
 	public void foldRoster() {
 		// expand the list size to the next power of two
-		Integer n = factorTwos(sMembers.size());
+		Integer n = Bracket.factorTwos(sMembers.size());
 
 		SessionMember dummySessionMember = new SessionMember(BrNodeType.BYE,
 				-1000);
@@ -341,12 +217,4 @@ public class BracketHolder implements View.OnClickListener {
 		}
 	}
 
-	/** find n such that 2**n >= p */
-	public Integer factorTwos(int p) {
-		Integer n = 1;
-		while (Math.pow(2, n) < p) {
-			n++;
-		}
-		return n;
-	}
 }
