@@ -14,7 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.Venue;
+import com.ultimatepolish.db.Venue;
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
 
 public class NewVenue extends MenuContainerActivity {
 	Long vId;

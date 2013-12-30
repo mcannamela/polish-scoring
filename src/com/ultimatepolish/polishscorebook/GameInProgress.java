@@ -34,11 +34,14 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.j256.ormlite.dao.Dao;
-import com.ultimatepolish.scorebookdb.ActiveGame;
-import com.ultimatepolish.scorebookdb.Throw;
-import com.ultimatepolish.scorebookdb.enums.DeadType;
-import com.ultimatepolish.scorebookdb.enums.ThrowResult;
-import com.ultimatepolish.scorebookdb.enums.ThrowType;
+import com.ultimatepolish.db.Throw;
+import com.ultimatepolish.enums.DeadType;
+import com.ultimatepolish.enums.ThrowResult;
+import com.ultimatepolish.enums.ThrowType;
+import com.ultimatepolish.polishscorebook.backend.ActiveGame;
+import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
+import com.ultimatepolish.polishscorebook.backend.ThrowTableFragment;
+import com.ultimatepolish.polishscorebook.backend.ThrowTableRow;
 
 public class GameInProgress extends MenuContainerActivity implements
 		ThrowTableFragment.OnTableRowClickedListener {
