@@ -2,7 +2,6 @@ package com.ultimatepolish.polishscorebook.backend;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
@@ -33,9 +32,6 @@ public class BracketHolder implements View.OnClickListener {
 	private Bracket lBr; // losers bracket
 	private Bracket fBr; // finals bracket
 
-	// sMemberMap maps a player id to a session member
-	public HashMap<Long, SessionMember> sMemberMap = new HashMap<Long, SessionMember>();
-
 	Dao<Session, Long> sDao;
 	Dao<SessionMember, Long> smDao;
 	Dao<Player, Long> pDao;
@@ -61,7 +57,6 @@ public class BracketHolder implements View.OnClickListener {
 					.orderBy(SessionMember.PLAYER_SEED, true).query();
 			for (SessionMember member : sMembers) {
 				pDao.refresh(member.getPlayer());
-				sMemberMap.put(member.getPlayer().getId(), member);
 			}
 		} catch (SQLException e) {
 			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -176,27 +171,16 @@ public class BracketHolder implements View.OnClickListener {
 			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
 		}
 
-		// step through the games for this session and associate each with a
-		// match in the bracket
-		int smIdxA;
-		int smIdxB;
-
-		for (Game g : sGamesList) {
-			smIdxA = sMemberMap.get(g.getFirstPlayer().getId()).getSeed();
-			smIdxB = sMemberMap.get(g.getSecondPlayer().getId()).getSeed();
-			wBr.matchMatches(g.getId(), smIdxA, smIdxB);
-
-			if (g.getIsComplete()) {
-				smIdxA = sMemberMap.get(g.getWinner().getId()).getSeed();
-				wBr.promoteWinner(wBr.gameIds.indexOf(g.getId()), smIdxA);
-			}
-		}
-
+		sGamesList = wBr.matchMatches(sGamesList);
 		wBr.refreshViews();
+
 		if (isDoubleElim) {
+			sGamesList = lBr.matchMatches(sGamesList);
 			lBr.refreshViews();
+			// sGamesList = fBr.matchMatches(sGamesList);
 			// fBr.refreshWinnersBracket();
 		}
+		assert sGamesList.isEmpty();
 	}
 
 	public void makeInvisibleHeaders(int baseWidth, int tierWidth,
