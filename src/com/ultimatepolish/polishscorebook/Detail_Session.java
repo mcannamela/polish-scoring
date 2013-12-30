@@ -27,7 +27,7 @@ public class Detail_Session extends MenuContainerActivity {
 	Long sId;
 	Session s;
 	Dao<Session, Long> sDao;
-	Bracket bracket;
+	Bracket bracket = null;
 	TextView matchText;
 	Button loadMatch;
 	MatchInfo mInfo;
@@ -50,7 +50,10 @@ public class Detail_Session extends MenuContainerActivity {
 			}
 		}
 
-		if (s.sessionType == SessionType.SNGL_ELIM) {
+		if (s.sessionType == SessionType.SNGL_ELIM
+				|| s.sessionType == SessionType.DBL_ELIM) {
+			boolean isDblElim = s.sessionType == SessionType.DBL_ELIM;
+
 			setContentView(R.layout.activity_detail_session_singleelim);
 			ScrollView sv = (ScrollView) findViewById(R.id.scrollView1);
 
@@ -60,7 +63,7 @@ public class Detail_Session extends MenuContainerActivity {
 			matchText = (TextView) findViewById(R.id.sDet_match);
 			loadMatch = (Button) findViewById(R.id.sDet_loadMatch);
 
-			bracket = new Bracket(sv, s, false) {
+			bracket = new Bracket(sv, s, isDblElim) {
 				@Override
 				public void onClick(View v) {
 					mInfo = bracket.getMatchInfo(v.getId());
@@ -108,8 +111,8 @@ public class Detail_Session extends MenuContainerActivity {
 	protected void onResume() {
 		super.onResume();
 		refreshDetails();
-		if (s.sessionType == SessionType.SNGL_ELIM) {
-			bracket.refreshSingleElimBracket();
+		if (bracket != null) {
+			bracket.refreshWinnersBracket();
 		}
 	}
 

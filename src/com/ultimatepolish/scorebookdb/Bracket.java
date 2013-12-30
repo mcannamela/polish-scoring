@@ -28,8 +28,9 @@ public class Bracket implements View.OnClickListener {
 	public RelativeLayout rl;
 	private List<SessionMember> sMembers = new ArrayList<SessionMember>();
 	private Boolean isDoubleElim;
-	private BracketData wBr;
-	private BracketData lBr;
+	private BracketData wBr; // winners bracket
+	private BracketData lBr; // losers bracket
+	private BracketData fBr; // finals bracket
 
 	// sMemberMap maps a player id to a session member
 	public HashMap<Long, SessionMember> sMemberMap = new HashMap<Long, SessionMember>();
@@ -65,45 +66,36 @@ public class Bracket implements View.OnClickListener {
 			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
 		}
 
-		if (isDoubleElim) {
-			for (int ii = 0; ii < 2 * sMembers.size(); ii++) {
-				lBr.addMatch(ii);
-			}
-		}
+		rl = new RelativeLayout(context);
+		this.context = rl.getContext();
 
-		createSingleElimBracket();
+		foldRoster();
+		wBr = new BracketData(sMembers.size());
+		wBr.seed(sMembers);
+		buildWinnersBracket();
+
+		if (isDoubleElim) {
+
+			lBr = new BracketData(sMembers.size());
+			lBr.changeOffsets(factorTwos(sMembers.size()) + 1, sMembers.size());
+			lBr.seed(sMembers);
+			buildLosersBracket();
+		}
 	}
 
-	private void createSingleElimBracket() {
+	private void buildWinnersBracket() {
 		// matches and tiers are 0 based.
 		// matches are numbered top to bottom starting at tier 0 and continuing
 		// in higher tiers of winners bracket followed by losers bracket.
 
-		// Id for upper half of match = 1000 + matchId
-		// Id for lower half of match = 2000 + matchId
+		// Id for upper half of match = matchId + SMType.UPPER
+		// Id for lower half of match = matchId + SMType.LOWER
 
-		rl = new RelativeLayout(context);
-		this.context = rl.getContext();
-		RelativeLayout.LayoutParams lp;
 		TextView tv;
 		Integer matchIdx;
 
-		SessionMember byeMember = new SessionMember(SMType.BYE, -1000);
-		SessionMember unsetMember = new SessionMember(SMType.UNSET, -1000);
-
-		// seed the winners bracket
-		foldRoster();
-		wBr = new BracketData(sMembers.size());
-		for (Integer ii = 0; ii < sMembers.size(); ii += 2) {
-			if (sMembers.get(ii + 1).getSeed() == SMType.BYE) {
-				wBr.modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.BYE);
-			} else {
-				wBr.modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.TIP);
-			}
-		}
-		wBr.byeBye();
-
-		makeInvisibleHeaders(rl);
+		// lay out the bracket
+		makeInvisibleHeaders(350, 150, 0, 0, 0);
 
 		for (Integer mPos = 0; mPos < wBr.length(); mPos++) {
 			// populate the bracket map
@@ -112,24 +104,69 @@ public class Bracket implements View.OnClickListener {
 			// upper half of match
 			tv = makeHalfBracket(wBr, matchIdx, true);
 			if (wBr.sm1Types.get(mPos) == SMType.TIP) {
-				addViewToLayout(tv, true);
+				addViewToLayout(wBr, tv, true);
 			} else {
-				addViewToLayout(tv, false);
+				addViewToLayout(wBr, tv, false);
 			}
 
 			// lower half of match
 			if (wBr.sm2Types.get(mPos) != SMType.NA) {
 				tv = makeHalfBracket(wBr, matchIdx, false);
 				if (wBr.sm2Types.get(mPos) == SMType.TIP) {
-					addViewToLayout(tv, true);
+					addViewToLayout(wBr, tv, true);
 				} else {
-					addViewToLayout(tv, false);
+					addViewToLayout(wBr, tv, false);
 				}
 			}
 		}
 	}
 
-	public void refreshSingleElimBracket() {
+	private void buildLosersBracket() {
+		// matches and tiers are 0 based.
+		// matches are numbered top to bottom starting at tier 0 and continuing
+		// in higher tiers of winners bracket followed by losers bracket.
+
+		// Id for upper half of match = matchId + SMType.UPPER
+		// Id for lower half of match = matchId + SMType.LOWER
+
+		TextView tv;
+		Integer matchIdx;
+
+		// lay out the bracket
+		int wBrLowest;
+		if (wBr.matchIds.contains(sMembers.size() / 2)) {
+			wBrLowest = sMembers.size() / 2 - 1 + SMType.LOWER;
+		} else {
+			wBrLowest = wBr.findViewAbove(sMembers.size() / 2 - 1
+					+ SMType.LOWER);
+		}
+		makeInvisibleHeaders(350, 150, 1, wBrLowest, lBr.headerIdOffset);
+
+		for (Integer mPos = 0; mPos < lBr.length(); mPos++) {
+			// populate the bracket map
+			matchIdx = lBr.matchIds.get(mPos);
+
+			// upper half of match
+			tv = makeHalfBracket(lBr, matchIdx, true);
+			if (lBr.sm1Types.get(mPos) == SMType.TIP) {
+				addViewToLayout(lBr, tv, true);
+			} else {
+				addViewToLayout(lBr, tv, false);
+			}
+
+			// lower half of match
+			if (lBr.sm2Types.get(mPos) != SMType.NA) {
+				tv = makeHalfBracket(lBr, matchIdx, false);
+				if (lBr.sm2Types.get(mPos) == SMType.TIP) {
+					addViewToLayout(lBr, tv, true);
+				} else {
+					addViewToLayout(lBr, tv, false);
+				}
+			}
+		}
+	}
+
+	public void refreshWinnersBracket() {
 		TextView tv;
 
 		// get all the completed games for the session, ordered by date played
@@ -155,7 +192,7 @@ public class Bracket implements View.OnClickListener {
 					.get(g.getFirstPlayer().getId()));
 			smIdxB = sMembers.indexOf(sMemberMap.get(g.getSecondPlayer()
 					.getId()));
-			wBr.matchMatch(g.getId(), smIdxA, smIdxB);
+			wBr.matchMatches(g.getId(), smIdxA, smIdxB);
 
 			if (g.getIsComplete()) {
 				smIdxA = sMembers
@@ -262,76 +299,51 @@ public class Bracket implements View.OnClickListener {
 		}
 	}
 
-	public void foldRoster() {
-		// expand the list size to the next power of two
-		Integer n = factorTwos(sMembers.size());
-
-		SessionMember dummySessionMember = new SessionMember(SMType.BYE, -1000);
-
-		while (sMembers.size() < Math.pow(2, n)) {
-			sMembers.add(dummySessionMember);
-		}
-		List<SessionMember> tempRoster = new ArrayList<SessionMember>();
-		for (Integer i = 0; i < n - 1; i++) {
-			tempRoster.clear();
-			for (Integer j = 0; j < sMembers.size() / Math.pow(2, i + 1); j++) {
-				tempRoster.addAll(sMembers.subList(j * (int) Math.pow(2, i),
-						(j + 1) * (int) Math.pow(2, i)));
-				tempRoster.addAll(sMembers.subList(sMembers.size() - (j + 1)
-						* (int) Math.pow(2, i), sMembers.size() - (j)
-						* (int) Math.pow(2, i)));
-			}
-			sMembers.clear();
-			sMembers.addAll(tempRoster);
-		}
-	}
-
-	public Integer factorTwos(Integer rosterSize) {
-		Integer n = 1;
-		while (Math.pow(2, n) < rosterSize) {
-			n++;
-		}
-		return n;
-	}
-
-	public void makeInvisibleHeaders(RelativeLayout rl) {
+	public void makeInvisibleHeaders(int baseWidth, int tierWidth,
+			int rightOfId, int belowId, int offset) {
 		// invisible headers are for spacing the bracket.
 		TextView tv;
 		RelativeLayout.LayoutParams lp;
+		int vwHeight = 10;
+		Log.i(LOGTAG, "baseWidth: " + baseWidth + ", tierWidth: " + tierWidth
+				+ ", rightOfId: " + rightOfId + ", belowId: " + belowId
+				+ ", offset: " + offset);
 
 		// header for the labeled brackets on tier 0
 		tv = new TextView(context);
-		tv.setWidth(350);
-		tv.setHeight(0);
-		tv.setId(1);
+		tv.setWidth(baseWidth);
+		tv.setHeight(vwHeight);
+		tv.setId(1 + offset);
 		tv.setBackgroundColor(Color.BLACK);
 		lp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
 		lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 1);
+		if (belowId > 0) {
+			Log.i(LOGTAG, "Header is below " + belowId);
+			lp.addRule(RelativeLayout.BELOW, belowId);
+		}
 		rl.addView(tv, lp);
 
 		// headers for the remaining tiers
 		Integer nTiers = factorTwos(sMembers.size());
 
-		Integer tierWidth = 150;
-
 		// tier width = (screen width - label width - arbitrary side spacing) /
 		// number of tiers
 		// tierWidth = (svWidth - 350 - 100) / nTiers;
 
+		int[] vwColor = { Color.RED, Color.BLUE, Color.GREEN };
 		for (Integer i = 0; i < nTiers; i++) {
 			tv = new TextView(context);
 			tv.setWidth(tierWidth);
-			tv.setHeight(0);
-			tv.setId(i + 2);
-			tv.setBackgroundColor(Color.RED);
+			tv.setHeight(vwHeight);
+			tv.setId(i + 2 + offset);
+			tv.setBackgroundColor(vwColor[i % 3]);
 			lp = new RelativeLayout.LayoutParams(
 					RelativeLayout.LayoutParams.WRAP_CONTENT,
 					RelativeLayout.LayoutParams.WRAP_CONTENT);
-			lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
-			lp.addRule(RelativeLayout.RIGHT_OF, i + 1);
+			lp.addRule(RelativeLayout.ALIGN_BASELINE, 1 + offset);
+			lp.addRule(RelativeLayout.RIGHT_OF, i + 1 + offset);
 			lp.setMargins(-14, 0, 0, 0);
 			rl.addView(tv, lp);
 		}
@@ -346,7 +358,7 @@ public class Bracket implements View.OnClickListener {
 		SessionMember sm = null;
 
 		if (upper) {
-			tv.setId(matchId + SMType.UPPER);
+			tv.setId(matchId + bd.matchIdOffset + SMType.UPPER);
 			smType = bd.sm1Types.get(idx);
 			switch (smType) {
 			case SMType.TIP:
@@ -367,7 +379,7 @@ public class Bracket implements View.OnClickListener {
 				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
 			}
 		} else {
-			tv.setId(matchId + SMType.LOWER);
+			tv.setId(matchId + bd.matchIdOffset + SMType.LOWER);
 			smType = bd.sm2Types.get(idx);
 			switch (smType) {
 			case SMType.TIP:
@@ -392,101 +404,25 @@ public class Bracket implements View.OnClickListener {
 		return tv;
 	}
 
-	public Integer getTier(Integer bracketIdx) {
-		// can take bracket idx or match idx
-		Integer matchIdx = bracketIdx % 1000;
-		return ((Double) Math.floor(-Math.log(1 - ((double) matchIdx)
-				/ sMembers.size())
-				/ Math.log(2))).intValue();
-	}
-
-	public Integer getTopMatchOfTier(Integer tier) {
-		return (int) (sMembers.size() * (1 - Math.pow(2, -tier)));
-	}
-
-	public Integer findViewAbove(BracketData bd, Integer viewId) {
-		Integer matchId = viewId % SMType.MOD;
-		Integer viewAboveId = 1;
-
-		if (!isUpperView(viewId)) {
-			viewAboveId = matchId + SMType.UPPER;
-		} else {
-			Integer baseId = matchId;
-			if (getTier(matchId) > 0) {
-				baseId = getTopParentMatch(matchId);
-			}
-			if (bd.matchIds.contains(baseId) && baseId != matchId) {
-				viewAboveId = baseId + SMType.UPPER;
-			} else {
-				if (baseId > getTopMatchOfTier(getTier(baseId))) {
-					// have to keep track of upper/lower now
-					baseId += SMType.LOWER - 1; // lower arm of the match above
-					while (!bd.matchIds.contains(baseId % SMType.MOD)) {
-						baseId = getChildBracketId(baseId);
-					}
-					viewAboveId = baseId;
-				}
-			}
-		}
-
-		Log.i(LOGTAG, "viewId: " + viewId + " placed below " + viewAboveId);
-		return viewAboveId;
-	}
-
-	public boolean isUpperView(int viewId) {
-		assert viewId >= 1000;
-		if (viewId < 2000) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public Integer getTopParentMatch(Integer bracketIdx) {
-		// can take bracket idx or match idx
-		Integer matchIdx = bracketIdx % 1000;
-		Integer tier = getTier(matchIdx);
-		Integer topOfTier = getTopMatchOfTier(tier);
-		Integer topOfPrevTier = getTopMatchOfTier(tier - 1);
-
-		Integer topParentMatch = topOfPrevTier + 2 * (matchIdx - topOfTier);
-		return topParentMatch;
-	}
-
-	public Integer getChildBracketId(Integer bracketIdx) {
-		// this can take in a bracket or match idx
-		Integer matchIdx = bracketIdx % 1000;
-		Integer tier = getTier(matchIdx);
-		Integer topOfTier = getTopMatchOfTier(tier);
-		Integer topOfNextTier = getTopMatchOfTier(tier + 1);
-
-		Integer childBracket = topOfNextTier + (matchIdx - topOfTier) / 2
-				+ 1000;
-		if (matchIdx % 2 != 0) {
-			childBracket += 1000;
-		}
-		return childBracket;
-	}
-
-	private void addViewToLayout(TextView tv, Boolean isLabeled) {
+	private void addViewToLayout(BracketData bd, TextView tv, Boolean isLabeled) {
 		Integer matchId = tv.getId() % SMType.MOD;
 		Boolean upper = isUpperView(tv.getId());
-		Integer tier = getTier(matchId);
+		Integer tier = bd.getTier(matchId);
 
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 		if (!isLabeled) {
 			lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 1);
-			if (tier == getTier(sMembers.size() - 1)) {
+			if (tier == bd.getTier(sMembers.size() - 1)) {
 				lp.setMargins(0, -25, 0, 0);
 			} else if (upper) {
-				Integer topParentMatch = getTopParentMatch(matchId);
+				Integer topParentMatch = bd.getTopParentMatch(matchId);
 				lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch
 						+ SMType.LOWER);
 				lp.setMargins(0, -2, 0, 0);
 			} else {
-				Integer bottomParentMatch = getTopParentMatch(matchId) + 1;
+				Integer bottomParentMatch = bd.getTopParentMatch(matchId) + 1;
 				lp.addRule(RelativeLayout.ABOVE, bottomParentMatch
 						+ SMType.LOWER);
 				lp.setMargins(0, 0, 0, -2);
@@ -501,9 +437,51 @@ public class Bracket implements View.OnClickListener {
 		}
 
 		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 1);
-		lp.addRule(RelativeLayout.BELOW, findViewAbove(wBr, tv.getId()));
+		lp.addRule(RelativeLayout.BELOW, bd.findViewAbove(tv.getId()));
 
 		rl.addView(tv, lp);
+	}
+
+	public void foldRoster() {
+		// expand the list size to the next power of two
+		Integer n = factorTwos(sMembers.size());
+
+		SessionMember dummySessionMember = new SessionMember(SMType.BYE, -1000);
+
+		while (sMembers.size() < Math.pow(2, n)) {
+			sMembers.add(dummySessionMember);
+		}
+		List<SessionMember> tempRoster = new ArrayList<SessionMember>();
+		for (Integer i = 0; i < n - 1; i++) {
+			tempRoster.clear();
+			for (Integer j = 0; j < sMembers.size() / Math.pow(2, i + 1); j++) {
+				tempRoster.addAll(sMembers.subList(j * (int) Math.pow(2, i),
+						(j + 1) * (int) Math.pow(2, i)));
+				tempRoster.addAll(sMembers.subList(sMembers.size() - (j + 1)
+						* (int) Math.pow(2, i), sMembers.size() - (j)
+						* (int) Math.pow(2, i)));
+			}
+			sMembers.clear();
+			sMembers.addAll(tempRoster);
+		}
+	}
+
+	/** find n such that 2**n >= p */
+	public Integer factorTwos(int p) {
+		Integer n = 1;
+		while (Math.pow(2, n) < p) {
+			n++;
+		}
+		return n;
+	}
+
+	public boolean isUpperView(int viewId) {
+		assert viewId >= 1000;
+		if (viewId < 2000) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -523,6 +501,7 @@ public class Bracket implements View.OnClickListener {
 
 	private class BracketData {
 		public boolean isDoubleElim;
+		private int headerIdOffset = 0;
 		private int matchIdOffset = 0;
 		private int nLeafs;
 		private List<Integer> matchIds = new ArrayList<Integer>();
@@ -533,30 +512,20 @@ public class Bracket implements View.OnClickListener {
 		private List<Long> gameIds = new ArrayList<Long>();
 
 		public BracketData(int nLeafs) {
-			this(nLeafs, 0);
+			this.nLeafs = (int) Math.pow(2, factorTwos(nLeafs));
+			addMatches();
 		}
 
-		public BracketData(int nLeafs, int offset) {
-			this.nLeafs = nLeafs;
-			matchIdOffset = offset;
+		private void addMatches() {
 			for (int ii = 0; ii < nLeafs; ii++) {
-				addMatch(ii);
+				matchIds.add(ii);
+				sm1Idcs.add(-1);
+				sm1Types.add(SMType.UNSET);
+				sm2Idcs.add(-1);
+				sm2Types.add(SMType.UNSET);
+				gameIds.add((long) -1);
 			}
 			sm2Types.set(nLeafs - 1, SMType.NA);
-		}
-
-		public void addMatch(int matchId) {
-			addMatch(matchId, -1, SMType.UNSET, -1, SMType.UNSET);
-		}
-
-		public void addMatch(int matchId, int sm1Idx, int sm1Type, int sm2Idx,
-				int sm2Type) {
-			matchIds.add(matchId);
-			sm1Idcs.add(sm1Idx);
-			sm1Types.add(sm1Type);
-			sm2Idcs.add(sm2Idx);
-			sm2Types.add(sm2Type);
-			gameIds.add((long) -1);
 		}
 
 		private void removeMatch(int pos) {
@@ -568,7 +537,83 @@ public class Bracket implements View.OnClickListener {
 			gameIds.remove(pos);
 		}
 
-		public void modSMs(int matchId, int sm1Idx, int sm1Type, int sm2Idx,
+		public void changeOffsets(int headerIdOffset, int matchIdOffset) {
+			assert matchIdOffset - this.matchIdOffset >= 0;
+			this.headerIdOffset = headerIdOffset;
+			this.matchIdOffset = matchIdOffset;
+		}
+
+		private int getTier(int viewId) {
+			// can take bracket idx or match idx
+			int matchId = viewId % SMType.MOD;
+			return ((Double) Math.floor(-Math.log(1 - ((double) matchId)
+					/ nLeafs)
+					/ Math.log(2))).intValue();
+		}
+
+		public int getTopMatchOfTier(int tier) {
+			return (int) (nLeafs * (1 - Math.pow(2, -tier)));
+		}
+
+		public int getTopParentMatch(int bracketIdx) {
+			// can take bracket idx or match idx
+			Integer matchIdx = bracketIdx % SMType.MOD;
+			Integer tier = getTier(matchIdx);
+			Integer topOfTier = getTopMatchOfTier(tier);
+			Integer topOfPrevTier = getTopMatchOfTier(tier - 1);
+
+			Integer topParentMatch = topOfPrevTier + 2 * (matchIdx - topOfTier);
+			return topParentMatch;
+		}
+
+		public int getChildBracketId(int bracketIdx) {
+			// this can take in a bracket or match idx
+			Integer matchIdx = bracketIdx % SMType.MOD;
+			Integer tier = getTier(matchIdx);
+			Integer topOfTier = getTopMatchOfTier(tier);
+			Integer topOfNextTier = getTopMatchOfTier(tier + 1);
+
+			Integer childBracket = topOfNextTier + (matchIdx - topOfTier) / 2
+					+ SMType.UPPER;
+			if (matchIdx % 2 != 0) {
+				childBracket += 1000;
+			}
+			return childBracket;
+		}
+
+		public int findViewAbove(int viewId) {
+			Integer matchId = viewId % SMType.MOD - matchIdOffset;
+
+			Integer viewAboveId = headerIdOffset + 1;
+			Log.i(LOGTAG, "findviewabove, headerOffset is " + headerIdOffset);
+
+			if (!isUpperView(viewId)) {
+				viewAboveId = matchId + matchIdOffset + SMType.UPPER;
+			} else {
+				Integer baseId = matchId;
+				if (getTier(matchId) > 0) {
+					baseId = getTopParentMatch(matchId);
+				}
+				if (matchIds.contains(baseId) && baseId != matchId) {
+					viewAboveId = baseId + matchIdOffset + SMType.UPPER;
+				} else {
+					if (baseId > getTopMatchOfTier(getTier(baseId))) {
+						// have to keep track of upper/lower now
+						baseId += SMType.LOWER - 1; // lower arm of the match
+													// above
+						while (!matchIds.contains(baseId % SMType.MOD)) {
+							baseId = getChildBracketId(baseId);
+						}
+						viewAboveId = baseId + matchIdOffset;
+					}
+				}
+			}
+
+			Log.i(LOGTAG, "viewId: " + viewId + " placed below " + viewAboveId);
+			return viewAboveId;
+		}
+
+		private void modSMs(int matchId, int sm1Idx, int sm1Type, int sm2Idx,
 				int sm2Type) {
 			Integer idx = matchIds.indexOf(matchId);
 			if (idx != -1) {
@@ -595,7 +640,19 @@ public class Bracket implements View.OnClickListener {
 			return hasLost;
 		}
 
-		public void byeBye() {
+		public void seed(List<SessionMember> sMembers) {
+			// seed the winners bracket
+			for (Integer ii = 0; ii < sMembers.size(); ii += 2) {
+				if (sMembers.get(ii + 1).getSeed() == SMType.BYE) {
+					modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.BYE);
+				} else {
+					modSMs(ii / 2, ii, SMType.TIP, ii + 1, SMType.TIP);
+				}
+			}
+			byeByes();
+		}
+
+		private void byeByes() {
 			// get rid of bye matches
 			int childViewId;
 			int childMatchId;
@@ -635,7 +692,7 @@ public class Bracket implements View.OnClickListener {
 			}
 		}
 
-		public void matchMatch(long gId, int smIdxA, int smIdxB) {
+		public void matchMatches(long gId, int smIdxA, int smIdxB) {
 			if (gameIds.contains(gId)) {
 				int idx = gameIds.indexOf(gId);
 				assert hasSm(idx, smIdxA) && hasSm(idx, smIdxB);
