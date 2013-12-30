@@ -2,7 +2,9 @@ package com.ultimatepolish.polishscorebook.backend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -13,6 +15,7 @@ import android.view.Gravity;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.ultimatepolish.db.Game;
 import com.ultimatepolish.db.SessionMember;
 import com.ultimatepolish.enums.BrDrawable;
 import com.ultimatepolish.enums.BrNodeType;
@@ -24,7 +27,8 @@ public class Bracket {
 	private int headerIdOffset = 0;
 	private int matchIdOffset = 0;
 	private int nLeafs;
-	private HashMap<Integer, SessionMember> smMap = new HashMap<Integer, SessionMember>();
+	private Map<Long, Integer> smIdMap = new HashMap<Long, Integer>();
+	private Map<Integer, SessionMember> smSeedMap = new HashMap<Integer, SessionMember>();
 	public List<Integer> matchIds = new ArrayList<Integer>();
 	public List<Integer> sm1Idcs = new ArrayList<Integer>();
 	public List<Integer> sm1Types = new ArrayList<Integer>();
@@ -43,8 +47,9 @@ public class Bracket {
 		int seed;
 		for (SessionMember sm : sMembers) {
 			seed = sm.getSeed();
-			if (seed >= 0 && !smMap.containsKey(seed)) {
-				smMap.put(seed, sm);
+			if (seed >= 0 && !smSeedMap.containsKey(seed)) {
+				smIdMap.put(sm.getPlayer().getId(), seed);
+				smSeedMap.put(seed, sm);
 			}
 		}
 	}
@@ -78,7 +83,7 @@ public class Bracket {
 			tv.setId(matchId + matchIdOffset + BrNodeType.UPPER);
 			smType = sm1Types.get(idx);
 			if (smType == BrNodeType.TIP) {
-				sm = smMap.get(sm1Idcs.get(idx));
+				sm = smSeedMap.get(sm1Idcs.get(idx));
 				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
 						+ sm.getPlayer().getNickName());
 				drwStr += "_labeled";
@@ -92,7 +97,7 @@ public class Bracket {
 			tv.setId(matchId + matchIdOffset + BrNodeType.LOWER);
 			smType = sm2Types.get(idx);
 			if (smType == BrNodeType.TIP) {
-				sm = smMap.get(sm2Idcs.get(idx));
+				sm = smSeedMap.get(sm2Idcs.get(idx));
 				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
 						+ sm.getPlayer().getNickName());
 				drwStr += "_labeled";
@@ -121,12 +126,12 @@ public class Bracket {
 			if (tier == getTier(nLeafs - 1)) {
 				lp.setMargins(0, -25, 0, 0);
 			} else if (upper) {
-				Integer topParentMatch = getTopParentMatch(matchId);
+				Integer topParentMatch = getUpperMatchParent(matchId);
 				lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch
 						+ BrNodeType.LOWER);
 				lp.setMargins(0, -2, 0, 0);
 			} else {
-				Integer bottomParentMatch = getTopParentMatch(matchId) + 1;
+				Integer bottomParentMatch = getUpperMatchParent(matchId) + 1;
 				lp.addRule(RelativeLayout.ABOVE, bottomParentMatch
 						+ BrNodeType.LOWER);
 				lp.setMargins(0, 0, 0, -2);
@@ -167,7 +172,7 @@ public class Bracket {
 			isLabeled = tv.getText() != "";
 
 			if (smType != BrNodeType.UNSET) {
-				drwColor = smMap.get(sm1Idcs.get(idx)).getPlayer().color;
+				drwColor = smSeedMap.get(sm1Idcs.get(idx)).getPlayer().color;
 			}
 			if (smType == BrNodeType.LOSS) {
 				drwString += "_eliminated";
@@ -196,7 +201,7 @@ public class Bracket {
 				isLabeled = tv.getText() != "";
 
 				if (smType != BrNodeType.UNSET) {
-					drwColor = smMap.get(sm2Idcs.get(idx)).getPlayer().color;
+					drwColor = smSeedMap.get(sm2Idcs.get(idx)).getPlayer().color;
 				}
 				if (smType == BrNodeType.LOSS) {
 					drwString += "_eliminated";
@@ -214,18 +219,18 @@ public class Bracket {
 		}
 	}
 
-	public int getTier(int viewId) {
+	private int getTier(int viewId) {
 		// can take bracket idx or match idx
 		int matchId = viewId % BrNodeType.MOD;
 		return ((Double) Math.floor(-Math.log(1 - ((double) matchId) / nLeafs)
 				/ Math.log(2))).intValue();
 	}
 
-	public int getTopMatchOfTier(int tier) {
+	private int getTopMatchOfTier(int tier) {
 		return (int) (nLeafs * (1 - Math.pow(2, -tier)));
 	}
 
-	public int getTopParentMatch(int bracketIdx) {
+	private int getUpperMatchParent(int bracketIdx) {
 		// can take bracket idx or match idx
 		Integer matchIdx = bracketIdx % BrNodeType.MOD;
 		Integer tier = getTier(matchIdx);
@@ -236,7 +241,7 @@ public class Bracket {
 		return topParentMatch;
 	}
 
-	public int getChildBracketId(int bracketIdx) {
+	private int getChildViewId(int bracketIdx) {
 		// this can take in a bracket or match idx
 		Integer matchIdx = bracketIdx % BrNodeType.MOD;
 		Integer tier = getTier(matchIdx);
@@ -262,7 +267,7 @@ public class Bracket {
 		} else {
 			Integer baseId = matchId;
 			if (getTier(matchId) > 0) {
-				baseId = getTopParentMatch(matchId);
+				baseId = getUpperMatchParent(matchId);
 			}
 			if (matchIds.contains(baseId) && baseId != matchId) {
 				viewAboveId = baseId + matchIdOffset + BrNodeType.UPPER;
@@ -272,7 +277,7 @@ public class Bracket {
 					baseId += BrNodeType.LOWER - 1; // lower arm of the match
 					// above
 					while (!matchIds.contains(baseId % BrNodeType.MOD)) {
-						baseId = getChildBracketId(baseId);
+						baseId = getChildViewId(baseId);
 					}
 					viewAboveId = baseId + matchIdOffset;
 				}
@@ -283,7 +288,7 @@ public class Bracket {
 		return viewAboveId;
 	}
 
-	public boolean isUpperView(int viewId) {
+	private boolean isUpperView(int viewId) {
 		assert viewId >= 1000;
 		if (viewId < 2000) {
 			return true;
@@ -292,18 +297,7 @@ public class Bracket {
 		}
 	}
 
-	private void modSMs(int matchId, int sm1Idx, int sm1Type, int sm2Idx,
-			int sm2Type) {
-		Integer idx = matchIds.indexOf(matchId);
-		if (idx != -1) {
-			sm1Idcs.set(idx, sm1Idx);
-			sm1Types.set(idx, sm1Type);
-			sm2Idcs.set(idx, sm2Idx);
-			sm2Types.set(idx, sm2Type);
-		}
-	}
-
-	public boolean smLost(int smIdx) {
+	private boolean smLost(int smIdx) {
 		boolean hasLost = false;
 		int idx1 = sm1Idcs.lastIndexOf(smIdx);
 		int idx2 = sm2Idcs.lastIndexOf(smIdx);
@@ -364,7 +358,7 @@ public class Bracket {
 		// promote players with a bye
 		for (int ii = 0; ii < matchIds.size(); ii++) {
 			if (sm2Types.get(ii) == BrNodeType.BYE) {
-				childViewId = getChildBracketId(matchIds.get(ii));
+				childViewId = getChildViewId(matchIds.get(ii));
 				childMatchId = childViewId % BrNodeType.MOD;
 				assert matchIds.indexOf(childMatchId) == childMatchId;
 
@@ -397,25 +391,50 @@ public class Bracket {
 		}
 	}
 
-	public void matchMatches(long gId, int smIdxA, int smIdxB) {
-		if (gameIds.contains(gId)) {
-			int idx = gameIds.indexOf(gId);
-			assert hasSm(idx, smIdxA) && hasSm(idx, smIdxB);
-		} else {
-			int nMatches = length();
-			for (int idx = 0; idx < nMatches; idx++) {
-				if (hasSm(idx, smIdxA) && hasSm(idx, smIdxB)
-						&& gameIds.get(idx) == -1) {
-					Log.i(LOGTAG, "Matching game " + gId + " to match "
-							+ matchIds.get(idx));
-					gameIds.set(idx, gId);
-					break;
+	public List<Game> matchMatches(List<Game> sGames) {
+		long gId;
+		int smASeed;
+		int smBSeed;
+		List<Integer> matchedIdx = new ArrayList<Integer>();
+
+		Log.i(LOGTAG, "sGames has " + sGames.size() + " items ");
+		Log.i(LOGTAG, "nMatches has " + length() + " items ");
+		Iterator<Game> gIt = sGames.iterator();
+		while (gIt.hasNext()) {
+			Game g = gIt.next();
+			gId = g.getId();
+			smASeed = smIdMap.get(g.getFirstPlayer().getId());
+			smBSeed = smIdMap.get(g.getSecondPlayer().getId());
+
+			Log.i(LOGTAG, "Matching game " + gId + " (" + smASeed + "/"
+					+ smBSeed + ")");
+			if (gameIds.contains(gId)) {
+				int idx = gameIds.indexOf(gId);
+				assert hasSm(idx, smASeed) && hasSm(idx, smBSeed);
+				gIt.remove();
+			} else {
+				int nMatches = length();
+				for (int idx = 0; idx < nMatches; idx++) {
+					if (hasSm(idx, smASeed) && hasSm(idx, smBSeed)
+							&& gameIds.get(idx) == -1) {
+						Log.i(LOGTAG, "Matching game " + gId + " to match "
+								+ matchIds.get(idx));
+						gameIds.set(idx, gId);
+						gIt.remove();
+						break;
+					}
 				}
 			}
+
+			if (g.getIsComplete()) {
+				smASeed = smIdMap.get(g.getWinner().getId());
+				promoteWinner(gameIds.indexOf(g.getId()), smASeed);
+			}
 		}
+		return sGames;
 	}
 
-	public void promoteWinner(int idx, int wIdx) {
+	private void promoteWinner(int idx, int wIdx) {
 		assert gameIds.get(idx) != -1;
 		boolean sm1Wins = true;
 
@@ -435,7 +454,7 @@ public class Bracket {
 			wIdx = sm2Idcs.get(idx);
 		}
 
-		int childViewId = getChildBracketId(matchIds.get(idx));
+		int childViewId = getChildViewId(matchIds.get(idx));
 		int childIdx = matchIds.indexOf(childViewId % BrNodeType.MOD);
 
 		if (isUpperView(childViewId)) {
@@ -492,12 +511,12 @@ public class Bracket {
 
 			if (sm1Type == BrNodeType.TIP || sm1Type == BrNodeType.WIN
 					|| sm1Type == BrNodeType.LOSS) {
-				p1Id = smMap.get(bd.sm1Idcs.get(idx)).getPlayer().getId();
+				p1Id = smSeedMap.get(bd.sm1Idcs.get(idx)).getPlayer().getId();
 			}
 
 			if (sm2Type == BrNodeType.TIP || sm2Type == BrNodeType.WIN
 					|| sm2Type == BrNodeType.LOSS) {
-				p2Id = smMap.get(bd.sm2Idcs.get(idx)).getPlayer().getId();
+				p2Id = smSeedMap.get(bd.sm2Idcs.get(idx)).getPlayer().getId();
 			}
 
 			if (sm1Type == BrNodeType.TIP && sm2Type == BrNodeType.TIP) {
@@ -515,7 +534,7 @@ public class Bracket {
 			if (sm1Type == BrNodeType.UNSET) {
 				marquee += "Unknown";
 			} else {
-				marquee += smMap.get(bd.sm1Idcs.get(idx)).getPlayer()
+				marquee += smSeedMap.get(bd.sm1Idcs.get(idx)).getPlayer()
 						.getNickName();
 				if (sm1Type == BrNodeType.WIN) {
 					marquee += " (W)";
@@ -531,7 +550,7 @@ public class Bracket {
 				marquee += ", tournament winner.";
 			} else {
 				marquee += " -vs- "
-						+ smMap.get(bd.sm2Idcs.get(idx)).getPlayer()
+						+ smSeedMap.get(bd.sm2Idcs.get(idx)).getPlayer()
 								.getNickName();
 				if (sm2Type == BrNodeType.WIN) {
 					marquee += " (W)";
