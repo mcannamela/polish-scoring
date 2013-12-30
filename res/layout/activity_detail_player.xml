@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".Detail_Player" >
+
+    <TextView
+        android:id="@+id/pDet_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <TextView
+        android:id="@+id/pDet_id"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/pDet_height"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pDet_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/pDet_weight"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pDet_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/pDet_winRatio"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pDet_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/pDet_handed"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pDet_winRatio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <Button
+        android:id="@+id/button_ComputeOffensiveStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="computeOffensiveStats"
+        android:text="@string/pDet_computeStats" />
+    
+    <Button
+        android:id="@+id/button_ComputeDefensiveStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/button_ComputeOffensiveStats"
+        android:onClick="computeDefensiveStats"
+        android:text="@string/pDet_computeDefensiveStats" />
+    
+    <TextView
+        android:id="@+id/pDet_statsSummary"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pDet_handed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp" />
+
+</RelativeLayout>

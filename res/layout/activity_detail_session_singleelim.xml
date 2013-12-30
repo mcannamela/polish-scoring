@@ -1,0 +1,92 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".Detail_Session" >
+
+    <TextView
+        android:id="@+id/sDet_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <TextView
+        android:id="@+id/sDet_type"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/sDet_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <TextView
+        android:id="@+id/sDet_id"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+     <TextView
+        android:id="@+id/sDet_ruleSet"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/sDet_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+     
+    <TextView
+        android:id="@+id/sDet_startDate"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/sDet_ruleSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/sDet_endDate"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/sDet_startDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/sDet_isTeam"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/sDet_endDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/sDet_isActive"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/sDet_isTeam"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+    	android:id="@+id/scrollView1"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@id/sDet_isActive"
+    	android:layout_marginTop="20dp" />
+    
+    <TextView
+        android:id="@+id/sDet_match"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <Button
+        android:id="@+id/sDet_loadMatch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@id/sDet_match"
+        android:visibility="gone"
+        android:text="Fight!" />
+
+</RelativeLayout>

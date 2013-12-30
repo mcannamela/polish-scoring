@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context=".DbSettings" >
+
+   	<Button
+	    android:id="@+id/db_clearDB"
+	    android:layout_width="200sp"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:text="clearDB" />
+	
+	<Button
+	    android:id="@+id/db_popDB"
+	    android:layout_width="200sp"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:text="populateDB" />
+	
+	<Button
+	    android:id="@+id/db_linkToDropbox"
+	    android:layout_width="200sp"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:text="Link to Dropbox" />
+	
+	<Button
+	    android:id="@+id/db_save_dropbox"
+	    android:layout_width="200sp"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:text="saveDB (dropbox)" />
+
+	<Button
+	    android:id="@+id/db_load_dropbox"
+	    android:layout_width="200sp"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:text="loadDB (dropbox)" />
+
+	<Button
+	    android:id="@+id/db_updateScores"
+	    android:layout_width="200sp"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:text="updateScores" />
+
+	<TextView 
+		android:id="@+id/db_dbxFiles"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		 />	
+    
+</LinearLayout>
