@@ -6,9 +6,11 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.util.Log;
 import android.view.Gravity;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ultimatepolish.db.SessionMember;
@@ -29,10 +31,12 @@ public class Bracket {
 	public List<Integer> sm2Idcs = new ArrayList<Integer>();
 	public List<Integer> sm2Types = new ArrayList<Integer>();
 	public List<Long> gameIds = new ArrayList<Long>();
+	public RelativeLayout rl;
 
-	public Bracket(List<SessionMember> sMembers) {
+	public Bracket(List<SessionMember> sMembers, RelativeLayout rl) {
 		// fast check that nLeafs is a power of two
 		this.nLeafs = sMembers.size();
+		this.rl = rl;
 		assert (nLeafs & (nLeafs - 1)) == 0;
 		seed(sMembers);
 
@@ -110,6 +114,151 @@ public class Bracket {
 		tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
 
 		return tv;
+	}
+
+	public void addViewToLayout(TextView tv, Boolean isLabeled) {
+		Integer matchId = tv.getId() % BrNodeType.MOD;
+		Boolean upper = isUpperView(tv.getId());
+		Integer tier = getTier(matchId);
+
+		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		if (!isLabeled) {
+			lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 1);
+			if (tier == getTier(nLeafs - 1)) {
+				lp.setMargins(0, -25, 0, 0);
+			} else if (upper) {
+				Integer topParentMatch = getTopParentMatch(matchId);
+				lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch
+						+ BrNodeType.LOWER);
+				lp.setMargins(0, -2, 0, 0);
+			} else {
+				Integer bottomParentMatch = getTopParentMatch(matchId) + 1;
+				lp.addRule(RelativeLayout.ABOVE, bottomParentMatch
+						+ BrNodeType.LOWER);
+				lp.setMargins(0, 0, 0, -2);
+			}
+
+		} else {
+			if (upper) {
+				lp.setMargins(0, 8, 0, 0);
+			} else {
+				lp.setMargins(0, 0, 0, 8);
+			}
+		}
+
+		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 1);
+		lp.addRule(RelativeLayout.BELOW, findViewAbove(tv.getId()));
+
+		rl.addView(tv, lp);
+	}
+
+	public void refresh() {
+		TextView tv;
+
+		// now refresh the views
+		int matchId;
+		int viewId;
+		int smColor;
+		int smType;
+		boolean isLabeled;
+		for (int idx = 0; idx < length(); idx++) {
+			matchId = matchIds.get(idx);
+
+			// match upper view
+			viewId = matchId + BrNodeType.UPPER;
+			smType = sm1Types.get(idx);
+			tv = (TextView) rl.findViewById(viewId);
+			isLabeled = tv.getText() != "";
+			if (isLabeled && smLost(sm1Idcs.get(idx))) {
+				tv.setPaintFlags(tv.getPaintFlags()
+						| Paint.STRIKE_THRU_TEXT_FLAG);
+			}
+
+			if (smType != BrNodeType.UNSET) {
+				smColor = smMap.get(sm1Idcs.get(idx)).getPlayer().color;
+			} else {
+				smColor = Color.LTGRAY;
+			}
+			switch (smType) {
+			case BrNodeType.UNSET:
+				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
+				break;
+			case BrNodeType.LOSS:
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_top_eliminated_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_top_eliminated);
+				}
+				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
+				break;
+			case BrNodeType.WIN:
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_top);
+				}
+				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
+				break;
+			case BrNodeType.TIP:
+				if (sm2Types.get(idx) == BrNodeType.NA) {
+				} else if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_top);
+				}
+				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
+				break;
+			}
+
+			// match lower view
+			viewId = matchId + BrNodeType.LOWER;
+			smType = sm2Types.get(idx);
+			tv = (TextView) rl.findViewById(viewId);
+			if (smType != BrNodeType.NA) {
+				if (smType != BrNodeType.UNSET) {
+					Log.i(LOGTAG, "smType is " + smType);
+					smColor = smMap.get(sm2Idcs.get(idx)).getPlayer().color;
+				}
+				isLabeled = tv.getText() != "";
+				if (isLabeled && smLost(sm2Idcs.get(idx))) {
+					tv.setPaintFlags(tv.getPaintFlags()
+							| Paint.STRIKE_THRU_TEXT_FLAG);
+				}
+			}
+
+			switch (smType) {
+			case BrNodeType.UNSET:
+				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
+				break;
+			case BrNodeType.LOSS:
+
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated);
+				}
+				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
+				break;
+			case BrNodeType.WIN:
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_bottom);
+				}
+				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
+				break;
+			case BrNodeType.TIP:
+				if (isLabeled) {
+					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
+				} else {
+					tv.setBackgroundResource(R.drawable.bracket_bottom);
+				}
+				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
+				break;
+			}
+		}
 	}
 
 	public int getTier(int viewId) {

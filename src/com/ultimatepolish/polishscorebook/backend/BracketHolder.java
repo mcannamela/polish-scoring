@@ -7,8 +7,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -23,7 +21,6 @@ import com.ultimatepolish.db.Player;
 import com.ultimatepolish.db.Session;
 import com.ultimatepolish.db.SessionMember;
 import com.ultimatepolish.enums.BrNodeType;
-import com.ultimatepolish.polishscorebook.R;
 
 public class BracketHolder implements View.OnClickListener {
 	public static String LOGTAG = "BracketHolder";
@@ -74,12 +71,12 @@ public class BracketHolder implements View.OnClickListener {
 		this.context = rl.getContext();
 
 		foldRoster();
-		wBr = new Bracket(sMembers);
+		wBr = new Bracket(sMembers, rl);
 		buildWinnersBracket();
 
 		if (isDoubleElim) {
 
-			lBr = new Bracket(sMembers);
+			lBr = new Bracket(sMembers, rl);
 			lBr.changeOffsets(factorTwos(sMembers.size()) + 1, sMembers.size());
 			buildLosersBracket();
 		}
@@ -103,18 +100,18 @@ public class BracketHolder implements View.OnClickListener {
 			tv = wBr.makeHalfMatchView(context, mPos, true);
 			tv.setOnClickListener(this);
 			if (wBr.sm1Types.get(mPos) == BrNodeType.TIP) {
-				addViewToLayout(wBr, tv, true);
+				wBr.addViewToLayout(tv, true);
 			} else {
-				addViewToLayout(wBr, tv, false);
+				wBr.addViewToLayout(tv, false);
 			}
 
 			// lower half of match
 			if (wBr.sm2Types.get(mPos) != BrNodeType.NA) {
 				tv = wBr.makeHalfMatchView(context, mPos, false);
 				if (wBr.sm2Types.get(mPos) == BrNodeType.TIP) {
-					addViewToLayout(wBr, tv, true);
+					wBr.addViewToLayout(tv, true);
 				} else {
-					addViewToLayout(wBr, tv, false);
+					wBr.addViewToLayout(tv, false);
 				}
 			}
 		}
@@ -147,9 +144,9 @@ public class BracketHolder implements View.OnClickListener {
 			tv = lBr.makeHalfMatchView(context, mPos, true);
 			tv.setOnClickListener(this);
 			if (lBr.sm1Types.get(mPos) == BrNodeType.TIP) {
-				addViewToLayout(lBr, tv, true);
+				lBr.addViewToLayout(tv, true);
 			} else {
-				addViewToLayout(lBr, tv, false);
+				lBr.addViewToLayout(tv, false);
 			}
 
 			// lower half of match
@@ -157,17 +154,15 @@ public class BracketHolder implements View.OnClickListener {
 				tv = lBr.makeHalfMatchView(context, mPos, false);
 				tv.setOnClickListener(this);
 				if (lBr.sm2Types.get(mPos) == BrNodeType.TIP) {
-					addViewToLayout(lBr, tv, true);
+					lBr.addViewToLayout(tv, true);
 				} else {
-					addViewToLayout(lBr, tv, false);
+					lBr.addViewToLayout(tv, false);
 				}
 			}
 		}
 	}
 
-	public void refreshWinnersBracket() {
-		TextView tv;
-
+	public void refreshBrackets() {
 		// get all the completed games for the session, ordered by date played
 		List<Game> sGamesList = new ArrayList<Game>();
 		try {
@@ -197,101 +192,10 @@ public class BracketHolder implements View.OnClickListener {
 			}
 		}
 
-		// now refresh the views
-		int matchId;
-		int viewId;
-		int smColor;
-		int smType;
-		boolean isLabeled;
-		for (int idx = 0; idx < wBr.length(); idx++) {
-			matchId = wBr.matchIds.get(idx);
-
-			// match upper view
-			viewId = matchId + BrNodeType.UPPER;
-			smType = wBr.sm1Types.get(idx);
-			tv = (TextView) rl.findViewById(viewId);
-			isLabeled = tv.getText() != "";
-			if (isLabeled && wBr.smLost(wBr.sm1Idcs.get(idx))) {
-				tv.setPaintFlags(tv.getPaintFlags()
-						| Paint.STRIKE_THRU_TEXT_FLAG);
-			}
-
-			// smColor = sMembers.get(wBr.sm1Idcs.get(idx)).getPlayer().color;
-			smColor = Color.RED;
-			switch (smType) {
-			case BrNodeType.BYE:
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
-			case BrNodeType.LOSS:
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_top_eliminated_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_top_eliminated);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.WIN:
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_top);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.TIP:
-				if (wBr.sm2Types.get(idx) == BrNodeType.NA) {
-				} else if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_top);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			}
-
-			// match lower view
-			viewId = matchId + BrNodeType.LOWER;
-			smType = wBr.sm2Types.get(idx);
-			tv = (TextView) rl.findViewById(viewId);
-			if (smType != BrNodeType.NA) {
-				isLabeled = tv.getText() != "";
-				if (isLabeled && wBr.smLost(wBr.sm2Idcs.get(idx))) {
-					tv.setPaintFlags(tv.getPaintFlags()
-							| Paint.STRIKE_THRU_TEXT_FLAG);
-				}
-			}
-
-			// smColor = sMembers.get(wBr.sm2Idcs.get(idx)).getPlayer().color;
-			switch (smType) {
-			case BrNodeType.BYE:
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
-			case BrNodeType.LOSS:
-
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.WIN:
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_bottom);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.TIP:
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_bottom);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			}
+		wBr.refresh();
+		if (isDoubleElim) {
+			lBr.refresh();
+			// fBr.refreshWinnersBracket();
 		}
 	}
 
@@ -343,44 +247,6 @@ public class BracketHolder implements View.OnClickListener {
 			lp.setMargins(-14, 0, 0, 0);
 			rl.addView(tv, lp);
 		}
-	}
-
-	private void addViewToLayout(Bracket bd, TextView tv, Boolean isLabeled) {
-		Integer matchId = tv.getId() % BrNodeType.MOD;
-		Boolean upper = bd.isUpperView(tv.getId());
-		Integer tier = bd.getTier(matchId);
-
-		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		if (!isLabeled) {
-			lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 1);
-			if (tier == bd.getTier(sMembers.size() - 1)) {
-				lp.setMargins(0, -25, 0, 0);
-			} else if (upper) {
-				Integer topParentMatch = bd.getTopParentMatch(matchId);
-				lp.addRule(RelativeLayout.ALIGN_BOTTOM, topParentMatch
-						+ BrNodeType.LOWER);
-				lp.setMargins(0, -2, 0, 0);
-			} else {
-				Integer bottomParentMatch = bd.getTopParentMatch(matchId) + 1;
-				lp.addRule(RelativeLayout.ABOVE, bottomParentMatch
-						+ BrNodeType.LOWER);
-				lp.setMargins(0, 0, 0, -2);
-			}
-
-		} else {
-			if (upper) {
-				lp.setMargins(0, 8, 0, 0);
-			} else {
-				lp.setMargins(0, 0, 0, 8);
-			}
-		}
-
-		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 1);
-		lp.addRule(RelativeLayout.BELOW, bd.findViewAbove(tv.getId()));
-
-		rl.addView(tv, lp);
 	}
 
 	public void foldRoster() {
