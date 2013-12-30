@@ -113,7 +113,7 @@ public class Detail_Session extends MenuContainerActivity {
 		super.onResume();
 		refreshDetails();
 		if (bracket != null) {
-			bracket.refreshWinnersBracket();
+			bracket.refreshBrackets();
 		}
 	}
 
