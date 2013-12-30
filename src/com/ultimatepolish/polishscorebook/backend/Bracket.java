@@ -6,6 +6,7 @@ import java.util.List;
 import android.util.Log;
 
 import com.ultimatepolish.db.SessionMember;
+import com.ultimatepolish.enums.BrNodeType;
 
 public class Bracket {
 	public static String LOGTAG = "Bracket";
@@ -109,7 +110,7 @@ public class Bracket {
 				if (baseId > getTopMatchOfTier(getTier(baseId))) {
 					// have to keep track of upper/lower now
 					baseId += BrNodeType.LOWER - 1; // lower arm of the match
-												// above
+					// above
 					while (!matchIds.contains(baseId % BrNodeType.MOD)) {
 						baseId = getChildBracketId(baseId);
 					}
@@ -365,16 +366,4 @@ public class Bracket {
 		}
 	}
 
-	private final class BrNodeType {
-		public static final int TIP = 0;
-		public static final int WIN = 1;
-		public static final int LOSS = 2;
-		public static final int BYE = 3;
-		public static final int UNSET = 4;
-		public static final int RESPAWN = 5;
-		public static final int NA = 7;
-		public static final int UPPER = 1000;
-		public static final int LOWER = 2000;
-		public static final int MOD = 1000;
-	}
 }
