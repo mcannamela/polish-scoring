@@ -14,8 +14,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ultimatepolish.db.SessionMember;
+import com.ultimatepolish.enums.BrDrawable;
 import com.ultimatepolish.enums.BrNodeType;
-import com.ultimatepolish.polishscorebook.R;
 
 public class Bracket {
 	public static String LOGTAG = "Bracket";
@@ -70,46 +70,38 @@ public class Bracket {
 		int matchId = matchIds.get(idx);
 		int smType = BrNodeType.TIP;
 		SessionMember sm = null;
+		String drwStr = "";
+		int drwColor = Color.LTGRAY;
 
 		if (upper) {
+			drwStr += "upper";
 			tv.setId(matchId + matchIdOffset + BrNodeType.UPPER);
 			smType = sm1Types.get(idx);
-			switch (smType) {
-			case BrNodeType.TIP:
+			if (smType == BrNodeType.TIP) {
 				sm = smMap.get(sm1Idcs.get(idx));
 				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
 						+ sm.getPlayer().getNickName());
-				tv.setBackgroundResource(R.drawable.bracket_top_labeled);
-				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
-						Mode.MULTIPLY);
-				break;
-			case BrNodeType.UNSET:
-				tv.setBackgroundResource(R.drawable.bracket_top);
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
+				drwStr += "_labeled";
+				drwColor = sm.getPlayer().getColor();
 			}
 			if (sm2Types.get(idx) == BrNodeType.NA) {
-				tv.setBackgroundResource(R.drawable.bracket_endpoint);
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
+				drwStr = "endpoint";
 			}
 		} else {
+			drwStr += "lower";
 			tv.setId(matchId + matchIdOffset + BrNodeType.LOWER);
 			smType = sm2Types.get(idx);
-			switch (smType) {
-			case BrNodeType.TIP:
+			if (smType == BrNodeType.TIP) {
 				sm = smMap.get(sm2Idcs.get(idx));
 				tv.setText("(" + String.valueOf(sm.getSeed() + 1) + ") "
 						+ sm.getPlayer().getNickName());
-				tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
-				tv.getBackground().setColorFilter(sm.getPlayer().getColor(),
-						Mode.MULTIPLY);
-				break;
-			case BrNodeType.UNSET:
-				tv.setBackgroundResource(R.drawable.bracket_bottom);
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
+				drwStr += "_labeled";
+				drwColor = sm.getPlayer().getColor();
 			}
 		}
+		Log.i(LOGTAG, "drwStr is " + drwStr);
+		tv.setBackgroundResource(BrDrawable.map.get(drwStr));
+		tv.getBackground().setColorFilter(drwColor, Mode.MULTIPLY);
 		tv.setGravity(Gravity.RIGHT);
 		tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
 
@@ -154,15 +146,15 @@ public class Bracket {
 		rl.addView(tv, lp);
 	}
 
-	public void refresh() {
+	public void refreshViews() {
 		TextView tv;
-
-		// now refresh the views
 		int matchId;
 		int viewId;
-		int smColor;
+		int drwColor;
+		String drwString;
 		int smType;
 		boolean isLabeled;
+
 		for (int idx = 0; idx < length(); idx++) {
 			matchId = matchIds.get(idx);
 
@@ -170,93 +162,54 @@ public class Bracket {
 			viewId = matchId + BrNodeType.UPPER;
 			smType = sm1Types.get(idx);
 			tv = (TextView) rl.findViewById(viewId);
+			drwString = "upper";
+			drwColor = Color.LTGRAY;
 			isLabeled = tv.getText() != "";
-			if (isLabeled && smLost(sm1Idcs.get(idx))) {
-				tv.setPaintFlags(tv.getPaintFlags()
-						| Paint.STRIKE_THRU_TEXT_FLAG);
-			}
 
 			if (smType != BrNodeType.UNSET) {
-				smColor = smMap.get(sm1Idcs.get(idx)).getPlayer().color;
-			} else {
-				smColor = Color.LTGRAY;
+				drwColor = smMap.get(sm1Idcs.get(idx)).getPlayer().color;
 			}
-			switch (smType) {
-			case BrNodeType.UNSET:
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
-			case BrNodeType.LOSS:
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_top_eliminated_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_top_eliminated);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.WIN:
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_top);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.TIP:
-				if (sm2Types.get(idx) == BrNodeType.NA) {
-				} else if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_top_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_top);
-				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
+			if (smType == BrNodeType.LOSS) {
+				drwString += "_eliminated";
 			}
-
-			// match lower view
-			viewId = matchId + BrNodeType.LOWER;
-			smType = sm2Types.get(idx);
-			tv = (TextView) rl.findViewById(viewId);
-			if (smType != BrNodeType.NA) {
-				if (smType != BrNodeType.UNSET) {
-					Log.i(LOGTAG, "smType is " + smType);
-					smColor = smMap.get(sm2Idcs.get(idx)).getPlayer().color;
-				}
-				isLabeled = tv.getText() != "";
-				if (isLabeled && smLost(sm2Idcs.get(idx))) {
+			if (isLabeled) {
+				drwString += "_labeled";
+				if (smLost(sm1Idcs.get(idx))) {
 					tv.setPaintFlags(tv.getPaintFlags()
 							| Paint.STRIKE_THRU_TEXT_FLAG);
 				}
 			}
+			if (sm2Types.get(idx) == BrNodeType.NA) {
+				drwString = "endpoint";
+			}
+			tv.setBackgroundResource(BrDrawable.map.get(drwString));
+			tv.getBackground().setColorFilter(drwColor, Mode.MULTIPLY);
 
-			switch (smType) {
-			case BrNodeType.UNSET:
-				tv.getBackground().setColorFilter(Color.LTGRAY, Mode.MULTIPLY);
-				break;
-			case BrNodeType.LOSS:
+			// match lower view
+			viewId = matchId + BrNodeType.LOWER;
+			smType = sm2Types.get(idx);
 
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_eliminated);
+			if (smType != BrNodeType.NA) {
+				tv = (TextView) rl.findViewById(viewId);
+				drwString = "lower";
+				drwColor = Color.LTGRAY;
+				isLabeled = tv.getText() != "";
+
+				if (smType != BrNodeType.UNSET) {
+					drwColor = smMap.get(sm2Idcs.get(idx)).getPlayer().color;
 				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.WIN:
-				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_bottom);
+				if (smType == BrNodeType.LOSS) {
+					drwString += "_eliminated";
 				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
-			case BrNodeType.TIP:
 				if (isLabeled) {
-					tv.setBackgroundResource(R.drawable.bracket_bottom_labeled);
-				} else {
-					tv.setBackgroundResource(R.drawable.bracket_bottom);
+					drwString += "_labeled";
+					if (smLost(sm2Idcs.get(idx))) {
+						tv.setPaintFlags(tv.getPaintFlags()
+								| Paint.STRIKE_THRU_TEXT_FLAG);
+					}
 				}
-				tv.getBackground().setColorFilter(smColor, Mode.MULTIPLY);
-				break;
+				tv.setBackgroundResource(BrDrawable.map.get(drwString));
+				tv.getBackground().setColorFilter(drwColor, Mode.MULTIPLY);
 			}
 		}
 	}

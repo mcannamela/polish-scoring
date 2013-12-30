@@ -192,9 +192,9 @@ public class BracketHolder implements View.OnClickListener {
 			}
 		}
 
-		wBr.refresh();
+		wBr.refreshViews();
 		if (isDoubleElim) {
-			lBr.refresh();
+			lBr.refreshViews();
 			// fBr.refreshWinnersBracket();
 		}
 	}
