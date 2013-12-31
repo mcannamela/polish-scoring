@@ -54,6 +54,20 @@ public class Bracket {
 		}
 	}
 
+	/**
+	 * Use this constructor for a respawn bracket. ie, members will come from
+	 * another bracket after losing or reaching the top tier. The insane loops
+	 * generate a tiered losers bracket.
+	 */
+	public Bracket(int nLeafs, RelativeLayout rl) {
+		// fast check that nLeafs is a power of two
+		this.nLeafs = 4 * nLeafs;
+		this.rl = rl;
+		assert (nLeafs & (nLeafs - 1)) == 0;
+		seed();
+
+	}
+
 	private void removeMatch(int pos) {
 		matchIds.remove(pos);
 		sm1Idcs.remove(pos);
@@ -70,14 +84,15 @@ public class Bracket {
 	}
 
 	public void buildBracket(Context context) {
-		buildBracket(context, -1, -1);
+		buildBracket(context, 150, -1, -1);
 	}
 
-	public void buildBracket(Context context, int aboveViewId, int columnViewId) {
+	public void buildBracket(Context context, int tierWidth, int aboveViewId,
+			int columnViewId) {
 		TextView tv;
 
 		// lay out the bracket
-		makeInvisibleHeaders(350, 150, aboveViewId, columnViewId);
+		makeInvisibleHeaders(350, tierWidth, aboveViewId, columnViewId);
 
 		for (Integer mPos = 0; mPos < length(); mPos++) {
 			// upper half of match
@@ -305,7 +320,7 @@ public class Bracket {
 	}
 
 	private int getTier(int viewId) {
-		// can take bracket idx or match idx
+		// can take view idx or match idx
 		int matchId = viewId % BrNodeType.MOD;
 		return ((Double) Math.floor(-Math.log(1 - ((double) matchId) / nLeafs)
 				/ Math.log(2))).intValue();
@@ -434,24 +449,95 @@ public class Bracket {
 		byeByes();
 	}
 
+	private void seed() {
+		List<Integer> idA = new ArrayList<Integer>();
+		idA.add(1);
+		idA.add(1);
+		List<Integer> idB = new ArrayList<Integer>();
+		idB.add(2);
+		List<Integer> idC = new ArrayList<Integer>();
+		idC.add(1);
+		idC.add(3);
+		idA.addAll(idB);
+		idA.addAll(idC);
+
+		int last;
+		for (int ii = 1; ii < factorTwos(nLeafs) - 3; ii++) {
+			idB.addAll(idB);
+			last = idB.size() - 1;
+			idB.set(last, (int) (idB.get(last) + Math.pow(2, 2 * ii)));
+
+			idC.addAll(idC);
+			last = idC.size() - 1;
+			idC.set(last, (int) (idC.get(last) + Math.pow(2, 2 * ii + 1)));
+
+			idA.addAll(idB);
+			idA.addAll(idC);
+		}
+
+		int matchId = -1;
+		int respawnId = 0;
+		int tier;
+		for (int ii = idA.size() - 1; ii >= 0; ii--) {
+			matchId += idA.get(ii);
+			matchIds.add(matchId);
+
+			tier = getTier(matchId);
+
+			if (tier % 2 == 0) {
+				sm1Idcs.add(respawnId);
+				respawnId++;
+				sm1Types.add(BrNodeType.RESPAWN);
+				sm2Idcs.add(-1);
+				if (tier == 0) {
+					sm2Types.add(BrNodeType.BYE);
+				} else {
+					sm2Types.add(BrNodeType.UNSET);
+				}
+			} else {
+				sm1Idcs.add(-1);
+				sm1Types.add(BrNodeType.UNSET);
+				sm2Idcs.add(-1);
+				sm2Types.add(BrNodeType.UNSET);
+			}
+			gameIds.add((long) -1);
+		}
+
+		// last match is actually just the winner
+		sm2Types.set(sm2Types.size() - 1, BrNodeType.NA);
+
+		byeByes();
+	}
+
 	private void byeByes() {
 		// get rid of bye matches
 		int childViewId;
 		int childMatchId;
+		int childIdx;
+
+		Log.i("Crunch", "Initial list:");
+		for (int ii = 0; ii < matchIds.size(); ii++) {
+			Log.i("Crunch",
+					"mIdx: " + matchIds.get(ii) + ", sm1id: " + sm1Idcs.get(ii)
+							+ ", sm1type: " + sm1Types.get(ii) + ", sm2id: "
+							+ sm2Idcs.get(ii) + ", sm2type: "
+							+ sm2Types.get(ii) + ", gId: " + gameIds.get(ii));
+		}
 
 		// promote players with a bye
 		for (int ii = 0; ii < matchIds.size(); ii++) {
 			if (sm2Types.get(ii) == BrNodeType.BYE) {
 				childViewId = getChildViewId(matchIds.get(ii));
 				childMatchId = childViewId % BrNodeType.MOD;
-				assert matchIds.indexOf(childMatchId) == childMatchId;
+				childIdx = matchIds.indexOf(childMatchId);
+				Log.i(LOGTAG, "ii: " + ii + ", childViewId: " + childViewId);
 
 				if (isUpperView(childViewId)) {
-					sm1Idcs.set(childMatchId, sm1Idcs.get(ii));
-					sm1Types.set(childMatchId, sm1Types.get(ii));
+					sm1Idcs.set(childIdx, sm1Idcs.get(ii));
+					sm1Types.set(childIdx, sm1Types.get(ii));
 				} else {
-					sm2Idcs.set(childMatchId, sm1Idcs.get(ii));
-					sm2Types.set(childMatchId, sm1Types.get(ii));
+					sm2Idcs.set(childIdx, sm1Idcs.get(ii));
+					sm2Types.set(childIdx, sm1Types.get(ii));
 				}
 				sm1Types.set(ii, BrNodeType.BYE);
 			}
@@ -646,6 +732,21 @@ public class Bracket {
 		while (Math.pow(2, n) < p) {
 			n++;
 		}
+		double np = Math.pow(2, n);
 		return n;
+	}
+
+	private int powerSeries(int maxPow, boolean evens) {
+		int sum = 0;
+		int startIdx = 1;
+		if (evens) {
+			startIdx = 0;
+		}
+		for (int ii = startIdx; ii <= maxPow; ii = ii + 2) {
+			sum += Math.pow(2, ii);
+		}
+		Log.i("PowerSeries", "evens: " + evens + ", maxPow: " + maxPow
+				+ ", sum: " + sum);
+		return sum;
 	}
 }
