@@ -98,7 +98,8 @@ public class Bracket {
 			// upper half of match
 			tv = makeHalfMatchView(context, mPos, true);
 			// tv.setOnClickListener(this);
-			if (sm1Types.get(mPos) == BrNodeType.TIP) {
+			if (sm1Types.get(mPos) == BrNodeType.TIP
+					|| sm1Types.get(mPos) == BrNodeType.RESPAWN) {
 				addViewToLayout(tv, true);
 			} else {
 				addViewToLayout(tv, false);
@@ -107,7 +108,8 @@ public class Bracket {
 			// lower half of match
 			if (sm2Types.get(mPos) != BrNodeType.NA) {
 				tv = makeHalfMatchView(context, mPos, false);
-				if (sm2Types.get(mPos) == BrNodeType.TIP) {
+				if (sm2Types.get(mPos) == BrNodeType.TIP
+						|| sm2Types.get(mPos) == BrNodeType.RESPAWN) {
 					addViewToLayout(tv, true);
 				} else {
 					addViewToLayout(tv, false);
@@ -156,13 +158,19 @@ public class Bracket {
 		int[] vwColor = { Color.RED, Color.BLUE, Color.GREEN };
 		for (Integer i = 0; i < nTiers; i++) {
 			tv = new TextView(context);
-			tv.setWidth(tierWidth);
-			tv.setHeight(vwHeight);
-			tv.setId(i + 2 + headerIdOffset);
-			tv.setBackgroundColor(vwColor[i % 3]);
 			lp = new RelativeLayout.LayoutParams(
 					RelativeLayout.LayoutParams.WRAP_CONTENT,
 					RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+			if (headerIdOffset != 0 && i == nTiers - 1) {
+				lp.addRule(RelativeLayout.ALIGN_RIGHT, headerIdOffset);
+			} else {
+				tv.setWidth(tierWidth);
+			}
+			tv.setHeight(vwHeight);
+			tv.setId(i + 2 + headerIdOffset);
+			tv.setBackgroundColor(vwColor[i % 3]);
+
 			lp.addRule(RelativeLayout.ALIGN_BASELINE, 1 + headerIdOffset);
 			lp.addRule(RelativeLayout.RIGHT_OF, i + 1 + headerIdOffset);
 			lp.setMargins(-14, 0, 0, 0);
@@ -189,6 +197,9 @@ public class Bracket {
 						+ sm.getPlayer().getNickName());
 				drwStr += "_labeled";
 				drwColor = sm.getPlayer().getColor();
+			} else if (smType == BrNodeType.RESPAWN) {
+				tv.setText("(" + (char) (sm1Idcs.get(idx) + 65) + ") ");
+				drwStr += "_labeled";
 			}
 			if (sm2Types.get(idx) == BrNodeType.NA) {
 				drwStr = "endpoint";
@@ -203,6 +214,9 @@ public class Bracket {
 						+ sm.getPlayer().getNickName());
 				drwStr += "_labeled";
 				drwColor = sm.getPlayer().getColor();
+			} else if (smType == BrNodeType.RESPAWN) {
+				tv.setText("(" + (char) (sm2Idcs.get(idx) + 65) + ") ");
+				drwStr += "_labeled";
 			}
 		}
 		tv.setBackgroundResource(BrDrawable.map.get(drwStr));
@@ -236,7 +250,6 @@ public class Bracket {
 						+ matchIdOffset + BrNodeType.LOWER);
 				lp.setMargins(0, 0, 0, -2);
 			}
-
 		} else {
 			if (upper) {
 				lp.setMargins(0, 8, 0, 0);
