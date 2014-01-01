@@ -61,7 +61,7 @@ public class Bracket {
 	 */
 	public Bracket(int nLeafs, RelativeLayout rl) {
 		// fast check that nLeafs is a power of two
-		this.nLeafs = 4 * nLeafs;
+		this.nLeafs = (int) Math.pow(2, 2 * factorTwos(nLeafs) - 1);
 		this.rl = rl;
 		assert (nLeafs & (nLeafs - 1)) == 0;
 		seed();
@@ -92,7 +92,7 @@ public class Bracket {
 		TextView tv;
 
 		// lay out the bracket
-		makeInvisibleHeaders(350, tierWidth, aboveViewId, columnViewId);
+		makeInvisibleHeaders(300, tierWidth, aboveViewId, columnViewId);
 
 		for (Integer mPos = 0; mPos < length(); mPos++) {
 			// upper half of match
@@ -125,7 +125,7 @@ public class Bracket {
 		RelativeLayout.LayoutParams lp;
 		Context context = rl.getContext();
 
-		int vwHeight = 10;
+		int vwHeight = 0;
 		Log.i(LOGTAG, "baseWidth: " + baseWidth + ", tierWidth: " + tierWidth
 				+ ", belowId: " + aboveViewId + ", offset: " + columnViewId);
 
@@ -475,7 +475,7 @@ public class Bracket {
 		idA.addAll(idC);
 
 		int last;
-		for (int ii = 1; ii < factorTwos(nLeafs) - 3; ii++) {
+		for (int ii = 1; ii <= (factorTwos(nLeafs) - 3) / 2; ii++) {
 			idB.addAll(idB);
 			last = idB.size() - 1;
 			idB.set(last, (int) (idB.get(last) + Math.pow(2, 2 * ii)));
@@ -496,11 +496,13 @@ public class Bracket {
 			matchIds.add(matchId);
 
 			tier = getTier(matchId);
-
+			Log.i("seed", "tier is " + tier + ", matchId is " + matchId
+					+ ", nLeafs: " + nLeafs);
 			if (tier % 2 == 0) {
 				sm1Idcs.add(respawnId);
 				respawnId++;
 				sm1Types.add(BrNodeType.RESPAWN);
+
 				sm2Idcs.add(-1);
 				if (tier == 0) {
 					sm2Types.add(BrNodeType.BYE);
@@ -516,9 +518,30 @@ public class Bracket {
 			gameIds.add((long) -1);
 		}
 
+		// For every other tier, the order is swapped
+		int idxA = (int) (3 * nLeafs / Math.pow(2, 4));
+		int idxB;
+		int ii = 3;
+		while (idxA < sm1Idcs.size()) {
+			for (int jj = 0; jj < nLeafs / Math.pow(2, ii + 2); jj++) {
+				idxB = (int) (idxA + nLeafs / Math.pow(2, ii + 1) - 1 - jj);
+				Log.i("Swapping", "Swap " + idxA + " with " + idxB);
+				// Collections.swap(sm1Idcs, idxA + jj, idxB);
+			}
+			idxA += 3 * nLeafs / Math.pow(2, ii + 1);
+		}
+
 		// last match is actually just the winner
 		sm2Types.set(sm2Types.size() - 1, BrNodeType.NA);
 
+		Log.i("Crunch", "Initial list:");
+		for (ii = 0; ii < matchIds.size(); ii++) {
+			Log.i("Crunch",
+					"mIdx: " + matchIds.get(ii) + ", sm1id: " + sm1Idcs.get(ii)
+							+ ", sm1type: " + sm1Types.get(ii) + ", sm2id: "
+							+ sm2Idcs.get(ii) + ", sm2type: "
+							+ sm2Types.get(ii) + ", gId: " + gameIds.get(ii));
+		}
 		byeByes();
 	}
 
