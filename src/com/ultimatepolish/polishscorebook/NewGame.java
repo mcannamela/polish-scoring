@@ -41,6 +41,9 @@ public class NewGame extends MenuContainerActivity {
 	int venue_pos = 1;
 	int ruleSet_pos = 0;
 
+	long p1Id;
+	long p2Id;
+
 	List<Player> players = new ArrayList<Player>();
 	List<Session> sessions = new ArrayList<Session>();
 	List<Venue> venues = new ArrayList<Venue>();
@@ -76,6 +79,11 @@ public class NewGame extends MenuContainerActivity {
 		spinner_ruleSet.setOnItemSelectedListener(mRuleSetSelectedHandler);
 
 		spinner_p2.setSelection(1);
+		if (intent.hasExtra("p1") && intent.hasExtra("p2")) {
+			if (p1Id > p2Id) {
+				swapPlayers();
+			}
+		}
 	}
 
 	private OnItemSelectedListener mPlayerOneSelectedHandler = new OnItemSelectedListener() {
@@ -144,8 +152,8 @@ public class NewGame extends MenuContainerActivity {
 			if (intent.hasExtra("p1") && intent.hasExtra("p2")) {
 				spinner_p1.setEnabled(false);
 				spinner_p2.setEnabled(false);
-				long p1Id = intent.getLongExtra("p1", -1);
-				long p2Id = intent.getLongExtra("p2", -1);
+				p1Id = intent.getLongExtra("p1", -1);
+				p2Id = intent.getLongExtra("p2", -1);
 				players = pDao.queryBuilder().where().idEq(p1Id).or()
 						.idEq(p2Id).query();
 			} else {
@@ -213,6 +221,16 @@ public class NewGame extends MenuContainerActivity {
 		spinner_session.setAdapter(sAdapter);
 		spinner_venue.setAdapter(vAdapter);
 		spinner_ruleSet.setAdapter(rsAdapter);
+	}
+
+	public void swapPlayers(View vw) {
+		swapPlayers();
+	}
+
+	public void swapPlayers() {
+		int p1 = spinner_p1.getSelectedItemPosition();
+		spinner_p1.setSelection(spinner_p2.getSelectedItemPosition());
+		spinner_p2.setSelection(p1);
 	}
 
 	public void createGame(View view) {
