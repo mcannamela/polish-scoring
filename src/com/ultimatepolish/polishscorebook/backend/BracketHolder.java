@@ -66,11 +66,15 @@ public class BracketHolder implements View.OnClickListener {
 
 		foldRoster();
 		wBr = new Bracket(sMembers, rl);
+		if (isDoubleElim) {
+			wBr.labelText = "Winners Bracket";
+		}
 		wBr.buildBracket(context, this);
 
 		if (isDoubleElim) {
 			lBr = new Bracket(sMembers.size(), rl);
-			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 1, 0);
+			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 2, 0);
+			lBr.labelText = "Losers Bracket";
 			lBr.seedFromParentBracket(wBr);
 			lBr.buildBracket(context, 82, wBr.lowestViewId(), 1, this);
 		}
