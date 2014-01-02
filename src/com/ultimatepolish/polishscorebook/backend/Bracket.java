@@ -119,6 +119,23 @@ public class Bracket {
 		}
 	}
 
+	public void updateFromParentBracket(Bracket br) {
+		int respawnId;
+		for (int idx = 0; idx < matchIds.size() - 1; idx++) {
+			respawnId = sm1Idcs.get(idx);
+			if (respawnId >= 0 && !br.matchIds.contains(respawnId)) {
+				sm1Types.set(idx, BrNodeType.BYE);
+				sm1Idcs.set(idx, -1);
+			}
+			respawnId = sm2Idcs.get(idx);
+			if (respawnId >= 0 && !br.matchIds.contains(respawnId)) {
+				sm2Types.set(idx, BrNodeType.BYE);
+				sm2Idcs.set(idx, -1);
+			}
+		}
+		byeByes();
+	}
+
 	private void makeInvisibleHeaders(int baseWidth, int tierWidth,
 			int aboveViewId, int columnViewId) {
 		// invisible headers are for spacing the bracket.
@@ -509,8 +526,11 @@ public class Bracket {
 
 				sm2Idcs.add(-1);
 				if (tier == 0) {
+
 					sm2Types.add(BrNodeType.BYE);
 				} else {
+					Log.i(LOGTAG, "Tier is " + tier + ", type"
+							+ BrNodeType.UNSET);
 					sm2Types.add(BrNodeType.UNSET);
 				}
 			} else {
@@ -540,32 +560,43 @@ public class Bracket {
 
 		// last match is actually just the winner
 		sm2Types.set(sm2Types.size() - 1, BrNodeType.NA);
-
+		Log.i(LOGTAG, "Finished seeding");
 		byeByes();
 	}
 
 	private void byeByes() {
-		// get rid of bye matches
+		// remove of bye matches
 		int childViewId;
 		int childMatchId;
 		int childIdx;
+		int promoteIdx;
+		int promoteType;
 
 		// promote players with a bye
 		for (int ii = 0; ii < matchIds.size(); ii++) {
-			if (sm2Types.get(ii) == BrNodeType.BYE) {
+			if (sm1Types.get(ii) == BrNodeType.BYE
+					|| sm2Types.get(ii) == BrNodeType.BYE) {
 				childViewId = getChildViewId(matchIds.get(ii));
 				childMatchId = childViewId % BrNodeType.MOD;
 				childIdx = matchIds.indexOf(childMatchId);
-				Log.i(LOGTAG, "ii: " + ii + ", childViewId: " + childViewId);
+
+				if (sm1Types.get(ii) == BrNodeType.BYE) {
+					promoteIdx = sm2Idcs.get(ii);
+					promoteType = sm2Types.get(ii);
+					sm2Types.set(ii, BrNodeType.BYE);
+				} else {
+					promoteIdx = sm1Idcs.get(ii);
+					promoteType = sm1Types.get(ii);
+					sm1Types.set(ii, BrNodeType.BYE);
+				}
 
 				if (isUpperView(childViewId)) {
-					sm1Idcs.set(childIdx, sm1Idcs.get(ii));
-					sm1Types.set(childIdx, sm1Types.get(ii));
+					sm1Idcs.set(childIdx, promoteIdx);
+					sm1Types.set(childIdx, promoteType);
 				} else {
-					sm2Idcs.set(childIdx, sm1Idcs.get(ii));
-					sm2Types.set(childIdx, sm1Types.get(ii));
+					sm2Idcs.set(childIdx, promoteIdx);
+					sm2Types.set(childIdx, promoteType);
 				}
-				sm1Types.set(ii, BrNodeType.BYE);
 			}
 		}
 
@@ -583,7 +614,7 @@ public class Bracket {
 					"mIdx: " + matchIds.get(ii) + ", sm1id: " + sm1Idcs.get(ii)
 							+ ", sm1type: " + sm1Types.get(ii) + ", sm2id: "
 							+ sm2Idcs.get(ii) + ", sm2type: "
-							+ sm1Types.get(ii) + ", gId: " + gameIds.get(ii));
+							+ sm2Types.get(ii) + ", gId: " + gameIds.get(ii));
 		}
 	}
 
