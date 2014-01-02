@@ -77,7 +77,6 @@ public class BracketHolder implements View.OnClickListener {
 			}
 
 			lBr = new Bracket(sMembers.size(), rl);
-			// lBr = new Bracket(8, rl);
 			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 1,
 					sMembers.size());
 			lBr.buildBracket(context, 82, wBrLowest, 1);
