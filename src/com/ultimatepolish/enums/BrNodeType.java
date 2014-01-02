@@ -1,5 +1,9 @@
 package com.ultimatepolish.enums;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /** Enum for the nodes in a bracket */
 public final class BrNodeType {
 	// These are the different types. Negative numbers used to avoid conflict
@@ -19,6 +23,16 @@ public final class BrNodeType {
 	public static final int L2U = -1000;
 	public static final int MOD = 1000;
 
-	public static final String[] typeString = { "Tip", "Win", "Loss", "Bye",
-			"Unset", "Respawn", "NA" };
+	public static final Map<Integer, String> map;
+	static {
+		Map<Integer, String> tempMap = new HashMap<Integer, String>();
+		tempMap.put(TIP, "Tip");
+		tempMap.put(WIN, "Win");
+		tempMap.put(LOSS, "Loss");
+		tempMap.put(BYE, "Bye");
+		tempMap.put(UNSET, "Unset");
+		tempMap.put(RESPAWN, "Respawn");
+		tempMap.put(NA, "N/A");
+		map = Collections.unmodifiableMap(tempMap);
+	}
 }
