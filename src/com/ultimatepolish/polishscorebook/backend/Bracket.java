@@ -158,7 +158,7 @@ public class Bracket {
 				if (br.sm1Types.get(matchIdx) == BrNodeType.LOSS) {
 					sm1Idcs.set(idx, br.sm1Idcs.get(matchIdx));
 					sm1Types.set(idx, BrNodeType.TIP);
-				} else {
+				} else if (br.sm2Types.get(matchIdx) == BrNodeType.LOSS) {
 					sm1Idcs.set(idx, br.sm2Idcs.get(matchIdx));
 					sm1Types.set(idx, BrNodeType.TIP);
 				}
@@ -171,12 +171,14 @@ public class Bracket {
 				if (br.sm1Types.get(matchIdx) == BrNodeType.LOSS) {
 					sm2Idcs.set(idx, br.sm1Idcs.get(matchIdx));
 					sm2Types.set(idx, BrNodeType.TIP);
-				} else {
+				} else if (br.sm2Types.get(matchIdx) == BrNodeType.LOSS) {
 					sm2Idcs.set(idx, br.sm2Idcs.get(matchIdx));
 					sm2Types.set(idx, BrNodeType.TIP);
 				}
 			}
 		}
+
+		logMatchList("Matches after respawn: ");
 	}
 
 	private void makeInvisibleHeaders(int baseWidth, int tierWidth,
@@ -657,14 +659,7 @@ public class Bracket {
 			}
 		}
 
-		Log.i(LOGTAG, "Final list:");
-		for (int ii = 0; ii < matchIds.size(); ii++) {
-			Log.i(LOGTAG,
-					"mIdx: " + matchIds.get(ii) + ", sm1id: " + sm1Idcs.get(ii)
-							+ ", sm1type: " + sm1Types.get(ii) + ", sm2id: "
-							+ sm2Idcs.get(ii) + ", sm2type: "
-							+ sm2Types.get(ii) + ", gId: " + gameIds.get(ii));
-		}
+		logMatchList("Matches after removing byes: ");
 	}
 
 	public List<Game> matchMatches(List<Game> sGames) {
@@ -838,7 +833,7 @@ public class Bracket {
 			}
 
 			// lower player
-			if (sm2Type == BrNodeType.UNSET || sm1Type == BrNodeType.RESPAWN) {
+			if (sm2Type == BrNodeType.UNSET || sm2Type == BrNodeType.RESPAWN) {
 				marquee += " -vs- Unknown";
 			} else if (sm2Type == BrNodeType.NA) {
 				marquee += ", tournament winner.";
@@ -862,5 +857,18 @@ public class Bracket {
 			n++;
 		}
 		return n;
+	}
+
+	private void logMatchList(String header) {
+		Log.i(LOGTAG, header);
+		for (int ii = 0; ii < matchIds.size(); ii++) {
+			Log.i(LOGTAG,
+					"(" + ii + ") Match " + matchIds.get(ii) + ", p1Seed: "
+							+ sm1Idcs.get(ii) + " ("
+							+ BrNodeType.map.get(sm1Types.get(ii))
+							+ "), p2Seed: " + sm2Idcs.get(ii) + " ("
+							+ BrNodeType.map.get(sm2Types.get(ii)) + "), gId: "
+							+ gameIds.get(ii));
+		}
 	}
 }
