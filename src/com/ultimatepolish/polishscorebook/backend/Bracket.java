@@ -385,7 +385,10 @@ public class Bracket {
 			if (matchIds.contains(baseId) && baseId != matchId) {
 				viewAboveId = baseId + matchIdOffset + BrNodeType.UPPER;
 			} else {
-				if (baseId > getTopMatchOfTier(getTier(baseId))) {
+				while (getTier(baseId) > 0) {
+					baseId = getUpperMatchParent(baseId);
+				}
+				if (baseId > 0) {
 					// have to keep track of upper/lower now
 					baseId += BrNodeType.LOWER - 1; // lower arm of the match
 					// above
