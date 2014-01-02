@@ -119,7 +119,10 @@ public class Bracket {
 		}
 	}
 
-	public void updateFromParentBracket(Bracket br) {
+	public void seedFromParentBracket(Bracket br) {
+		this.smIdMap = br.smIdMap;
+		this.smSeedMap = br.smSeedMap;
+
 		int respawnId;
 		for (int idx = 0; idx < matchIds.size() - 1; idx++) {
 			respawnId = sm1Idcs.get(idx);
@@ -134,6 +137,40 @@ public class Bracket {
 			}
 		}
 		byeByes();
+	}
+
+	public void respawnFromParentBracket(Bracket br) {
+		int respawnId;
+		int nodeType;
+		int matchIdx;
+
+		for (int idx = 0; idx < matchIds.size() - 1; idx++) {
+			respawnId = sm1Idcs.get(idx);
+			nodeType = sm1Types.get(idx);
+			matchIdx = br.matchIds.indexOf(respawnId);
+			if (nodeType == BrNodeType.RESPAWN && br.gameIds.get(matchIdx) > 0) {
+				if (br.sm1Types.get(matchIdx) == BrNodeType.LOSS) {
+					sm1Idcs.set(idx, br.sm1Idcs.get(matchIdx));
+					sm1Types.set(idx, BrNodeType.TIP);
+				} else {
+					sm1Idcs.set(idx, br.sm2Idcs.get(matchIdx));
+					sm1Types.set(idx, BrNodeType.TIP);
+				}
+			}
+
+			respawnId = sm2Idcs.get(idx);
+			nodeType = sm2Types.get(idx);
+			matchIdx = br.matchIds.indexOf(respawnId);
+			if (nodeType == BrNodeType.RESPAWN && br.gameIds.get(matchIdx) > 0) {
+				if (br.sm1Types.get(matchIdx) == BrNodeType.LOSS) {
+					sm2Idcs.set(idx, br.sm1Idcs.get(matchIdx));
+					sm2Types.set(idx, BrNodeType.TIP);
+				} else {
+					sm2Idcs.set(idx, br.sm2Idcs.get(matchIdx));
+					sm2Types.set(idx, BrNodeType.TIP);
+				}
+			}
+		}
 	}
 
 	private void makeInvisibleHeaders(int baseWidth, int tierWidth,
