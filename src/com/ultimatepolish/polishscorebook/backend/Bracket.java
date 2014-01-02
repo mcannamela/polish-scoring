@@ -1,6 +1,7 @@
 package com.ultimatepolish.polishscorebook.backend;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -519,29 +520,24 @@ public class Bracket {
 		}
 
 		// For every other tier, the order is swapped
-		int idxA = (int) (3 * nLeafs / Math.pow(2, 4));
+		int ii = (int) (Math.pow(2, (factorTwos(nLeafs) - 3) / 2));
+		int idxA = 3 * ii;
 		int idxB;
-		int ii = 3;
-		while (idxA < sm1Idcs.size()) {
-			for (int jj = 0; jj < nLeafs / Math.pow(2, ii + 2); jj++) {
-				idxB = (int) (idxA + nLeafs / Math.pow(2, ii + 1) - 1 - jj);
-				Log.i("Swapping", "Swap " + idxA + " with " + idxB);
-				// Collections.swap(sm1Idcs, idxA + jj, idxB);
+
+		if (ii > 0) {
+			while (idxA < sm1Idcs.size() - 1) {
+				for (int jj = 0; jj < ii / 2; jj++) {
+					idxB = (int) (idxA + ii - 1 - jj);
+					Collections.swap(sm1Idcs, idxA + jj, idxB);
+				}
+				idxA += (9 * ii) / 4;
+				ii /= 4;
 			}
-			idxA += 3 * nLeafs / Math.pow(2, ii + 1);
 		}
 
 		// last match is actually just the winner
 		sm2Types.set(sm2Types.size() - 1, BrNodeType.NA);
 
-		Log.i("Crunch", "Initial list:");
-		for (ii = 0; ii < matchIds.size(); ii++) {
-			Log.i("Crunch",
-					"mIdx: " + matchIds.get(ii) + ", sm1id: " + sm1Idcs.get(ii)
-							+ ", sm1type: " + sm1Types.get(ii) + ", sm2id: "
-							+ sm2Idcs.get(ii) + ", sm2type: "
-							+ sm2Types.get(ii) + ", gId: " + gameIds.get(ii));
-		}
 		byeByes();
 	}
 
@@ -550,15 +546,6 @@ public class Bracket {
 		int childViewId;
 		int childMatchId;
 		int childIdx;
-
-		Log.i("Crunch", "Initial list:");
-		for (int ii = 0; ii < matchIds.size(); ii++) {
-			Log.i("Crunch",
-					"mIdx: " + matchIds.get(ii) + ", sm1id: " + sm1Idcs.get(ii)
-							+ ", sm1type: " + sm1Types.get(ii) + ", sm2id: "
-							+ sm2Idcs.get(ii) + ", sm2type: "
-							+ sm2Types.get(ii) + ", gId: " + gameIds.get(ii));
-		}
 
 		// promote players with a bye
 		for (int ii = 0; ii < matchIds.size(); ii++) {
