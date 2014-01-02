@@ -26,9 +26,10 @@ public class Bracket {
 	public static String LOGTAG = "Bracket";
 
 	public boolean isDoubleElim;
+	public String labelText = "";
 	private int headerIdOffset = 0;
 	private int matchIdOffset = 0;
-	private int topMatchId;
+	private int lastMatchId;
 	private int nLeafs;
 	private Map<Long, Integer> smIdMap = new HashMap<Long, Integer>();
 	private Map<Integer, SessionMember> smSeedMap = new HashMap<Integer, SessionMember>();
@@ -44,7 +45,7 @@ public class Bracket {
 		// fast check that nLeafs is a power of two
 		this.nLeafs = sMembers.size();
 		this.rl = rl;
-		this.topMatchId = nLeafs - 1;
+		this.lastMatchId = nLeafs - 1;
 		assert (nLeafs & (nLeafs - 1)) == 0;
 		seed(sMembers);
 
@@ -67,7 +68,7 @@ public class Bracket {
 		// fast check that nLeafs is a power of two
 		this.nLeafs = (int) Math.pow(2, 2 * factorTwos(nLeafs) - 1);
 		this.rl = rl;
-		this.topMatchId = nLeafs - 1;
+		this.lastMatchId = nLeafs - 1;
 		assert (nLeafs & (nLeafs - 1)) == 0;
 		seed();
 
@@ -86,7 +87,7 @@ public class Bracket {
 		assert matchIdOffset - this.matchIdOffset >= 0;
 		this.headerIdOffset = headerIdOffset;
 		this.matchIdOffset = matchIdOffset;
-		this.topMatchId = nLeafs - 1 + matchIdOffset;
+		this.lastMatchId = nLeafs - 1 + matchIdOffset;
 	}
 
 	public void buildBracket(Context context, OnClickListener mListener) {
@@ -187,14 +188,47 @@ public class Bracket {
 		TextView tv;
 		RelativeLayout.LayoutParams lp;
 		Context context = rl.getContext();
-
 		int vwHeight = 0;
+
+		// bracket label view
+		tv = new TextView(context);
+		tv.setText(labelText);
+		tv.setTextAppearance(context, android.R.style.TextAppearance_Large);
+		tv.setId(1 + headerIdOffset);
+		tv.setPadding(0, 40, 0, 0);
+		lp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 1);
+
+		if (aboveViewId > 0) {
+			lp.addRule(RelativeLayout.BELOW, aboveViewId);
+
+		}
+		if (labelText == "") {
+			tv.setHeight(0);
+		}
+		rl.addView(tv, lp);
+
+		// horizontal rule
+		tv = new TextView(context);
+		tv.setHeight(2);
+		// tv.setId(1 + headerIdOffset);
+		tv.setPadding(10, 10, 10, 10);
+		tv.setBackgroundColor(Color.BLACK);
+		lp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.MATCH_PARENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 1);
+		lp.addRule(RelativeLayout.BELOW, 1 + headerIdOffset);
+
+		rl.addView(tv, lp);
 
 		// header for the labeled brackets on tier 0
 		tv = new TextView(context);
 		tv.setWidth(baseWidth);
 		tv.setHeight(vwHeight);
-		tv.setId(1 + headerIdOffset);
+		tv.setId(2 + headerIdOffset);
 		tv.setBackgroundColor(Color.BLACK);
 		lp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -204,9 +238,10 @@ public class Bracket {
 		} else {
 			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 1);
 		}
-		if (aboveViewId > 0) {
-			lp.addRule(RelativeLayout.BELOW, aboveViewId);
-		}
+
+		lp.addRule(RelativeLayout.BELOW, 1 + headerIdOffset);
+		lp.setMargins(0, 10, 0, 0);
+
 		rl.addView(tv, lp);
 
 		// headers for the remaining tiers
@@ -229,11 +264,11 @@ public class Bracket {
 				tv.setWidth(tierWidth);
 			}
 			tv.setHeight(vwHeight);
-			tv.setId(i + 2 + headerIdOffset);
+			tv.setId(i + 3 + headerIdOffset);
 			tv.setBackgroundColor(vwColor[i % 3]);
 
-			lp.addRule(RelativeLayout.ALIGN_BASELINE, 1 + headerIdOffset);
-			lp.addRule(RelativeLayout.RIGHT_OF, i + 1 + headerIdOffset);
+			lp.addRule(RelativeLayout.ALIGN_BASELINE, 2 + headerIdOffset);
+			lp.addRule(RelativeLayout.RIGHT_OF, i + 2 + headerIdOffset);
 			lp.setMargins(-14, 0, 0, 0);
 			rl.addView(tv, lp);
 		}
@@ -297,7 +332,7 @@ public class Bracket {
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 		if (!isLabeled) {
-			lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 1 + headerIdOffset);
+			lp.addRule(RelativeLayout.ALIGN_LEFT, tier + 2 + headerIdOffset);
 			if (tier == getTier(nLeafs - 1)) {
 				lp.setMargins(0, -25, 0, 0);
 			} else if (upper) {
@@ -319,7 +354,7 @@ public class Bracket {
 			}
 		}
 
-		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 1 + headerIdOffset);
+		lp.addRule(RelativeLayout.ALIGN_RIGHT, tier + 2 + headerIdOffset);
 		lp.addRule(RelativeLayout.BELOW, findViewAbove(tv.getId()));
 
 		rl.addView(tv, lp);
@@ -446,7 +481,7 @@ public class Bracket {
 	public int findViewAbove(int viewId) {
 		Integer matchId = viewId % BrNodeType.MOD - matchIdOffset;
 
-		Integer viewAboveId = headerIdOffset + 1;
+		Integer viewAboveId = headerIdOffset + 2;
 
 		if (!isUpperView(viewId)) {
 			viewAboveId = matchId + matchIdOffset + BrNodeType.UPPER;
