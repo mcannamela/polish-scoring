@@ -343,13 +343,18 @@ public class Bracket {
 			drwColor = Color.LTGRAY;
 			isLabeled = tv.getText() != "";
 
-			if (smType != BrNodeType.UNSET) {
+			if (smType != BrNodeType.UNSET && smType != BrNodeType.RESPAWN) {
 				drwColor = smSeedMap.get(sm1Idcs.get(idx)).getPlayer().color;
 			}
 			if (smType == BrNodeType.LOSS) {
 				drwString += "_eliminated";
 			}
 			if (isLabeled) {
+				if (sm1Types.get(idx) != BrNodeType.RESPAWN) {
+					String nickname = smSeedMap.get(sm1Idcs.get(idx))
+							.getPlayer().getNickName();
+					tv.setText(nickname);
+				}
 				drwString += "_labeled";
 				if (smLost(sm1Idcs.get(idx))) {
 					tv.setPaintFlags(tv.getPaintFlags()
@@ -372,13 +377,18 @@ public class Bracket {
 				drwColor = Color.LTGRAY;
 				isLabeled = tv.getText() != "";
 
-				if (smType != BrNodeType.UNSET) {
+				if (smType != BrNodeType.UNSET && smType != BrNodeType.RESPAWN) {
 					drwColor = smSeedMap.get(sm2Idcs.get(idx)).getPlayer().color;
 				}
 				if (smType == BrNodeType.LOSS) {
 					drwString += "_eliminated";
 				}
 				if (isLabeled) {
+					if (sm2Types.get(idx) != BrNodeType.RESPAWN) {
+						String nickname = smSeedMap.get(sm2Idcs.get(idx))
+								.getPlayer().getNickName();
+						tv.setText(nickname);
+					}
 					drwString += "_labeled";
 					if (smLost(sm2Idcs.get(idx))) {
 						tv.setPaintFlags(tv.getPaintFlags()
@@ -684,7 +694,7 @@ public class Bracket {
 				}
 			}
 
-			if (g.getIsComplete()) {
+			if (g.getIsComplete() && gameIds.contains(gId)) {
 				smASeed = smIdMap.get(g.getWinner().getId());
 				promoteWinner(gameIds.indexOf(g.getId()), smASeed);
 			}
@@ -734,22 +744,24 @@ public class Bracket {
 	}
 
 	private Boolean hasSm(int idx, int smIdx) {
-		if (sm1Idcs.get(idx) == smIdx || sm2Idcs.get(idx) == smIdx) {
-			return true;
-		} else {
-			return false;
+		Boolean hasSm = false;
+		if (sm1Idcs.get(idx) == smIdx
+				&& sm1Types.get(idx) != BrNodeType.RESPAWN) {
+			hasSm = true;
+		} else if (sm2Idcs.get(idx) == smIdx
+				&& sm2Types.get(idx) != BrNodeType.RESPAWN) {
+			hasSm = true;
 		}
+		return hasSm;
 	}
 
 	public Integer lowestViewId() {
 		int viewId = nLeafs / 2 - 1 + matchIdOffset + BrNodeType.LOWER;
 
-		Log.i(LOGTAG, "start view is " + viewId);
 		while (!matchIds.contains(viewId % BrNodeType.MOD)) {
 			viewId = getChildViewId(viewId);
 			Log.i(LOGTAG, "then " + viewId);
 		}
-		Log.i(LOGTAG, "matchOffset: " + matchIdOffset + ", lowest " + viewId);
 		return viewId;
 	}
 
