@@ -19,8 +19,8 @@ import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.db.Session;
 import com.ultimatepolish.enums.RuleType;
 import com.ultimatepolish.enums.SessionType;
+import com.ultimatepolish.polishscorebook.backend.Bracket.MatchInfo;
 import com.ultimatepolish.polishscorebook.backend.BracketHolder;
-import com.ultimatepolish.polishscorebook.backend.BracketHolder.MatchInfo;
 import com.ultimatepolish.polishscorebook.backend.MenuContainerActivity;
 
 public class Detail_Session extends MenuContainerActivity {
@@ -67,7 +67,8 @@ public class Detail_Session extends MenuContainerActivity {
 			bracket = new BracketHolder(sv, s, isDblElim) {
 				@Override
 				public void onClick(View v) {
-					mInfo = bracket.getMatchInfo(v.getId());
+					mInfo = getMatchInfo(v.getId());
+
 					matchText.setText(mInfo.marquee);
 					if (mInfo.allowCreate) {
 						loadMatch.setVisibility(View.VISIBLE);
