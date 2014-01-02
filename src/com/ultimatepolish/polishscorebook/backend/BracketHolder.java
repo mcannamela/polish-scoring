@@ -18,6 +18,7 @@ import com.ultimatepolish.db.Player;
 import com.ultimatepolish.db.Session;
 import com.ultimatepolish.db.SessionMember;
 import com.ultimatepolish.enums.BrNodeType;
+import com.ultimatepolish.polishscorebook.backend.Bracket.MatchInfo;
 
 public class BracketHolder implements View.OnClickListener {
 	public static String LOGTAG = "BracketHolder";
@@ -65,22 +66,13 @@ public class BracketHolder implements View.OnClickListener {
 
 		foldRoster();
 		wBr = new Bracket(sMembers, rl);
-		wBr.buildBracket(context);
+		wBr.buildBracket(context, this);
 
 		if (isDoubleElim) {
-			int wBrLowest;
-			if (wBr.matchIds.contains(sMembers.size() / 2)) {
-				wBrLowest = sMembers.size() / 2 - 1 + BrNodeType.LOWER;
-			} else {
-				wBrLowest = wBr.findViewAbove(sMembers.size() / 2 - 1
-						+ BrNodeType.LOWER);
-			}
-
 			lBr = new Bracket(sMembers.size(), rl);
-			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 1,
-					sMembers.size());
+			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 1, 0);
 			lBr.seedFromParentBracket(wBr);
-			lBr.buildBracket(context, 82, wBrLowest, 1);
+			lBr.buildBracket(context, 82, wBr.lowestViewId(), 1, this);
 		}
 	}
 
@@ -136,87 +128,23 @@ public class BracketHolder implements View.OnClickListener {
 		}
 	}
 
+	public MatchInfo getMatchInfo(int viewId) {
+		MatchInfo mInfo = wBr.getMatchInfo(viewId);
+
+		if (isDoubleElim) {
+			if (lBr.hasView(viewId)) {
+				mInfo = lBr.getMatchInfo(viewId);
+			}
+			// else if (fBr.hasView(viewId)) {
+			// mInfo = fBr.getMatchInfo(viewId);
+			// }
+		}
+
+		return mInfo;
+	}
+
 	@Override
 	public void onClick(View v) {
 		Log.i(LOGTAG, "View " + v.getId() + " was clicked");
 	}
-
-	public MatchInfo getMatchInfo(int viewId) {
-		MatchInfo mInfo = new MatchInfo();
-		int matchId = viewId % BrNodeType.MOD;
-		if (wBr.matchIds.contains(matchId)) {
-			int idx = wBr.matchIds.indexOf(matchId);
-			mInfo = new MatchInfo(wBr, idx);
-		}
-		return mInfo;
-	}
-
-	public class MatchInfo {
-		public long gameId = -1;
-		public long p1Id = -1;
-		public long p2Id = -1;
-		public boolean allowCreate = false;
-		public boolean allowView = false;
-		public String marquee = "";
-
-		MatchInfo() {
-		}
-
-		MatchInfo(Bracket bd, int idx) {
-			gameId = bd.gameIds.get(idx);
-			int sm1Type = bd.sm1Types.get(idx);
-			int sm2Type = bd.sm2Types.get(idx);
-
-			if (sm1Type == BrNodeType.TIP || sm1Type == BrNodeType.WIN
-					|| sm1Type == BrNodeType.LOSS) {
-				p1Id = sMembers.get(bd.sm1Idcs.get(idx)).getPlayer().getId();
-			}
-
-			if (sm2Type == BrNodeType.TIP || sm2Type == BrNodeType.WIN
-					|| sm2Type == BrNodeType.LOSS) {
-				p2Id = sMembers.get(bd.sm2Idcs.get(idx)).getPlayer().getId();
-			}
-
-			if (sm1Type == BrNodeType.TIP && sm2Type == BrNodeType.TIP) {
-				allowCreate = true;
-			}
-
-			if (sm1Type == BrNodeType.WIN || sm1Type == BrNodeType.LOSS) {
-				assert sm2Type == BrNodeType.WIN || sm2Type == BrNodeType.LOSS;
-				allowView = true;
-			}
-
-			marquee += "[ " + bd.matchIds.get(idx) + " / " + gameId + " ] ";
-
-			// upper player
-			if (sm1Type == BrNodeType.UNSET) {
-				marquee += "Unknown";
-			} else {
-				marquee += sMembers.get(bd.sm1Idcs.get(idx)).getPlayer()
-						.getNickName();
-				if (sm1Type == BrNodeType.WIN) {
-					marquee += " (W)";
-				} else if (sm1Type == BrNodeType.LOSS) {
-					marquee += " (L)";
-				}
-			}
-
-			// lower player
-			if (sm2Type == BrNodeType.UNSET) {
-				marquee += " -vs- Unknown";
-			} else if (sm2Type == BrNodeType.NA) {
-				marquee += ", tournament winner.";
-			} else {
-				marquee += " -vs- "
-						+ sMembers.get(bd.sm2Idcs.get(idx)).getPlayer()
-								.getNickName();
-				if (sm2Type == BrNodeType.WIN) {
-					marquee += " (W)";
-				} else if (sm2Type == BrNodeType.LOSS) {
-					marquee += " (L)";
-				}
-			}
-		}
-	}
-
 }
