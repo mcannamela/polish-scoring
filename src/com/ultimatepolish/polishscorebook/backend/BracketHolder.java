@@ -79,7 +79,7 @@ public class BracketHolder implements View.OnClickListener {
 			lBr = new Bracket(sMembers.size(), rl);
 			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 1,
 					sMembers.size());
-			lBr.updateFromParentBracket(wBr);
+			lBr.seedFromParentBracket(wBr);
 			lBr.buildBracket(context, 82, wBrLowest, 1);
 		}
 	}
@@ -102,7 +102,8 @@ public class BracketHolder implements View.OnClickListener {
 		wBr.refreshViews();
 
 		if (isDoubleElim) {
-			// sGamesList = lBr.matchMatches(sGamesList);
+			lBr.respawnFromParentBracket(wBr);
+			sGamesList = lBr.matchMatches(sGamesList);
 			// lBr.refreshViews();
 			// sGamesList = fBr.matchMatches(sGamesList);
 			// fBr.refreshWinnersBracket();
