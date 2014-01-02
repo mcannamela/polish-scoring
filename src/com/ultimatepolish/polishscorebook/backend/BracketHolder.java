@@ -96,7 +96,7 @@ public class BracketHolder implements View.OnClickListener {
 		if (isDoubleElim) {
 			lBr.respawnFromParentBracket(wBr);
 			sGamesList = lBr.matchMatches(sGamesList);
-			// lBr.refreshViews();
+			lBr.refreshViews();
 			// sGamesList = fBr.matchMatches(sGamesList);
 			// fBr.refreshWinnersBracket();
 		}
