@@ -24,7 +24,7 @@ public class BracketHolder implements View.OnClickListener {
 	public static String LOGTAG = "BracketHolder";
 	public Context context;
 	private Session s;
-	public RelativeLayout rl;
+	private RelativeLayout rl;
 	private List<SessionMember> sMembers = new ArrayList<SessionMember>();
 	private Boolean isDoubleElim;
 	private Bracket wBr; // winners bracket
@@ -62,7 +62,6 @@ public class BracketHolder implements View.OnClickListener {
 		}
 
 		rl = new RelativeLayout(context);
-		this.context = rl.getContext();
 
 		foldRoster();
 		wBr = new Bracket(sMembers, rl);
@@ -72,12 +71,19 @@ public class BracketHolder implements View.OnClickListener {
 		wBr.buildBracket(context, this);
 
 		if (isDoubleElim) {
-			lBr = new Bracket(sMembers.size(), rl);
-			lBr.changeOffsets(Bracket.factorTwos(sMembers.size()) + 2, 0);
+			lBr = new Bracket(sMembers.size(), false, rl);
+			lBr.changeOffsets(wBr.lastHeaderId, 0);
 			lBr.labelText = "Losers Bracket";
 			lBr.seedFromParentBracket(wBr);
 			lBr.buildBracket(context, 82, wBr.lowestViewId(), 1, this);
+
+			fBr = new Bracket(sMembers.size(), true, rl);
+			fBr.changeOffsets(lBr.lastHeaderId, lBr.lastMatchId + 1);
+			fBr.labelText = "Finals";
+			fBr.copyBracketMaps(wBr);
+			fBr.buildBracket(context, 82, lBr.lowestViewId(), 1, this);
 		}
+		sv.addView(rl);
 	}
 
 	public void refreshBrackets() {
@@ -101,8 +107,11 @@ public class BracketHolder implements View.OnClickListener {
 			lBr.respawnFromParentBracket(wBr);
 			sGamesList = lBr.matchMatches(sGamesList);
 			lBr.refreshViews();
-			// sGamesList = fBr.matchMatches(sGamesList);
-			// fBr.refreshWinnersBracket();
+
+			fBr.respawnFromParentBracket(wBr);
+			fBr.respawnFromParentBracket(lBr);
+			sGamesList = fBr.matchMatches(sGamesList);
+			fBr.refreshViews();
 		}
 		assert sGamesList.isEmpty();
 	}
@@ -138,10 +147,9 @@ public class BracketHolder implements View.OnClickListener {
 		if (isDoubleElim) {
 			if (lBr.hasView(viewId)) {
 				mInfo = lBr.getMatchInfo(viewId);
+			} else if (fBr.hasView(viewId)) {
+				mInfo = fBr.getMatchInfo(viewId);
 			}
-			// else if (fBr.hasView(viewId)) {
-			// mInfo = fBr.getMatchInfo(viewId);
-			// }
 		}
 
 		return mInfo;
