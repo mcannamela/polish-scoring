@@ -16,7 +16,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/polish-scoring/libs/docs/ormlite-core-4.47-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/android-support-v13.jar"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/android-support-v13.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
