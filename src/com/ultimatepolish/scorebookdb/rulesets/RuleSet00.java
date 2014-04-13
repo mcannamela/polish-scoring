@@ -67,93 +67,119 @@ public class RuleSet00 implements RuleSet {
 		int[] diffs = { 0, 0 };
 		switch (t.throwResult) {
 		case ThrowResult.NA:
-			if (t.throwType == ThrowType.TRAP) {
-				diffs[0] = -1;
-			} else if (isOnFire(t)) {
-				if (!t.isTipped) {
-					switch (t.throwType) {
-					case ThrowType.BOTTLE:
-						diffs[0] = 3;
-						break;
-					case ThrowType.CUP:
-					case ThrowType.POLE:
-						diffs[0] = 2;
-						break;
-					}
-				}
-			}
+			handleNA(t, diffs);
 			break;
 		case ThrowResult.DROP:
-			if (!t.isLineFault) {
-				switch (t.throwType) {
-				case ThrowType.STRIKE:
-					if (!isDropScoreBlocked(t) && t.deadType == DeadType.ALIVE) {
-						diffs[0] = 1;
-					}
-					break;
-				case ThrowType.POLE:
-				case ThrowType.CUP:
-					if (!t.isTipped) {
-						diffs[0] = 2;
-						if (t.isGoaltend) {
-							// if goaltended, an extra point for dropping disc
-							diffs[0] += 1;
-						}
-					}
-					break;
-				case ThrowType.BOTTLE:
-					if (!t.isTipped) {
-						diffs[0] = 3;
-						if (t.isGoaltend) {
-							// if goaltended, an extra point for dropping disc
-							diffs[0] += 1;
-						}
-					}
-					break;
-				default:
-					break;
-				}
-			}
+			handleDrop(t, diffs);
 			break;
 		case ThrowResult.CATCH:
-			if (!t.isLineFault) {
-				switch (t.throwType) {
-				case ThrowType.POLE:
-				case ThrowType.CUP:
-					if (!t.isTipped) {
-						if (t.isGoaltend) {
-							// if goaltended, award points for hit
-							diffs[0] = 2;
-						}
-					}
-					break;
-				case ThrowType.BOTTLE:
-					if (!t.isTipped) {
-						if (t.isGoaltend) {
-							// if goaltended, award points for hit
-							diffs[0] = 3;
-						}
-					}
-					break;
-				default:
-					break;
-				}
-			}
+			handleCatch(t, diffs);
 			break;
 		case ThrowResult.STALWART:
-			if (isStackHit(t)) {
-				diffs[1] = 1;
-			}
+			handleStalwart(t, diffs);
 			break;
 		case ThrowResult.BROKEN:
-			if (!t.isLineFault) {
-				diffs[0] = 20;
-			}
+			handleBroken(t, diffs);
 			break;
 		default:
 			break;
 		}
+		
+		handleExtra(t, diffs);
 
+		return diffs;
+	}
+
+	protected void handleBroken(Throw t, int[] diffs) {
+		if (!t.isLineFault) {
+			diffs[0] = 20;
+		}
+	}
+
+	protected void handleStalwart(Throw t, int[] diffs) {
+		if (isStackHit(t)) {
+			diffs[1] = 1;
+		}
+	}
+
+	protected void handleCatch(Throw t, int[] diffs) {
+		if (!t.isLineFault) {
+			switch (t.throwType) {
+			case ThrowType.POLE:
+			case ThrowType.CUP:
+				if (!t.isTipped) {
+					if (t.isGoaltend) {
+						// if goaltended, award points for hit
+						diffs[0] = 2;
+					}
+				}
+				break;
+			case ThrowType.BOTTLE:
+				if (!t.isTipped) {
+					if (t.isGoaltend) {
+						// if goaltended, award points for hit
+						diffs[0] = 3;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	protected void handleDrop(Throw t, int[] diffs) {
+		if (!t.isLineFault) {
+			switch (t.throwType) {
+			case ThrowType.STRIKE:
+				if (!isOffenseOnHill(t) && t.deadType == DeadType.ALIVE) {
+					diffs[0] = 1;
+				}
+				break;
+			case ThrowType.POLE:
+			case ThrowType.CUP:
+				if (!t.isTipped) {
+					diffs[0] = 2;
+					if (t.isGoaltend) {
+						// if goaltended, an extra point for dropping disc
+						diffs[0] += 1;
+					}
+				}
+				break;
+			case ThrowType.BOTTLE:
+				if (!t.isTipped) {
+					diffs[0] = 3;
+					if (t.isGoaltend) {
+						// if goaltended, an extra point for dropping disc
+						diffs[0] += 1;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+	protected void handleNA(Throw t, int[] diffs){
+		if (t.throwType == ThrowType.TRAP) {
+			diffs[0] = -1;
+		} else if (isOnFire(t)) {
+			if (!t.isTipped) {
+				switch (t.throwType) {
+				case ThrowType.BOTTLE:
+					diffs[0] = 3;
+					break;
+				case ThrowType.CUP:
+				case ThrowType.POLE:
+					diffs[0] = 2;
+					break;
+				}
+			}
+		}
+	}
+	
+	protected void handleExtra(Throw t, int[] diffs){
 		// extra points for other modifiers
 		if (t.isDrinkHit) {
 			diffs[1] -= 1;
@@ -185,8 +211,6 @@ public class RuleSet00 implements RuleSet {
 		if (t.isDefensiveBreakError) {
 			diffs[0] += 20;
 		}
-
-		return diffs;
 	}
 
 	public int[] getFinalScores(Throw t) {
@@ -384,19 +408,32 @@ public class RuleSet00 implements RuleSet {
 				.toArray(new Drawable[0])));
 	}
 
-	public boolean isDropScoreBlocked(Throw t) {
+	public boolean isOffenseOnHill(Throw t) {
 		boolean isBlocked = false;
 		int oScore = t.initialOffensivePlayerScore;
 		int dScore = t.initialDefensivePlayerScore;
 
 		if (oScore < 10 && dScore < 10) {
 			isBlocked = false;
-		} else if (oScore >= 10 && dScore < oScore && dScore < 10) {
+		} else if (oScore >= 10 && dScore < oScore) {
 			isBlocked = true;
-		} else if (oScore >= 10 && dScore >= 10 && oScore > dScore) {
-			isBlocked = true;
+		} else{
+			isBlocked = false;
 		}
+		return isBlocked;
+	}
+	public boolean isDefenseOnHill(Throw t) {
+		boolean isBlocked = false;
+		int oScore = t.initialOffensivePlayerScore;
+		int dScore = t.initialDefensivePlayerScore;
 
+		if (oScore < 10 && dScore < 10) {
+			isBlocked = false;
+		} else if (dScore >= 10 && dScore > oScore){
+			isBlocked = true;
+		} else{
+			isBlocked = false;
+		}
 		return isBlocked;
 	}
 

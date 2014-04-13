@@ -35,7 +35,7 @@ public interface RuleSet {
 	public void setThrowDrawable(Throw t, ImageView iv);
 
 	// Special Rules ==========================================================
-	public boolean isDropScoreBlocked(Throw t);
+	public boolean isOffenseOnHill(Throw t);
 
 	public boolean isFiredOn(Throw t);
 
