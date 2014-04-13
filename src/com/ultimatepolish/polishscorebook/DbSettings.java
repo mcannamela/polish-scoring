@@ -33,6 +33,7 @@ import com.dropbox.sync.android.DbxFile;
 import com.dropbox.sync.android.DbxFileInfo;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 import com.ultimatepolish.scorebookdb.DatabaseHelper;
 import com.ultimatepolish.scorebookdb.DatabaseUpgrader;
@@ -375,6 +376,11 @@ public class DbSettings extends OrmLiteFragment {
 				copyDbxFile(latestDb, getInternalPath());
 				mTestOutput.append("Loaded: " + latestDb.getPath() + '\n');
 				latestDb.close();
+				DatabaseHelper databaseHelper = null;
+				databaseHelper = OpenHelperManager.getHelper(getActivity(),
+						DatabaseHelper.class);
+				databaseHelper.close();
+				databaseHelper.getWritableDatabase();
 			} else {
 				mTestOutput.append("No database files were found.\n");
 			}

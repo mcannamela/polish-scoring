@@ -282,6 +282,12 @@ public class DatabaseUpgrader {
 				+ "offenseFireCount, defenseFireCount, initialOffensivePlayerScore, initialDefensivePlayerScore FROM temp;");
 		tDao.executeRaw("DROP TABLE temp;");
 	}
+	
+	public static void increment_11(ConnectionSource connectionSource,
+			Dao<Throw, Long> tDao) throws SQLException {
+		tDao.executeRaw(addColumn("throw", "initialOffensivePlayerHitPoints", "INTEGER", "10"));
+		tDao.executeRaw(addColumn("throw", "initialDefensivePlayerHitPoints", "INTEGER", "10"));
+	}
 
 	public static String replaceNulls(String tableName, String columnName,
 			String value) {

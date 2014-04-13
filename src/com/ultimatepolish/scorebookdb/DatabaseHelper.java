@@ -17,7 +17,7 @@ import com.ultimatepolish.polishscorebook.R;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	private static final String DATABASE_NAME = "polish.db";
-	private static final int DATABASE_VERSION = 11;
+	private static final int DATABASE_VERSION = 12;
 
 	private Dao<Player, Long> playerDao;
 	private Dao<PlayerStats, Long> playerStatsDao;
@@ -75,13 +75,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	@Override
 	public void onUpgrade(final SQLiteDatabase sqliteDatabase, final ConnectionSource connectionSource, int oldVer, final int newVer) {
-		Log.i("DatabaseHelper.onUpgrade()", "Attempting to upgrade from version " + oldVer + " to version " + newVer);
+		Log.w("DatabaseHelper.onUpgrade()", "Attempting to upgrade from version " + oldVer + " to version " + newVer);
 		
 		switch (oldVer){
 			case 9:
 				increment_09(sqliteDatabase, connectionSource);
 			case 10:
 				increment_10(sqliteDatabase, connectionSource);
+			case 11:
+				increment_11(sqliteDatabase, connectionSource);
 				break;
 			default:
 				try {
@@ -121,10 +123,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			Dao<Game, Long> gDao = getGameDao();
 			Dao<Throw, Long> tDao = getThrowDao();
 			DatabaseUpgrader.increment_10(connectionSource, gDao, tDao);
-
+			
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Unable to upgrade database from version " + 10 + " to "
 					+ 11, e);
+		}
+	}
+	private void increment_11(SQLiteDatabase sqliteDatabase, ConnectionSource connectionSource){
+		try {
+			Log.i("DatabaseHelper.increment_11", "Attempting to upgrade from version 11 to version 12");
+			// throw table
+			Dao<Throw, Long> tDao = getThrowDao();
+			DatabaseUpgrader.increment_11(connectionSource, tDao);
+
+		} catch (SQLException e) {
+			Log.e(DatabaseHelper.class.getName(), "Unable to upgrade database from version " + 11 + " to "
+					+ 12, e);
 		}
 	}
 	

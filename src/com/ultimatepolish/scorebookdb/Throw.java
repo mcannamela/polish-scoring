@@ -95,6 +95,12 @@ public class Throw implements Comparable<Throw> {
 
 	@DatabaseField
 	public int initialDefensivePlayerScore = 0;
+	
+	@DatabaseField
+	public int initialOffensivePlayerHitPoints = 10;
+	
+	@DatabaseField
+	public int initialDefensivePlayerHitPoints = 10;
 
 	public String invalidMessage = "";
 

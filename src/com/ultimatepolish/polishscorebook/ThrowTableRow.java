@@ -17,10 +17,11 @@ import com.ultimatepolish.scorebookdb.rulesets.RuleSet;
 
 public class ThrowTableRow extends TableRow {
 
-	public static int tableTextSize = 20;
+	public static int tableTextSize = 19;
 	public static int tableTextColor = Color.BLACK;
 	public static int tableBackgroundColor = Color.WHITE;
-	public static int columnWidth = 30;
+	public static int columnWidth = 28;
+	public static int scoreColumnWidth = 28;
 
 	public ThrowTableRow(Context context) {
 		super(context);
