@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TableLayout
+        android:id="@+id/TableLayout_stats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="86dp"
+        android:layout_marginTop="108dp" >
+
+    </TableLayout>
+
+    <Spinner
+        android:id="@+id/spinner_session"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TableLayout_stats" />
+
+    <DatePicker
+        android:id="@+id/datePicker_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/TableLayout_stats"
+        android:layout_toRightOf="@+id/spinner_session" />
+
+    <DatePicker
+        android:id="@+id/datePicker_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/datePicker_start"
+        android:layout_toRightOf="@+id/spinner_session" />
+
+</RelativeLayout>
