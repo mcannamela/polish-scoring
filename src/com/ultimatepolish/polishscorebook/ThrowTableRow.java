@@ -20,8 +20,10 @@ public class ThrowTableRow extends TableRow {
 	public static int tableTextSize = 19;
 	public static int tableTextColor = Color.BLACK;
 	public static int tableBackgroundColor = Color.WHITE;
-	public static int columnWidth = 28;
-	public static int scoreColumnWidth = 28;
+	public static int defaultColumnWidth = 25;
+	public static int inningColumnWidth = 75;
+	public static int specialMarksColumnWidth = 100;
+	
 
 	public ThrowTableRow(Context context) {
 		super(context);
@@ -36,14 +38,16 @@ public class ThrowTableRow extends TableRow {
 		TextView tv = new TextView(context);
 		ImageView iv = new ImageView(context);
 
+		//inning column
 		ThrowTableRow.formatTextView(tv);
 		tv.setText("--");
-		tv.setWidth(100);
-		tv.setGravity(Gravity.RIGHT);
-		tv.setPadding(0, 0, 15, 0);
+		tv.setWidth(inningColumnWidth);
+		tv.setGravity(Gravity.CENTER);
+		tv.setPadding(0, 0, 5, 0);
 
 		tr.addView(tv);
 
+		//p1 throw symbol
 		iv.setBackgroundColor(tableBackgroundColor);
 		iv.setImageDrawable(context.getResources().getDrawable(
 				R.drawable.bxs_blank));
@@ -52,12 +56,14 @@ public class ThrowTableRow extends TableRow {
 				LayoutParams.MATCH_PARENT));
 		tr.addView(iv);
 
+		//p1 special marks
 		tv = new TextView(context);
 		tv.setText("--");
 		ThrowTableRow.formatTextView(tv);
-		tv.setWidth(100);
+		tv.setWidth(specialMarksColumnWidth);
 		tr.addView(tv);
 
+		//p2 throw symbol
 		iv = new ImageView(context);
 		iv.setBackgroundColor(tableBackgroundColor);
 		iv.setImageDrawable(context.getResources().getDrawable(
@@ -67,12 +73,14 @@ public class ThrowTableRow extends TableRow {
 				LayoutParams.MATCH_PARENT));
 		tr.addView(iv);
 
+		//p1 special marks
 		tv = new TextView(context);
 		tv.setText("--");
 		ThrowTableRow.formatTextView(tv);
-		tv.setWidth(100);
+		tv.setWidth(specialMarksColumnWidth);
 		tr.addView(tv);
 
+		//p1score,p2score
 		tr.appendBlank();
 		return tr;
 	}
@@ -94,7 +102,7 @@ public class ThrowTableRow extends TableRow {
 		v.setTextSize(tableTextSize);
 		v.setBackgroundColor(tableBackgroundColor);
 		v.setGravity(Gravity.CENTER);
-		v.setWidth((int) (columnWidth * v.getResources().getDisplayMetrics().density));
+		v.setWidth((int) (defaultColumnWidth * v.getResources().getDisplayMetrics().density));
 		v.setPadding(1, 0, 1, 0);
 	}
 
