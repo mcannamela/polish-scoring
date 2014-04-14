@@ -546,9 +546,19 @@ public class GameInProgress extends MenuContainerActivity implements
 		tv.setText(ag.getP1Nick());
 		tv.setTextColor(ThrowTableRow.tableTextColor);
 		tv.setTextSize(ThrowTableRow.tableTextSize);
+		
+		tv = (TextView) findViewById(R.id.hitpoints_p1);
+		tv.setText("hp");
+		tv.setTextColor(ThrowTableRow.tableTextColor);
+		tv.setTextSize(ThrowTableRow.tableTextSize);
 
 		tv = (TextView) findViewById(R.id.header_p2);
 		tv.setText(ag.getP2Nick());
+		tv.setTextColor(ThrowTableRow.tableTextColor);
+		tv.setTextSize(ThrowTableRow.tableTextSize);
+		
+		tv = (TextView) findViewById(R.id.hitpoints_p2);
+		tv.setText("hp");
 		tv.setTextColor(ThrowTableRow.tableTextColor);
 		tv.setTextSize(ThrowTableRow.tableTextSize);
 	}
@@ -708,7 +718,24 @@ public class GameInProgress extends MenuContainerActivity implements
 		}
 		if (uiThrow.deadType > 0) {
 			deadViews[uiThrow.deadType - 1].setBackgroundColor(Color.RED);
+		} 
+		
+		TextView tv = null;
+		int hp1,hp2;
+		
+		hp1 = uiThrow.initialOffensivePlayerHitPoints;
+		hp2 = uiThrow.initialDefensivePlayerHitPoints;
+		
+		if (!uiThrow.isP1Throw()){
+			int tmp = hp1;
+			hp1 = hp2;
+			hp2 = tmp;
 		}
+		tv = (TextView) findViewById(R.id.hitpoints_p1);
+		tv.setText(""+hp1);
+		tv = (TextView) findViewById(R.id.hitpoints_p2);
+		tv.setText(""+hp2);
+		
 	}
 
 	private void setThrowButtonState(int throwType, ImageView iv) {
