@@ -165,7 +165,7 @@
         android:src="@drawable/btn_bottle"
         android:layout_toRightOf="@id/gip_button_cup"
         android:layout_below="@id/gip_dead_low"
-        android:layout_width="75dp"
+        android:layout_width="65dp"
         android:layout_height="75dp"
         android:onClick="throwTypePressed"
         android:contentDescription="bottle" />
